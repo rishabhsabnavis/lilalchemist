@@ -1,4 +1,4 @@
-# CauldronMind: The Potion Flow Monitoring Dashboard
+# PotionMaster: The Potion Flow Monitoring Dashboard
 
 **EOG × NVIDIA HackUTD 2025**
 
