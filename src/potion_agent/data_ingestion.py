@@ -11,7 +11,7 @@ import asyncio
 import math
 import random
 from collections import deque
-from datetime import datetime, timedelta
+from datetime import date, datetime, timedelta
 from typing import Deque, Iterable, List, Optional
 
 from .config import get_settings
@@ -29,14 +29,25 @@ class CauldronDataSimulator:
         base_capacity_liters: float = 500.0,
     ) -> None:
         self._rng = random.Random(42)
-        self._state = {
-            cauldron_id: {
+        # Sample coordinates for cauldrons (latitude, longitude)
+        sample_coords = [
+            (40.7128, -74.0060),  # north_tower
+            (40.7580, -73.9855),  # east_garden
+            (40.7505, -73.9934),  # grand_hall
+            (40.7282, -74.0776),  # crypt_chamber
+        ]
+        self._state = {}
+        for idx, cauldron_id in enumerate(cauldron_ids):
+            coord = sample_coords[idx % len(sample_coords)]
+            self._state[cauldron_id] = {
                 "fill_level": self._rng.uniform(0.35, 0.75) * base_capacity_liters,
                 "capacity": base_capacity_liters * self._rng.uniform(0.9, 1.1),
-                "location": cauldron_id.replace("_", " ").title(),
+                "name": cauldron_id.replace("_", " ").title(),
+                "latitude": coord[0] + self._rng.uniform(-0.01, 0.01),
+                "longitude": coord[1] + self._rng.uniform(-0.01, 0.01),
+                "fill_rate": self._rng.uniform(1.0, 6.0),  # L/min
+                "drain_rate": self._rng.uniform(10.0, 30.0),  # L/min
             }
-            for cauldron_id in cauldron_ids
-        }
         self._history: Deque[CauldronStatus] = deque(maxlen=200)
 
     def sample(self) -> List[CauldronStatus]:
@@ -53,9 +64,13 @@ class CauldronDataSimulator:
             )
             status = CauldronStatus(
                 cauldron_id=cauldron_id,
+                name=payload["name"],
                 fill_level_liters=payload["fill_level"],
                 capacity_liters=payload["capacity"],
-                location=payload["location"],
+                latitude=payload["latitude"],
+                longitude=payload["longitude"],
+                fill_rate_liters_per_min=payload["fill_rate"],
+                drain_rate_liters_per_min=payload["drain_rate"],
                 last_updated=now,
             )
             readings.append(status)
@@ -88,13 +103,17 @@ class TransportLogSimulator:
             cauldron_id = self._rng.choice(self._cauldron_ids)
             direction = self._rng.choice(("pickup", "dropoff"))
             volume = abs(self._rng.gauss(20, 7))
+            ticket_timestamp = now - timedelta(minutes=self._rng.random() * 5.0)
+            ticket_date = ticket_timestamp.date().isoformat()  # EOG: date only
+            
             ticket = TransportTicket(
                 ticket_id=f"T-{now.strftime('%H%M%S')}-{idx}",
                 cauldron_id=cauldron_id,
                 volume_liters=volume,
                 direction=direction,
                 courier_id=self._rng.choice(self._courier_pool),
-                timestamp=now - timedelta(minutes=self._rng.random() * 5.0),
+                date=ticket_date,  # EOG requirement: date only
+                timestamp=ticket_timestamp,  # Optional internal timestamp
             )
             self._tickets.append(ticket)
             batch.append(ticket)

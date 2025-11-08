@@ -10,9 +10,10 @@ from pathlib import Path
 from typing import Dict, Iterable, List, Sequence
 
 from .config import get_settings
-from .data_models import PotionNetworkMap, RoutePlan
+from .data_models import PotionNetworkMap, RoutePlan, CauldronStatus, ForecastResult
 
 DEFAULT_SPEED_KM_PER_MINUTE = 0.6  # ~36 km/h average gryphon speed
+UNLOAD_TIME_MINUTES = 15.0  # EOG: Witches take 15 minutes to unload at market
 
 
 class RouteOptimizer:
@@ -56,7 +57,13 @@ class RouteOptimizer:
             route.append(next_stop)
             pending.remove(next_stop)
 
-        estimated_minutes = total_distance / DEFAULT_SPEED_KM_PER_MINUTE if total_distance else 0.0
+        # Calculate travel time
+        travel_minutes = total_distance / DEFAULT_SPEED_KM_PER_MINUTE if total_distance else 0.0
+        
+        # EOG: Add 15 minutes unload time for each market visit
+        # Count how many times route goes to market (assuming route ends at market)
+        market_visits = 1  # At least one visit to drop off
+        estimated_minutes = travel_minutes + (market_visits * UNLOAD_TIME_MINUTES)
 
         return RoutePlan(
             courier_id=courier_id,
