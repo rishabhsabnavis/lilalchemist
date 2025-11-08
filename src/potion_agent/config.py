@@ -41,12 +41,27 @@ class Settings:
     )
     max_history_points: int = int(os.getenv("POTION_MAX_HISTORY_POINTS", "20"))
 
+    llm_provider: str = os.getenv("POTION_LLM_PROVIDER", "nvidia_nim")
+
     nvidia_api_key: Optional[str] = os.getenv("NVIDIA_API_KEY")
     nvidia_api_base: str = os.getenv(
         "NVIDIA_API_BASE", "https://integrate.api.nvidia.com/v1"
     )
     nemotron_model: str = os.getenv(
         "POTION_NEMOTRON_MODEL", "nemotron-4-340b-instruct"
+    )
+
+    huggingface_model_id: str = os.getenv(
+        "POTION_HF_MODEL_ID", "nvidia/NVIDIA-Nemotron-Nano-9B-v2"
+    )
+    huggingface_device: str = os.getenv("POTION_HF_DEVICE", "auto")
+    huggingface_dtype: str = os.getenv("POTION_HF_DTYPE", "bfloat16")
+    huggingface_temperature: float = float(
+        os.getenv("POTION_HF_TEMPERATURE", "0.2")
+    )
+    huggingface_top_p: float = float(os.getenv("POTION_HF_TOP_P", "0.9"))
+    huggingface_max_new_tokens: int = int(
+        os.getenv("POTION_HF_MAX_NEW_TOKENS", "512")
     )
 
     log_dir: str = os.getenv("POTION_LOG_DIR", "logs")

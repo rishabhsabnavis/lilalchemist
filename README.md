@@ -56,6 +56,7 @@ Deep within Poyo's Potion Factory, dozens of enchanted cauldrons bubble away, co
 
 3. **Configure environment**
    ```bash
+   export POTION_LLM_PROVIDER="nvidia_nim"
    export NVIDIA_API_KEY="your-nvidia-key"
    export POTION_NEMOTRON_MODEL="nemotron-4-340b-instruct"  # optional
    ```
