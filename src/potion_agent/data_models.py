@@ -5,18 +5,30 @@ Shared dataclasses and typing primitives for the potion logistics agent.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import date, datetime
 from typing import Dict, List, Optional
 
 
 @dataclass(slots=True)
 class CauldronStatus:
-    """Represent the current state of a cauldron in the network."""
+    """Represent the current state of a cauldron in the network.
+    
+    Matches EOG problem statement schema:
+    - id (cauldron_id)
+    - name
+    - latitude
+    - longitude
+    - maximum storage volume (capacity_liters)
+    """
 
     cauldron_id: str
+    name: str
     fill_level_liters: float
-    capacity_liters: float
-    location: str
+    capacity_liters: float  # maximum storage volume
+    latitude: float
+    longitude: float
+    fill_rate_liters_per_min: float  # Per-cauldron fill rate
+    drain_rate_liters_per_min: float  # Per-cauldron drain rate
     last_updated: datetime
 
     def utilization(self) -> float:
@@ -29,14 +41,19 @@ class CauldronStatus:
 
 @dataclass(slots=True)
 class TransportTicket:
-    """Represent an individual potion transport event."""
+    """Represent an individual potion transport event.
+    
+    EOG requirement: Tickets are received at end of day with only a date (no timestamp).
+    The date field is used for matching tickets to drain events.
+    """
 
     ticket_id: str
     cauldron_id: str
     volume_liters: float
     direction: str  # "pickup" or "dropoff"
     courier_id: str
-    timestamp: datetime
+    date: str  # Date only (YYYY-MM-DD format) - EOG requirement
+    timestamp: Optional[datetime] = None  # Optional internal timestamp for processing
 
 
 @dataclass(slots=True)

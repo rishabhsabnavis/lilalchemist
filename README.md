@@ -1,76 +1,170 @@
-# Potion Logistics Autonomous Agent
+# PotionMaster: The Potion Flow Monitoring Dashboard
 
-This project assembles an autonomous LangChain agent (compatible with NVIDIA Nemotron NIM or the Hugging Face `nvidia/NVIDIA-Nemotron-Nano-9B-v2` model) that manages potion distribution logistics. It continuously watches simulated cauldron telemetry, compares it against transport ticket logs, forecasts overflow risk, optimises courier pickup routes, and executes multi-step remediation plans through agentic tool orchestration.
+**EOG × NVIDIA HackUTD 2025**
 
-## Key Capabilities
+A full-stack solution combining a real-time React dashboard with an autonomous LangChain + NVIDIA Nemotron agent system for monitoring potion flow across enchanted cauldrons.
 
-- **Real-time ingestion** – Simulated cauldron fill-level and potion transport APIs with extension points for production endpoints.
-- **Anomaly detection** – Detects mismatches between telemetry and transport logs, plus overflow/shortage conditions.
-- **Predictive forecasting** – Maintains rolling histories and projects overflow horizons using lightweight regression.
-- **Route optimisation** – Greedy nearest-neighbour routing over a configurable potion network map.
-- **Agentic orchestration** – LangChain agent powered by NVIDIA Nemotron NIM selects tools (logging, notifications, scheduling, data lookups) to respond to emerging issues while maintaining an audit trail.
-- **Structured observability** – JSON logging for major workflows and decisions.
+## 🧙🏽‍♀️ Overview
 
-## Project Layout
+Deep within Poyo's Potion Factory, dozens of enchanted cauldrons bubble away, collecting potions from brewing towers. This system tracks potion levels in real-time, detects anomalies, reconciles transport tickets, forecasts overflow risks, and optimizes courier routes using agentic AI.
 
-- `src/potion_agent/config.py` – Environment-driven settings.
-- `src/potion_agent/data_ingestion.py` – Simulated API clients with pluggable fetch logic.
-- `src/potion_agent/anomaly_detection.py` – Telemetry vs. transport anomaly detector.
-- `src/potion_agent/forecasting.py` – Rolling history maintenance and overflow forecasting.
-- `src/potion_agent/routing.py` – Courier route planning.
-- `src/potion_agent/logging_utils.py` – Structured logging configuration.
-- `src/potion_agent/tools.py` – LangChain tool definitions.
-- `src/potion_agent/agent.py` – LangChain agent assembly (supports NVIDIA NIM or Hugging Face deployments).
-- `src/potion_agent/orchestrator.py` – Core orchestration loop and tool context.
-- `src/potion_agent/main.py` – CLI entrypoint.
-- `config/potion_network_map.json` – Sample potion network graph.
+## 🏗️ Architecture
 
-## Getting Started
+### Frontend (React + Vite)
+- **Real-time dashboard** with animated cauldron map
+- **Agent workflow visualization** (Monitor → Detect → Reconcile → Plan → Report)
+- **Ticket reconciliation** with mismatch detection
+- **Forecasting & scheduling** for overflow prevention
+- **Dark futuristic UI** with Tailwind CSS + Framer Motion
+
+### Backend (Python + LangChain + NVIDIA Nemotron)
+- **Autonomous agent** powered by NVIDIA Nemotron NIM
+- **Anomaly detection** between telemetry and transport logs
+- **Predictive forecasting** for overflow risks
+- **Route optimization** for courier scheduling
+- **Structured logging** and audit trails
+
+## 🚀 Getting Started
+
+### Frontend Setup
 
 1. **Install dependencies**
    ```bash
+   npm install
+   ```
+
+2. **Start development server**
+   ```bash
+   npm run dev
+   ```
+
+3. **Open browser**
+   - Navigate to `http://localhost:5173`
+
+### Backend Setup
+
+1. **Create virtual environment**
+   ```bash
    python -m venv .venv
-   source .venv/bin/activate
+   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+   ```
+
+2. **Install Python dependencies**
+   ```bash
    pip install -r requirements.txt
    ```
 
-2. **Configure environment**
-
-   **Using Hugging Face (local or self-hosted Nemotron Nano 9B v2)**
-   ```bash
-   export POTION_LLM_PROVIDER="huggingface"
-   export POTION_HF_MODEL_ID="nvidia/NVIDIA-Nemotron-Nano-9B-v2"  # optional override
-   export POTION_HF_DEVICE="auto"                                # or "cuda", "cpu"
-   export POTION_HF_DTYPE="bfloat16"                             # float16/float32 also supported
-   ```
-
-   **Using NVIDIA Nemotron NIM endpoint**
+3. **Configure environment**
    ```bash
    export POTION_LLM_PROVIDER="nvidia_nim"
    export NVIDIA_API_KEY="your-nvidia-key"
-   export POTION_NEMOTRON_MODEL="nemotron-4-340b-instruct"   # optional override
-   # Optional: override simulated endpoints, thresholds, logging output, etc.
+   export POTION_NEMOTRON_MODEL="nemotron-4-340b-instruct"  # optional
    ```
 
-3. **Run the agent**
+4. **Run the agent**
    ```bash
    python -m potion_agent.main --run-once    # single cycle for testing
    python -m potion_agent.main               # continuous monitoring loop
    ```
 
-## Extending the Simulated APIs
+## 📁 Project Structure
 
-- Replace `_fetch_from_source` in `CauldronAPIClient` / `TransportLogAPIClient` with real HTTP (or message bus) calls.
-- Adjust the anomaly threshold via `POTION_ANOMALY_THRESHOLD`.
-- Update or replace `config/potion_network_map.json` with actual distance matrices.
+```
+cauldronmind/
+├── src/
+│   ├── App.jsx              # Main React dashboard component
+│   ├── main.jsx             # React entry point
+│   ├── index.css            # Tailwind styles
+│   └── potion_agent/        # Python backend
+│       ├── agent.py         # LangChain + Nemotron agent
+│       ├── orchestrator.py  # Main orchestration loop
+│       ├── anomaly_detection.py
+│       ├── forecasting.py
+│       ├── routing.py
+│       └── ...
+├── config/
+│   └── potion_network_map.json  # Network topology
+├── package.json             # Frontend dependencies
+├── requirements.txt         # Python dependencies
+└── README.md               # This file
+```
 
-## Operational Notes
+## 🎯 Key Features
 
-- The agent writes structured JSON logs to `logs/potion_agent.log`.
-- Tool executions (e.g. notifications, schedule updates) are captured in the audit trail and can be republished downstream.
-- LangChain’s `AgentExecutor` runs asynchronously; failures are logged but do not terminate the loop.
+### Frontend
+- ✅ Real-time cauldron level visualization
+- ✅ Interactive cauldron map with 12+ cauldrons
+- ✅ Agent workflow status panel
+- ✅ Ticket reconciliation display
+- ✅ Overflow forecasting
+- ✅ Witch route optimization visualization
+- ✅ Time series charts
 
-## Requirements
+### Backend
+- ✅ Real-time data ingestion (with API extension points)
+- ✅ Anomaly detection (telemetry vs. transport logs)
+- ✅ Predictive forecasting (overflow risk)
+- ✅ Route optimization (greedy nearest-neighbor)
+- ✅ Agentic orchestration (NVIDIA Nemotron)
+- ✅ Structured JSON logging
 
-See `requirements.txt` for the precise package list. Using the Hugging Face model requires adequate local GPU/CPU resources. NVIDIA Nemotron access requires network connectivity to the configured NIM endpoint.
+## 🔧 Configuration
 
+### Frontend
+- Tailwind CSS v4 with custom theme
+- Framer Motion for animations
+- Recharts for data visualization
+- Lucide React for icons
+
+### Backend
+Environment variables (all optional with defaults):
+- `NVIDIA_API_KEY` - Required for Nemotron agent
+- `POTION_CAULDRON_API_URL` - Cauldron data endpoint
+- `POTION_TRANSPORT_API_URL` - Transport ticket endpoint
+- `POTION_ANOMALY_THRESHOLD` - Anomaly sensitivity (default: 0.15)
+- `POTION_POLL_INTERVAL_SECONDS` - Update frequency (default: 5.0)
+
+## 🔌 API Integration
+
+The backend includes simulated data generators for local development. To connect to real EOG APIs:
+
+1. Update `CauldronAPIClient._fetch_from_source()` in `src/potion_agent/data_ingestion.py`
+2. Update `TransportLogAPIClient._fetch_from_source()` in the same file
+3. Set environment variables for API endpoints
+
+## 📊 Data Models
+
+- **CauldronStatus**: ID, fill level, capacity, location, timestamps
+- **TransportTicket**: Ticket ID, cauldron ID, volume, direction, courier, timestamp
+- **AnomalyFlag**: Cauldron ID, type, severity, description
+- **ForecastResult**: Overflow projections with confidence scores
+- **RoutePlan**: Optimized courier routes with stop sequences
+
+## 🛠️ Development
+
+### Frontend
+```bash
+npm run dev      # Start dev server
+npm run build    # Production build
+npm run preview  # Preview production build
+```
+
+### Backend
+```bash
+python -m potion_agent.main --run-once  # Test single cycle
+python -m potion_agent.main             # Continuous monitoring
+```
+
+## 📝 Logging
+
+Backend logs are written to `logs/potion_agent.log` in structured JSON format. The agent maintains an audit trail of all tool executions and decisions.
+
+## 🤝 Contributing
+
+This is a hackathon project for HackUTD 2025, combining:
+- **EOG Challenge**: Real-time potion flow monitoring
+- **NVIDIA Challenge**: Agentic AI with multi-step workflows
+
+## 📄 License
+
+Hackathon project - See challenge requirements for details.

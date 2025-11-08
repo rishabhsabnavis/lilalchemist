@@ -1,5 +1,7 @@
 """
 Anomaly detection logic for potion logistics.
+
+Updated to account for continuous potion flow during drainage (EOG requirement).
 """
 
 from __future__ import annotations
@@ -10,6 +12,7 @@ from typing import Dict, Iterable, List, Optional
 
 from .config import get_settings
 from .data_models import AnomalyFlag, CauldronStatus, TransportTicket
+from .ticket_matching import TicketMatcher
 
 
 class AnomalyDetector:
@@ -20,6 +23,7 @@ class AnomalyDetector:
         self._threshold = anomaly_threshold or settings.anomaly_threshold
         self._previous_levels: Dict[str, float] = {}
         self._previous_timestamp: Dict[str, datetime] = {}
+        self._ticket_matcher = TicketMatcher()
 
     def detect(
         self,
@@ -37,7 +41,15 @@ class AnomalyDetector:
             transport_delta = transport_deltas.get(cauldron.cauldron_id, 0.0)
 
             if prev_level is not None and prev_ts is not None:
-                expected_level = prev_level + transport_delta
+                # EOG: Account for continuous fill during any drain period
+                # Calculate time elapsed and expected fill
+                time_elapsed_minutes = (cauldron.last_updated - prev_ts).total_seconds() / 60.0
+                expected_fill = cauldron.fill_rate_liters_per_min * time_elapsed_minutes
+                
+                # Expected level = previous level + fill - transport delta
+                # (transport_delta is negative for pickups, positive for dropoffs)
+                expected_level = prev_level + expected_fill + transport_delta
+                
                 deviation = cauldron.fill_level_liters - expected_level
                 severity = abs(deviation) / max(cauldron.capacity_liters, 1.0)
                 if severity >= self._threshold:
@@ -51,7 +63,8 @@ class AnomalyDetector:
                             severity=severity,
                             description=(
                                 f"Deviation of {deviation:.1f}L vs transport logs "
-                                f"(expected {expected_level:.1f}L, observed {cauldron.fill_level_liters:.1f}L)."
+                                f"(expected {expected_level:.1f}L, observed {cauldron.fill_level_liters:.1f}L). "
+                                f"Accounted for {expected_fill:.1f}L continuous fill during period."
                             ),
                         )
                     )

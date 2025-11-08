@@ -101,9 +101,13 @@ class AgentContext(AgentContextProtocol):
         return json.dumps(
             {
                 "cauldron_id": snapshot.cauldron_id,
+                "name": snapshot.name,
                 "fill_level_liters": snapshot.fill_level_liters,
                 "capacity_liters": snapshot.capacity_liters,
-                "location": snapshot.location,
+                "latitude": snapshot.latitude,
+                "longitude": snapshot.longitude,
+                "fill_rate_liters_per_min": snapshot.fill_rate_liters_per_min,
+                "drain_rate_liters_per_min": snapshot.drain_rate_liters_per_min,
                 "last_updated": snapshot.last_updated.isoformat(),
             }
         )
@@ -116,7 +120,8 @@ class AgentContext(AgentContextProtocol):
                 "direction": ticket.direction,
                 "volume_liters": ticket.volume_liters,
                 "courier_id": ticket.courier_id,
-                "timestamp": ticket.timestamp.isoformat(),
+                "date": ticket.date,  # EOG: date only
+                "timestamp": ticket.timestamp.isoformat() if ticket.timestamp else None,
             }
             for ticket in tickets
         ]
@@ -238,7 +243,8 @@ class PotionLogisticsOrchestrator:
                     "volume_liters": t.volume_liters,
                     "direction": t.direction,
                     "courier_id": t.courier_id,
-                    "timestamp": t.timestamp.isoformat(),
+                    "date": t.date,  # EOG: date only
+                    "timestamp": t.timestamp.isoformat() if t.timestamp else None,
                 }
                 for t in tickets
             ],
