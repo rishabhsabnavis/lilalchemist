@@ -1,6 +1,6 @@
 # Potion Logistics Autonomous Agent
 
-This project assembles an autonomous LangChain + NVIDIA Nemotron (NIM) agent that manages potion distribution logistics. It continuously watches simulated cauldron telemetry, compares it against transport ticket logs, forecasts overflow risk, optimises courier pickup routes, and executes multi-step remediation plans through agentic tool orchestration.
+This project assembles an autonomous LangChain agent (compatible with NVIDIA Nemotron NIM or the Hugging Face `nvidia/NVIDIA-Nemotron-Nano-9B-v2` model) that manages potion distribution logistics. It continuously watches simulated cauldron telemetry, compares it against transport ticket logs, forecasts overflow risk, optimises courier pickup routes, and executes multi-step remediation plans through agentic tool orchestration.
 
 ## Key Capabilities
 
@@ -20,7 +20,7 @@ This project assembles an autonomous LangChain + NVIDIA Nemotron (NIM) agent tha
 - `src/potion_agent/routing.py` – Courier route planning.
 - `src/potion_agent/logging_utils.py` – Structured logging configuration.
 - `src/potion_agent/tools.py` – LangChain tool definitions.
-- `src/potion_agent/agent.py` – Nemotron-backed LangChain agent assembly.
+- `src/potion_agent/agent.py` – LangChain agent assembly (supports NVIDIA NIM or Hugging Face deployments).
 - `src/potion_agent/orchestrator.py` – Core orchestration loop and tool context.
 - `src/potion_agent/main.py` – CLI entrypoint.
 - `config/potion_network_map.json` – Sample potion network graph.
@@ -35,7 +35,18 @@ This project assembles an autonomous LangChain + NVIDIA Nemotron (NIM) agent tha
    ```
 
 2. **Configure environment**
+
+   **Using Hugging Face (local or self-hosted Nemotron Nano 9B v2)**
    ```bash
+   export POTION_LLM_PROVIDER="huggingface"
+   export POTION_HF_MODEL_ID="nvidia/NVIDIA-Nemotron-Nano-9B-v2"  # optional override
+   export POTION_HF_DEVICE="auto"                                # or "cuda", "cpu"
+   export POTION_HF_DTYPE="bfloat16"                             # float16/float32 also supported
+   ```
+
+   **Using NVIDIA Nemotron NIM endpoint**
+   ```bash
+   export POTION_LLM_PROVIDER="nvidia_nim"
    export NVIDIA_API_KEY="your-nvidia-key"
    export POTION_NEMOTRON_MODEL="nemotron-4-340b-instruct"   # optional override
    # Optional: override simulated endpoints, thresholds, logging output, etc.
@@ -61,5 +72,5 @@ This project assembles an autonomous LangChain + NVIDIA Nemotron (NIM) agent tha
 
 ## Requirements
 
-See `requirements.txt` for the precise package list. NVIDIA Nemotron access requires network connectivity to the configured NIM endpoint.
+See `requirements.txt` for the precise package list. Using the Hugging Face model requires adequate local GPU/CPU resources. NVIDIA Nemotron access requires network connectivity to the configured NIM endpoint.
 
