@@ -1,0 +1,21 @@
+{
+  "north_tower": {
+    "east_garden": 2.5,
+    "grand_hall": 1.2
+  },
+  "east_garden": {
+    "north_tower": 2.5,
+    "grand_hall": 3.1,
+    "crypt_chamber": 4.6
+  },
+  "grand_hall": {
+    "north_tower": 1.2,
+    "east_garden": 3.1,
+    "crypt_chamber": 2.8
+  },
+  "crypt_chamber": {
+    "grand_hall": 2.8,
+    "east_garden": 4.6
+  }
+}
+
