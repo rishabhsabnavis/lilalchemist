@@ -1,286 +1,64 @@
-"""
-High-level orchestration and agent workflow management.
-"""
+# Example agent controller - customize/extend agents & plug in new algorithms easily
 
-from __future__ import annotations
+class PotionAgentController:
+    def __init__(self, cauldrons, couriers, network, market):
+        self.cauldrons = cauldrons                  # List[CauldronDto]
+        self.couriers = couriers                    # List[CourierDto]
+        self.network = network                      # NetworkDto (edges, etc.)
+        self.market = market                        # MarketDto
 
-import asyncio
-import json
-import logging
-from datetime import datetime
-from typing import Dict, Iterable, List, Sequence
+    def get_fill_rates(self, historical_data):
+        # Placeholder: Insert your team's fill rate algorithm here
+        # Return: Dict[cauldron_id: float]
+        return {c['id']: 1.0 for c in self.cauldrons}     # Mock/fixed for now
 
-from langchain.agents import AgentExecutor
+    def forecast_overflows(self, levels, fill_rates):
+        # Placeholder: Insert your team's overflow forecasting algorithm here
+        # Return: Dict[cauldron_id: minutes_till_overflow]
+        return {c['id']: 60.0 for c in self.cauldrons}    # Mock/fixed for now
 
-from .anomaly_detection import AnomalyDetector
-from .config import get_settings
-from .data_ingestion import CauldronAPIClient, TransportLogAPIClient
-from .data_models import (
-    AnomalyFlag,
-    CauldronStatus,
-    ForecastResult,
-    RoutePlan,
-    TransportTicket,
-)
-from .forecasting import ForecastEngine
-from .logging_utils import configure_logging
-from .routing import RouteOptimizer
-from .tools import AgentContextProtocol
+    def plan_routes(self, overflow_predictions, couriers, market, network):
+        # Placeholder: Your team's route optimizer here (OR-Tools, cuOpt, custom ...)
+        # Return: List of route plans (or whatever your algorithm outputs)
+        return [{"courier_id": c['courier_id'], "route": ["cauldron_001", "market"]} for c in couriers]
 
+    def answer_rag_query(self, query):
+        # Placeholder: Connect to your team's RAG agent here (LangChain, etc.)
+        # Return: str answer or document snippet
+        return "This is a mock answer from the potion RAG knowledge base."
 
-class AgentContext(AgentContextProtocol):
-    """Hold shared state that tools can read or mutate."""
+    def run_all(self, historical_data, current_levels):
+        # Step 1: Get current fill rates
+        fill_rates = self.get_fill_rates(historical_data)
 
-    def __init__(self) -> None:
-        self.audit_trail: List[Dict[str, str]] = []
-        self.cauldron_snapshots: Dict[str, CauldronStatus] = {}
-        self.transport_activity: Dict[str, List[TransportTicket]] = {}
-        self.route_plans: Dict[str, RoutePlan] = {}
+        # Step 2: Forecast overflows
+        overflow_predictions = self.forecast_overflows(current_levels, fill_rates)
 
-    def update_state(
-        self,
-        cauldrons: Iterable[CauldronStatus],
-        tickets: Iterable[TransportTicket],
-        routes: Iterable[RoutePlan],
-    ) -> None:
-        self.cauldron_snapshots = {c.cauldron_id: c for c in cauldrons}
-        summary_map: Dict[str, List[TransportTicket]] = {}
-        for ticket in tickets:
-            summary_map.setdefault(ticket.cauldron_id, []).append(ticket)
-        self.transport_activity = summary_map
-        self.route_plans = {route.courier_id: route for route in routes}
+        # Step 3: Plan optimal pickup routes
+        route_plans = self.plan_routes(overflow_predictions, self.couriers, self.market, self.network)
 
-    def log_event(self, action: str, details: str) -> str:
-        entry = {
-            "timestamp": datetime.utcnow().isoformat(),
-            "action": action,
-            "details": details,
+        # Step 4: Handle dynamic RAG/adaptation
+        rag_response = self.answer_rag_query("How should the schedule change if a leaky cauldron is detected?")
+
+        # Step 5: Return composite dashboard update
+        return {
+            "fill_rates": fill_rates,
+            "overflow_predictions": overflow_predictions,
+            "route_plans": route_plans,
+            "rag_response": rag_response
         }
-        self.audit_trail.append(entry)
-        logging.getLogger("potion_agent.audit").info(
-            "Logged event", extra={"context": entry}
-        )
-        return json.dumps(entry)
 
-    def notify_team(self, channel: str, message: str) -> str:
-        entry = {
-            "timestamp": datetime.utcnow().isoformat(),
-            "channel": channel,
-            "message": message,
-        }
-        logging.getLogger("potion_agent.notify").info(
-            "Notification issued", extra={"context": entry}
-        )
-        self.audit_trail.append(
-            {"timestamp": entry["timestamp"], "action": "notify", "details": message}
-        )
-        return json.dumps(entry)
+# --- Usage Example ---
 
-    def update_schedule(self, courier_id: str, new_route: str) -> str:
-        entry = {
-            "timestamp": datetime.utcnow().isoformat(),
-            "courier_id": courier_id,
-            "route": new_route,
-        }
-        logging.getLogger("potion_agent.schedule").info(
-            "Schedule update", extra={"context": entry}
-        )
-        self.audit_trail.append(
-            {
-                "timestamp": entry["timestamp"],
-                "action": "schedule_update",
-                "details": new_route,
-            }
-        )
-        return json.dumps(entry)
+# These come from your API/data ingestion
+cauldrons = [...]      # List of CauldronDto dicts
+couriers = [...]       # List of CourierDto dicts
+network = {...}        # NetworkDto
+market = {...}         # MarketDto
+historical_data = [...]# List of HistoricalDataDto/metadata
+current_levels = {...} # Current cauldron levels snapshot (CauldronLevelsDto)
 
-    def fetch_cauldron_snapshot(self, cauldron_id: str) -> str:
-        snapshot = self.cauldron_snapshots.get(cauldron_id)
-        if not snapshot:
-            return json.dumps({"error": "unknown cauldron"})
-        return json.dumps(
-            {
-                "cauldron_id": snapshot.cauldron_id,
-                "name": snapshot.name,
-                "fill_level_liters": snapshot.fill_level_liters,
-                "capacity_liters": snapshot.capacity_liters,
-                "latitude": snapshot.latitude,
-                "longitude": snapshot.longitude,
-                "fill_rate_liters_per_min": snapshot.fill_rate_liters_per_min,
-                "drain_rate_liters_per_min": snapshot.drain_rate_liters_per_min,
-                "last_updated": snapshot.last_updated.isoformat(),
-            }
-        )
+controller = PotionAgentController(cauldrons, couriers, network, market)
+dashboard_data = controller.run_all(historical_data, current_levels)
 
-    def fetch_transport_summary(self, cauldron_id: str) -> str:
-        tickets = self.transport_activity.get(cauldron_id, [])
-        payload = [
-            {
-                "ticket_id": ticket.ticket_id,
-                "direction": ticket.direction,
-                "volume_liters": ticket.volume_liters,
-                "courier_id": ticket.courier_id,
-                "date": ticket.date,  # EOG: date only
-                "timestamp": ticket.timestamp.isoformat() if ticket.timestamp else None,
-            }
-            for ticket in tickets
-        ]
-        return json.dumps(payload)
-
-
-class PotionLogisticsOrchestrator:
-    """Coordinate data ingestion, analytics, and the autonomous agent workflow."""
-
-    def __init__(
-        self,
-        agent: AgentExecutor,
-        cauldron_client: CauldronAPIClient | None = None,
-        transport_client: TransportLogAPIClient | None = None,
-        anomaly_detector: AnomalyDetector | None = None,
-        forecast_engine: ForecastEngine | None = None,
-        route_optimizer: RouteOptimizer | None = None,
-        context: AgentContext | None = None,
-    ) -> None:
-        configure_logging()
-        self._settings = get_settings()
-        self._agent = agent
-        self._cauldron_client = cauldron_client or CauldronAPIClient()
-        self._transport_client = transport_client or TransportLogAPIClient()
-        self._anomaly_detector = anomaly_detector or AnomalyDetector()
-        self._forecast_engine = forecast_engine or ForecastEngine()
-        self._route_optimizer = route_optimizer or RouteOptimizer()
-        self._context = context or AgentContext()
-        self._logger = logging.getLogger("potion_agent.orchestrator")
-
-    @property
-    def context(self) -> AgentContext:
-        return self._context
-
-    async def run_forever(self) -> None:
-        """Start the continuous monitoring loop."""
-
-        self._logger.info("Starting orchestration loop")
-        while True:
-            await self.run_cycle()
-            await asyncio.sleep(self._settings.poll_interval_seconds)
-
-    async def run_cycle(self) -> None:
-        """Perform a single monitoring + planning cycle."""
-
-        self._logger.info("Starting orchestration cycle")
-        cauldrons = await self._cauldron_client.fetch_current_levels()
-        tickets = await self._transport_client.fetch_recent_tickets()
-
-        self._forecast_engine.update_history(cauldrons)
-        anomalies = self._anomaly_detector.detect(cauldrons, tickets)
-        forecasts = self._forecast_engine.forecast_overflow(cauldrons)
-        routes = self._plan_routes(forecasts)
-
-        self._context.update_state(cauldrons, tickets, routes)
-
-        narrative = self._compose_agent_input(cauldrons, tickets, anomalies, forecasts, routes)
-        self._logger.debug("Agent input prepared", extra={"context": {"input": narrative}})
-
-        try:
-            await self._agent.ainvoke({"input": narrative})
-        except Exception as exc:  # pragma: no cover
-            self._logger.exception("Agent execution failed: %s", exc)
-
-    def _plan_routes(self, forecasts: Sequence[ForecastResult]) -> List[RoutePlan]:
-        """Create route plans prioritising highest-risk cauldrons."""
-
-        # Sort by earliest overflow projection (None means low risk).
-        prioritized = sorted(
-            forecasts,
-            key=lambda item: (
-                item.projected_overflow_time or datetime.max,
-                -item.confidence,
-            ),
-        )
-        demand_order = [forecast.cauldron_id for forecast in prioritized if forecast.projected_overflow_time]
-        if not demand_order:
-            return []
-
-        couriers = ("wyvern_01", "wyvern_02", "griffin_03")
-        routes: List[RoutePlan] = []
-        for index, courier in enumerate(couriers):
-            if index >= len(demand_order):
-                break
-            starting_node = demand_order[index % len(demand_order)]
-            plan = self._route_optimizer.generate_pickup_plan(
-                courier_id=courier,
-                current_location=starting_node,
-                demand_order=demand_order,
-            )
-            routes.append(plan)
-        return routes
-
-    @staticmethod
-    def _compose_agent_input(
-        cauldrons: Iterable[CauldronStatus],
-        tickets: Iterable[TransportTicket],
-        anomalies: Iterable[AnomalyFlag],
-        forecasts: Iterable[ForecastResult],
-        routes: Iterable[RoutePlan],
-    ) -> str:
-        """Construct a structured textual summary for the autonomous agent."""
-
-        payload = {
-            "timestamp": datetime.utcnow().isoformat(),
-            "cauldrons": [
-                {
-                    "id": c.cauldron_id,
-                    "fill_level_liters": c.fill_level_liters,
-                    "capacity_liters": c.capacity_liters,
-                    "utilisation": c.utilization(),
-                }
-                for c in cauldrons
-            ],
-            "recent_transport_tickets": [
-                {
-                    "id": t.ticket_id,
-                    "cauldron_id": t.cauldron_id,
-                    "volume_liters": t.volume_liters,
-                    "direction": t.direction,
-                    "courier_id": t.courier_id,
-                    "date": t.date,  # EOG: date only
-                    "timestamp": t.timestamp.isoformat() if t.timestamp else None,
-                }
-                for t in tickets
-            ],
-            "anomalies": [
-                {
-                    "cauldron_id": a.cauldron_id,
-                    "type": a.anomaly_type,
-                    "severity": a.severity,
-                    "description": a.description,
-                    "detected_at": a.detected_at.isoformat(),
-                }
-                for a in anomalies
-            ],
-            "forecasts": [
-                {
-                    "cauldron_id": f.cauldron_id,
-                    "projected_overflow_time": f.projected_overflow_time.isoformat()
-                    if f.projected_overflow_time
-                    else None,
-                    "projected_fill_level": f.projected_fill_level,
-                    "confidence": f.confidence,
-                }
-                for f in forecasts
-            ],
-            "route_plans": [
-                {
-                    "courier_id": r.courier_id,
-                    "ordered_stops": r.ordered_stops,
-                    "total_distance_km": r.total_distance_km,
-                    "estimated_completion_minutes": r.estimated_completion_minutes,
-                }
-                for r in routes
-            ],
-        }
-        return json.dumps(payload)
-
-
-__all__ = ["AgentContext", "PotionLogisticsOrchestrator"]
-
+print(dashboard_data)
