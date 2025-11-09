@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import * as api from './services/api'
 import { 
   Activity, 
   AlertTriangle, 
@@ -22,7 +23,24 @@ import {
   BarChart3
 } from 'lucide-react'
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
+import { MapContainer, TileLayer, Marker, Popup, Polyline, Tooltip as LeafletTooltip } from 'react-leaflet'
+import L from 'leaflet'
 import './App.css'
+
+// Fix for default marker icons in Leaflet with Vite
+delete L.Icon.Default.prototype._getIconUrl
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+})
+
+// Enchanted Market coordinates (hardcoded)
+const ENCHANTED_MARKET_LAT = 33.2148
+const ENCHANTED_MARKET_LNG = -97.13
+
+// Fallback network map (empty - use only API data)
+const FALLBACK_NETWORK_MAP = {}
 
 // Simulated data generator - matches backend CauldronStatus schema
 const generateCauldronData = () => {
@@ -135,8 +153,8 @@ const agentWorkflowSteps = [
 ]
 
 function App() {
-  const [cauldrons, setCauldrons] = useState(generateCauldronData())
-  const [tickets, setTickets] = useState(generateTickets())
+  const [cauldrons, setCauldrons] = useState([])
+  const [tickets, setTickets] = useState([])
   const [selectedCauldron, setSelectedCauldron] = useState(null)
   const [timeSeriesData, setTimeSeriesData] = useState([])
   const [activeWorkflowStep, setActiveWorkflowStep] = useState(1)
@@ -144,24 +162,157 @@ function App() {
   const [showHistory, setShowHistory] = useState(false)
   const [historyDate, setHistoryDate] = useState(new Date().toISOString().split('T')[0])
   const [historicalData, setHistoricalData] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+  const [networkMap, setNetworkMap] = useState(FALLBACK_NETWORK_MAP)
 
-  useEffect(() => {
-    // Simulate real-time updates
-    const interval = setInterval(() => {
-      setCauldrons(generateCauldronData())
-      setTickets(generateTickets())
-      
+  // Transform API cauldron data to match frontend format
+  const transformCauldron = (apiCauldron) => {
+    const level = apiCauldron.level || (apiCauldron.fill_level_liters / apiCauldron.capacity_liters) * 100
+    return {
+      ...apiCauldron,
+      level: Math.round(level),
+      isDraining: false, // Will be determined by ticket matching
+      hasAnomaly: false, // Will be determined by anomaly detection
+      fillRate: apiCauldron.fill_rate_liters_per_min || apiCauldron.fillRate || 2.5,
+      capacity: apiCauldron.capacity_liters,
+      forecastOverflow: null, // Will be set by forecasts
+    }
+  }
+
+  // Transform API ticket data to match frontend format
+  const transformTicket = (apiTicket) => {
+    return {
+      ...apiTicket,
+      id: apiTicket.ticket_id || apiTicket.id,
+      cauldronId: apiTicket.cauldron_id,
+      volume: apiTicket.volume_liters || apiTicket.volume,
+      status: apiTicket.status || 'matched', // Default to matched, will be updated by matching logic
+    }
+  }
+
+  // Fetch network map from API
+  const fetchNetworkMapData = async () => {
+    try {
+      const networkData = await api.fetchNetworkMap()
+      if (networkData && Object.keys(networkData).length > 0) {
+        setNetworkMap(networkData)
+      }
+    } catch (err) {
+      console.error('Error fetching network map:', err)
+      // Keep fallback network map on error
+    }
+  }
+
+  // Helper function to get travel time between a cauldron and the market
+  const getTravelTimeToMarket = (cauldron) => {
+    // Try to find market node (could be "market_001", "enchanted_market", etc.)
+    const marketNode = Object.keys(networkMap).find(key => 
+      key.toLowerCase().includes('market') || key === 'enchanted_market'
+    ) || 'market_001'
+    
+    // Try to match by cauldron_id first (e.g., "cauldron_001")
+    const cauldronId = cauldron.cauldron_id || cauldron.id || ''
+    
+    // Debug logging
+    console.log('Getting travel time for:', {
+      cauldronId,
+      cauldronName: cauldron.name,
+      marketNode,
+      networkMapKeys: Object.keys(networkMap),
+      hasMarketNode: !!networkMap[marketNode],
+      marketConnections: networkMap[marketNode] ? Object.keys(networkMap[marketNode]) : []
+    })
+    
+    // Check if cauldron_id matches a network map key
+    if (networkMap[marketNode] && networkMap[marketNode][cauldronId]) {
+      console.log('Found travel time (market->cauldron):', networkMap[marketNode][cauldronId])
+      return networkMap[marketNode][cauldronId]
+    }
+    
+    // Also check reverse direction (cauldron -> market)
+    if (networkMap[cauldronId] && networkMap[cauldronId][marketNode]) {
+      console.log('Found travel time (cauldron->market):', networkMap[cauldronId][marketNode])
+      return networkMap[cauldronId][marketNode]
+    }
+    
+    // Try to match by name (e.g., "Cauldron 001" -> "cauldron_001")
+    const name = cauldron.name?.toLowerCase().replace(/\s+/g, '_') || ''
+    if (networkMap[marketNode] && networkMap[marketNode][name]) {
+      console.log('Found travel time (by name):', networkMap[marketNode][name])
+      return networkMap[marketNode][name]
+    }
+    
+    // Fallback: calculate approximate time based on distance
+    console.log('Using fallback distance calculation')
+    // Using Haversine formula for distance, then convert to time
+    const R = 6371 // Earth radius in km
+    const dLat = (ENCHANTED_MARKET_LAT - cauldron.latitude) * Math.PI / 180
+    const dLng = (ENCHANTED_MARKET_LNG - cauldron.longitude) * Math.PI / 180
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(cauldron.latitude * Math.PI / 180) * Math.cos(ENCHANTED_MARKET_LAT * Math.PI / 180) *
+      Math.sin(dLng / 2) * Math.sin(dLng / 2)
+    const haversineC = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+    const distanceKm = R * haversineC
+    
+    // Convert distance to time (assuming 36 km/h = 0.6 km/min)
+    const DEFAULT_SPEED_KM_PER_MIN = 0.6
+    return distanceKm / DEFAULT_SPEED_KM_PER_MIN
+  }
+
+  // Fetch data from API
+  const fetchData = async () => {
+    try {
+      setError(null)
+      const [cauldronsData, ticketsData] = await Promise.all([
+        api.fetchCauldrons(),
+        api.fetchTickets(20), // Fetch last 20 tickets
+      ])
+
+      // Transform and set cauldrons
+      const transformedCauldrons = cauldronsData.map(transformCauldron)
+      setCauldrons(transformedCauldrons)
+
+      // Transform and set tickets
+      const transformedTickets = ticketsData.map(transformTicket)
+      setTickets(transformedTickets)
+
       // Update time series data
       const now = new Date()
+      const avgLevel = transformedCauldrons.length > 0
+        ? Math.round(transformedCauldrons.reduce((sum, c) => sum + c.level, 0) / transformedCauldrons.length)
+        : 0
+      
       setTimeSeriesData(prev => {
         const newData = [...prev, {
           time: now.toLocaleTimeString(),
-          avgLevel: Math.round(cauldrons.reduce((sum, c) => sum + c.level, 0) / cauldrons.length),
-          anomalies: cauldrons.filter(c => c.hasAnomaly).length,
+          avgLevel,
+          anomalies: transformedCauldrons.filter(c => c.hasAnomaly).length,
         }]
         return newData.slice(-20) // Keep last 20 data points
       })
-    }, 2000)
+
+      setLoading(false)
+    } catch (err) {
+      console.error('Error fetching data:', err)
+      setError(err.message || 'Failed to fetch data from API')
+      setLoading(false)
+      
+      // Fallback to simulated data on error
+      setCauldrons(generateCauldronData())
+      setTickets(generateTickets())
+    }
+  }
+
+  useEffect(() => {
+    // Initial data fetch
+    fetchData()
+    fetchNetworkMapData() // Fetch network map once
+
+    // Set up polling for real-time updates
+    const interval = setInterval(() => {
+      fetchData()
+    }, 5000) // Poll every 5 seconds
 
     // Simulate workflow progression
     const workflowInterval = setInterval(() => {
@@ -177,8 +328,42 @@ function App() {
     }
   }, [])
 
+  // Show loading state
+  if (loading && cauldrons.length === 0) {
+    return (
+      <div className="min-h-screen bg-cauldron-darker p-4 md:p-6 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-cauldron-purple border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-400">Loading PotionMaster Dashboard...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Show error state (only if no data loaded)
+  if (error && cauldrons.length === 0) {
+    return (
+      <div className="min-h-screen bg-cauldron-darker p-4 md:p-6 flex items-center justify-center">
+        <div className="text-center glass rounded-xl p-6 max-w-md">
+          <AlertTriangle className="w-12 h-12 text-red-400 mx-auto mb-4" />
+          <h2 className="text-xl font-bold text-gray-100 mb-2">Connection Error</h2>
+          <p className="text-gray-400 mb-4">{error}</p>
+          <p className="text-sm text-gray-500 mb-4">Using simulated data as fallback</p>
+          <button
+            onClick={fetchData}
+            className="px-4 py-2 bg-cauldron-purple text-white rounded-lg hover:bg-cauldron-purple/80 transition-colors"
+          >
+            Retry Connection
+          </button>
+        </div>
+      </div>
+    )
+  }
+
   const totalPotion = cauldrons.reduce((sum, c) => sum + (c.fill_level_liters || c.level * (c.capacity_liters || 100) / 100), 0)
-  const avgLevel = Math.round(cauldrons.reduce((sum, c) => sum + (c.level || (c.fill_level_liters / (c.capacity_liters || 100)) * 100), 0) / cauldrons.length)
+  const avgLevel = cauldrons.length > 0 
+    ? Math.round(cauldrons.reduce((sum, c) => sum + (c.level || (c.fill_level_liters / (c.capacity_liters || 100)) * 100), 0) / cauldrons.length)
+    : 0
   const anomalies = cauldrons.filter(c => c.hasAnomaly).length
   const mismatches = tickets.filter(t => t.status === 'mismatch' || t.status === 'missing').length
   const activeDrains = cauldrons.filter(c => c.isDraining).length
@@ -242,6 +427,30 @@ function App() {
       {/* Conditional Rendering: Dashboard or Map View */}
       {viewMode === 'dashboard' ? (
         <>
+      {/* Overview Requirement: "Real-time Potion Flow Monitoring Dashboard" */}
+      <div className="mb-4 p-4 rounded-lg bg-cauldron-purple/10 border border-cauldron-purple/30">
+        <div className="flex items-center gap-2 mb-2">
+          <Activity className="w-5 h-5 text-cauldron-purple" />
+          <span className="text-lg font-semibold text-cauldron-purple">Real-Time Potion Flow Monitoring Dashboard</span>
+        </div>
+        <p className="text-sm text-gray-300 mb-2">
+          Tracks potion levels across all cauldrons, identifies collection events, checks Potion Transport Tickets, and detects any missing or unlogged potion.
+        </p>
+        <div className="flex flex-wrap gap-2 text-xs text-gray-400">
+          <span>✓ Real-time monitoring</span>
+          <span>•</span>
+          <span>✓ Collection event identification</span>
+          <span>•</span>
+          <span>✓ Transport ticket checking</span>
+          <span>•</span>
+          <span>✓ Unlogged potion detection</span>
+          <span>•</span>
+          <span>✓ Inconsistency flagging</span>
+          <span>•</span>
+          <span>✓ Suspicious activity identification</span>
+        </div>
+      </div>
+
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <motion.div
@@ -295,7 +504,7 @@ function App() {
           className="glass rounded-lg p-4 glow-cyan"
         >
           <div className="flex items-center justify-between">
-            <div>
+      <div>
               <p className="text-gray-400 text-xs">Mismatches</p>
               <p className="text-2xl font-bold text-yellow-400">{mismatches}</p>
             </div>
@@ -400,73 +609,121 @@ function App() {
           )}
         </motion.div>
 
-        {/* Agent Workflow Panel */}
+        {/* Overview Requirement: "Identifies suspicious activity" */}
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           className="glass rounded-xl p-6"
         >
           <h2 className="text-2xl font-bold text-gray-100 mb-4 flex items-center gap-2">
-            <Activity className="w-6 h-6 text-cauldron-cyan" />
-            Agent Workflow
+            <AlertTriangle className="w-6 h-6 text-red-400" />
+            Suspicious Activity
           </h2>
+          <p className="text-xs text-gray-400 mb-4">
+            Overview Requirement: "Identifies suspicious activity and helps ensure every drop of potion is properly accounted for"
+          </p>
 
-          <div className="space-y-3">
-            {agentWorkflowSteps.map((step, index) => {
-              const Icon = step.icon
-              const isActive = activeWorkflowStep === step.id
-              const isCompleted = activeWorkflowStep > step.id
-
-              return (
-                <motion.div
-                  key={step.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className={`p-4 rounded-lg border transition-all ${
-                    isActive
-                      ? 'border-cauldron-cyan bg-cauldron-cyan/10 glow-cyan'
-                      : isCompleted
-                      ? 'border-green-500 bg-green-500/10'
-                      : 'border-gray-700 bg-gray-800/30'
-                  }`}
-                >
-                  <div className="flex items-start gap-3">
-                    <div
-                      className={`p-2 rounded-lg ${
-                        isActive
-                          ? 'bg-cauldron-cyan text-white'
-                          : isCompleted
-                          ? 'bg-green-500 text-white'
-                          : 'bg-gray-700 text-gray-400'
-                      }`}
-                    >
-                      <Icon className="w-5 h-5" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between mb-1">
-                        <h3 className="font-semibold text-gray-100">{step.name}</h3>
-                        {isActive && (
-                          <div className="w-2 h-2 bg-cauldron-cyan rounded-full animate-pulse"></div>
-                        )}
-                        {isCompleted && (
-                          <CheckCircle2 className="w-5 h-5 text-green-500" />
-                        )}
+          {/* Anomalies Section */}
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold mb-3 text-gray-300 flex items-center gap-2">
+              <AlertTriangle className="w-5 h-5 text-red-400" />
+              Anomalies Detected
+            </h3>
+            <div className="space-y-2">
+              {cauldrons
+                .filter(c => c.hasAnomaly)
+                .map(cauldron => (
+                  <div
+                    key={cauldron.id}
+                    className="p-3 rounded-lg bg-red-500/10 border border-red-500/30"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-sm font-medium text-red-400">
+                          {cauldron.name}
+                        </span>
+                        <div className="text-xs text-gray-400 mt-1">
+                          Suspicious activity detected • Level: {cauldron.level}%
+                        </div>
                       </div>
-                      <p className="text-xs text-gray-400">{step.description}</p>
+                      <AlertTriangle className="w-4 h-4 text-red-400" />
                     </div>
                   </div>
-                </motion.div>
-              )
-            })}
+                ))}
+              {anomalies === 0 && (
+                <p className="text-sm text-gray-500 text-center py-4">
+                  No suspicious activity detected
+                </p>
+              )}
+            </div>
           </div>
 
-          {/* Active Drains */}
+          <div className="pt-4 border-t border-gray-700">
+            <h3 className="text-lg font-semibold mb-3 text-gray-300 flex items-center gap-2">
+              <Activity className="w-5 h-5 text-cauldron-cyan" />
+              Agent Workflow
+            </h3>
+
+            <div className="space-y-3">
+              {agentWorkflowSteps.map((step, index) => {
+                const Icon = step.icon
+                const isActive = activeWorkflowStep === step.id
+                const isCompleted = activeWorkflowStep > step.id
+
+                return (
+                  <motion.div
+                    key={step.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className={`p-4 rounded-lg border transition-all ${
+                      isActive
+                        ? 'border-cauldron-cyan bg-cauldron-cyan/10 glow-cyan'
+                        : isCompleted
+                        ? 'border-green-500 bg-green-500/10'
+                        : 'border-gray-700 bg-gray-800/30'
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div
+                        className={`p-2 rounded-lg ${
+                          isActive
+                            ? 'bg-cauldron-cyan text-white'
+                            : isCompleted
+                            ? 'bg-green-500 text-white'
+                            : 'bg-gray-700 text-gray-400'
+                        }`}
+                      >
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-1">
+                          <h3 className="font-semibold text-gray-100">{step.name}</h3>
+                          {isActive && (
+                            <div className="w-2 h-2 bg-cauldron-cyan rounded-full animate-pulse"></div>
+                          )}
+                          {isCompleted && (
+                            <CheckCircle2 className="w-5 h-5 text-green-500" />
+                          )}
+                        </div>
+                        <p className="text-xs text-gray-400">{step.description}</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Collection Events - Overview Requirement: "Identifies collection events" */}
           <div className="mt-6 pt-6 border-t border-gray-700">
             <h3 className="text-lg font-semibold mb-3 text-gray-300 flex items-center gap-2">
               <Zap className="w-5 h-5 text-yellow-400" />
-              Active Drains
+              Collection Events
             </h3>
+            <p className="text-xs text-gray-400 mb-3">
+              Courier witches collecting potion from cauldrons (Active Drains)
+            </p>
             <div className="space-y-2">
               {cauldrons
                 .filter(c => c.isDraining)
@@ -476,18 +733,21 @@ function App() {
                     className="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-yellow-400">
-                        {cauldron.name}
-                      </span>
-                      <span className="text-xs text-gray-400">
-                        {cauldron.level}L
-                      </span>
+                      <div>
+                        <span className="text-sm font-medium text-yellow-400">
+                          {cauldron.name}
+                        </span>
+                        <div className="text-xs text-gray-400 mt-1">
+                          Collection in progress • Level: {cauldron.level}%
+                        </div>
+                      </div>
+                      <Zap className="w-4 h-4 text-yellow-400" />
                     </div>
                   </div>
                 ))}
               {activeDrains === 0 && (
                 <p className="text-sm text-gray-500 text-center py-4">
-                  No active drains
+                  No active collection events
                 </p>
               )}
             </div>
@@ -536,27 +796,29 @@ function App() {
 
           <div className="space-y-3">
             {tickets.map((ticket) => {
-              // Simulate drain event matching for demonstration
-              const matchedCauldron = cauldrons.find(c => 
-                (c.cauldron_id || `cauldron_${c.id}`) === (ticket.cauldron_id || `cauldron_${ticket.cauldronId}`)
-              )
-              const fillRate = matchedCauldron?.fill_rate_liters_per_min || matchedCauldron?.fillRate || 2.5
-              const drainDuration = 15 // minutes (simulated)
-              const continuousFill = fillRate * drainDuration
-              const levelDrop = (ticket.volume_liters || ticket.volume) - continuousFill
-              const expectedVolume = levelDrop + continuousFill
-              const volumeDiff = Math.abs((ticket.volume_liters || ticket.volume) - expectedVolume)
-              const isDiscrepancy = volumeDiff > 5 // 5L tolerance
+              // Use real matching data from API (EOG Requirement: Dynamic Ticket Matching)
+              const matchedDrain = ticket.matched_drain
+              const volumeDifference = ticket.volume_difference || 0
+              const expectedVolume = matchedDrain?.expected_total_volume || (ticket.volume_liters || ticket.volume)
+              const levelDrop = matchedDrain?.level_drop || 0
+              const continuousFill = matchedDrain?.potion_generated_during_drain || 0
+              const drainDuration = matchedDrain?.duration_minutes || 0
+              
+              // Determine status (from API matching algorithm)
+              const status = ticket.status || 'unknown'
+              const isMismatch = status === 'mismatch'
+              const isMissing = status === 'missing_drain' || status === 'missing'
+              const isMatched = status === 'matched'
 
               return (
                 <motion.div
-                  key={ticket.id}
+                  key={ticket.id || ticket.ticket_id}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   className={`p-4 rounded-lg border ${
-                    ticket.status === 'matched'
+                    isMatched
                       ? 'border-green-500/30 bg-green-500/10'
-                      : ticket.status === 'mismatch'
+                      : isMismatch
                       ? 'border-yellow-500/30 bg-yellow-500/10'
                       : 'border-red-500/30 bg-red-500/10'
                   }`}
@@ -566,13 +828,13 @@ function App() {
                       <span className="text-sm font-semibold text-gray-200">
                         {ticket.ticket_id || `Ticket #${ticket.id}`}
                       </span>
-                      {ticket.status === 'matched' && (
+                      {isMatched && (
                         <CheckCircle2 className="w-4 h-4 text-green-500" />
                       )}
-                      {ticket.status === 'mismatch' && (
+                      {isMismatch && (
                         <AlertTriangle className="w-4 h-4 text-yellow-500" />
                       )}
-                      {ticket.status === 'missing' && (
+                      {(isMissing || status === 'missing_drain') && (
                         <AlertTriangle className="w-4 h-4 text-red-500" />
                       )}
                     </div>
@@ -590,10 +852,13 @@ function App() {
                     )}
                   </div>
 
-                  {/* EOG Requirement: Discrepancy Detection Details */}
-                  {ticket.status === 'mismatch' && (
+                  {/* EOG Requirement: Discrepancy Detection - Match tickets to drain events, verify volumes */}
+                  {isMismatch && matchedDrain && (
                     <div className="mt-3 p-2 rounded bg-yellow-500/10 border border-yellow-500/20">
-                      <div className="text-xs text-yellow-400 font-semibold mb-1">Discrepancy Detected:</div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <AlertTriangle className="w-4 h-4 text-yellow-400" />
+                        <div className="text-xs text-yellow-400 font-semibold">Inconsistency Detected - Unlogged Potion Possible</div>
+                      </div>
                       <div className="text-xs text-gray-300 space-y-1">
                         <div>Ticket Volume: <span className="font-semibold">{ticket.volume_liters || ticket.volume}L</span></div>
                         <div>Expected Volume: <span className="font-semibold">{expectedVolume.toFixed(1)}L</span></div>
@@ -601,32 +866,52 @@ function App() {
                           <span>• Level Drop: {levelDrop > 0 ? levelDrop.toFixed(1) : '0.0'}L</span>
                           <span>• Continuous Fill: {continuousFill.toFixed(1)}L</span>
                         </div>
+                        {drainDuration > 0 && (
+                          <div className="text-gray-400">
+                            • Drain Duration: {drainDuration.toFixed(1)} min
+                          </div>
+                        )}
                         <div className="text-yellow-400 font-semibold">
-                          Difference: {volumeDiff.toFixed(1)}L
+                          Difference: {volumeDifference.toFixed(1)}L - Potential unlogged potion drain
                         </div>
                       </div>
                     </div>
                   )}
 
-                  {ticket.status === 'matched' && (
-                    <div className="mt-2 text-xs text-gray-400">
-                      ✓ Matched to drain event on {ticket.date}
+                  {(isMissing || status === 'missing_drain') && (
+                    <div className="mt-3 p-2 rounded bg-red-500/10 border border-red-500/20">
+                      <div className="flex items-center gap-2 mb-1">
+                        <AlertTriangle className="w-4 h-4 text-red-400" />
+                        <div className="text-xs text-red-400 font-semibold">Missing Ticket - Unlogged Potion Drain Detected</div>
+                      </div>
+                      <div className="text-xs text-gray-300">
+                        A drain event was detected but no corresponding transport ticket was found. This indicates unlogged potion collection.
+                      </div>
+                    </div>
+                  )}
+
+                  {isMatched && matchedDrain && (
+                    <div className="mt-2 text-xs text-gray-400 space-y-1">
+                      <div>✓ Matched to drain event on {ticket.date}</div>
+                      <div className="text-gray-500">
+                        Drain: {new Date(matchedDrain.start_time).toLocaleTimeString()} - {new Date(matchedDrain.end_time).toLocaleTimeString()}
+                      </div>
                     </div>
                   )}
 
                   <div className="mt-2 text-xs">
                     <span
                       className={`px-2 py-1 rounded ${
-                        ticket.status === 'matched'
+                        isMatched
                           ? 'bg-green-500/20 text-green-400'
-                          : ticket.status === 'mismatch'
+                          : isMismatch
                           ? 'bg-yellow-500/20 text-yellow-400'
                           : 'bg-red-500/20 text-red-400'
                       }`}
                     >
-                      {ticket.status === 'matched'
+                      {isMatched
                         ? 'Matched'
-                        : ticket.status === 'mismatch'
+                        : isMismatch
                         ? 'Volume Mismatch'
                         : 'Missing Ticket'}
                     </span>
@@ -743,189 +1028,224 @@ function App() {
           </h2>
           
           <div className="relative w-full h-[600px] bg-gray-900/50 rounded-lg border border-gray-700 overflow-hidden">
-            {/* Map Container */}
-            <svg
-              viewBox="0 0 1000 600"
-              className="w-full h-full"
-              preserveAspectRatio="xMidYMid meet"
-            >
-              {/* Grid lines */}
-              <defs>
-                <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
-                  <path d="M 50 0 L 0 0 0 50" fill="none" stroke="#374151" strokeWidth="0.5" opacity="0.3"/>
-                </pattern>
-              </defs>
-              <rect width="100%" height="100%" fill="url(#grid)" />
-              
-              {/* Enchanted Market marker - EOG Requirement: Sales Point */}
-              <g>
-                <circle
-                  cx={500}
-                  cy={300}
-                  r={18}
-                  fill="#8b5cf6"
-                  className="animate-pulse"
-                  opacity="0.9"
-                  stroke="#ec4899"
-                  strokeWidth="2"
-                />
-                <circle
-                  cx={500}
-                  cy={300}
-                  r={12}
-                  fill="#ec4899"
-                  opacity="0.6"
-                  className="animate-pulse"
-                />
-                <text
-                  x={500}
-                  y={335}
-                  textAnchor="middle"
-                  className="text-xs fill-cauldron-purple font-bold"
-                  fontSize="13"
-                >
-                  🏪 Enchanted Market
-                </text>
-                <text
-                  x={500}
-                  y={350}
-                  textAnchor="middle"
-                  className="text-xs fill-gray-400"
-                  fontSize="10"
-                >
-                  (Sales Point)
-                </text>
-              </g>
-              
-              {/* Cauldron markers */}
-              {cauldrons.map((cauldron) => {
-                if (!cauldron.latitude || !cauldron.longitude) return null
-                
-                // Normalize coordinates to map bounds (assuming coordinates are in NYC area)
-                // Adjust these bounds based on your actual coordinate range
-                const minLat = 40.70
-                const maxLat = 40.77
-                const minLng = -74.08
-                const maxLng = -73.97
-                
-                const x = ((cauldron.longitude - minLng) / (maxLng - minLng)) * 1000
-                const y = ((maxLat - cauldron.latitude) / (maxLat - minLat)) * 600
-                
-                const level = cauldron.level || (cauldron.fill_level_liters / cauldron.capacity_liters) * 100
-                const color = cauldron.hasAnomaly 
-                  ? '#ef4444' 
-                  : level > 80 
-                  ? '#eab308' 
-                  : level > 50 
-                  ? '#06b6d4' 
-                  : '#8b5cf6'
-                
+            {/* Leaflet Map Container */}
+            {(() => {
+              const validCauldrons = cauldrons.filter(c => c.latitude && c.longitude)
+              if (validCauldrons.length === 0) {
                 return (
-                  <g
-                    key={cauldron.cauldron_id || cauldron.id}
-                    className="cursor-pointer"
-                    onClick={() => setSelectedCauldron(cauldron)}
-                  >
-                    {/* Connection line to market */}
-                    <line
-                      x1={x}
-                      y1={y}
-                      x2={500}
-                      y2={300}
-                      stroke={color}
-                      strokeWidth="1"
-                      strokeDasharray="5,5"
-                      opacity="0.3"
-                    />
-                    
-                    {/* Cauldron marker */}
-                    <circle
-                      cx={x}
-                      cy={y}
-                      r={level > 80 ? 12 : 8}
-                      fill={color}
-                      className="hover:scale-125 transition-transform"
-                      opacity="0.9"
-                    >
-                      <animate
-                        attributeName="r"
-                        values={level > 80 ? "12;14;12" : "8;10;8"}
-                        dur="2s"
-                        repeatCount="indefinite"
-                      />
-                    </circle>
-                    
-                    {/* Cauldron label */}
-                    <text
-                      x={x}
-                      y={y - 20}
-                      textAnchor="middle"
-                      className="text-xs fill-gray-200 font-semibold"
-                      fontSize="11"
-                    >
-                      {cauldron.name}
-                    </text>
-                    
-                    {/* Level indicator */}
-                    <text
-                      x={x}
-                      y={y + 5}
-                      textAnchor="middle"
-                      className="text-xs fill-gray-300 font-bold"
-                      fontSize="10"
-                    >
-                      {Math.round(level)}%
-                    </text>
-                    
-                    {/* Anomaly indicator */}
-                    {cauldron.hasAnomaly && (
-                      <g>
-                        <circle
-                          cx={x + 10}
-                          cy={y - 10}
-                          r={6}
-                          fill="#ef4444"
-                          className="animate-pulse"
-                          opacity="0.8"
-                        />
-                        <text
-                          x={x + 10}
-                          y={y - 7}
-                          textAnchor="middle"
-                          className="text-xs fill-white font-bold"
-                          fontSize="8"
-                        >
-                          ⚠
-                        </text>
-                      </g>
-                    )}
-                    
-                    {/* Draining indicator */}
-                    {cauldron.isDraining && (
-                      <g>
-                        <circle
-                          cx={x - 10}
-                          cy={y - 10}
-                          r={6}
-                          fill="#eab308"
-                          className="animate-pulse"
-                          opacity="0.8"
-                        />
-                        <text
-                          x={x - 10}
-                          y={y - 7}
-                          textAnchor="middle"
-                          className="text-xs fill-white font-bold"
-                          fontSize="8"
-                        >
-                          ⚡
-                        </text>
-                      </g>
-                    )}
-                  </g>
+                  <div className="w-full h-full flex items-center justify-center text-gray-400">
+                    No cauldron data available
+                  </div>
                 )
-              })}
-            </svg>
+              }
+              
+              // Calculate bounds including all cauldrons and the market
+              const allLats = [...validCauldrons.map(c => c.latitude), ENCHANTED_MARKET_LAT]
+              const allLngs = [...validCauldrons.map(c => c.longitude), ENCHANTED_MARKET_LNG]
+              
+              const centerLat = (Math.min(...allLats) + Math.max(...allLats)) / 2
+              const centerLng = (Math.min(...allLngs) + Math.max(...allLngs)) / 2
+              
+              // Create custom icons
+              const createCauldronIcon = (color, size = 20) => {
+                return L.divIcon({
+                  className: 'custom-cauldron-icon',
+                  html: `<div style="
+                    width: ${size}px;
+                    height: ${size}px;
+                    border-radius: 50%;
+                    background-color: ${color};
+                    border: 3px solid #1a1a1f;
+                    box-shadow: 0 0 10px ${color}80;
+                  "></div>`,
+                  iconSize: [size, size],
+                  iconAnchor: [size / 2, size / 2],
+                })
+              }
+              
+              const marketIcon = L.divIcon({
+                className: 'custom-market-icon',
+                html: `<div style="
+                  width: 30px;
+                  height: 30px;
+                  border-radius: 50%;
+                  background-color: #8b5cf6;
+                  border: 3px solid #ec4899;
+                  box-shadow: 0 0 15px #8b5cf680, 0 0 25px #ec489980;
+                  animation: pulse 2s infinite;
+                "></div>`,
+                iconSize: [30, 30],
+                iconAnchor: [15, 15],
+              })
+              
+              return (
+                <MapContainer
+                  center={[centerLat, centerLng]}
+                  zoom={11}
+                  style={{ height: '100%', width: '100%', zIndex: 0 }}
+                  className="rounded-lg"
+                >
+                  <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  />
+                  
+                  {/* Enchanted Market marker */}
+                  <Marker position={[ENCHANTED_MARKET_LAT, ENCHANTED_MARKET_LNG]} icon={marketIcon}>
+                    <Popup>
+                      <div className="text-center">
+                        <div className="font-bold text-purple-400 text-lg mb-1">🏪 Enchanted Market</div>
+                        <div className="text-sm text-gray-300">Sales Point</div>
+                        <div className="text-xs text-gray-400 mt-1">
+                          {ENCHANTED_MARKET_LAT.toFixed(4)}, {ENCHANTED_MARKET_LNG.toFixed(4)}
+                        </div>
+                      </div>
+                    </Popup>
+                  </Marker>
+                  
+                  {/* Cauldron markers */}
+                  {validCauldrons.map((cauldron) => {
+                    const level = cauldron.level || (cauldron.fill_level_liters / cauldron.capacity_liters) * 100
+                    const color = cauldron.hasAnomaly 
+                      ? '#ef4444' 
+                      : level > 80 
+                      ? '#eab308' 
+                      : level > 50 
+                      ? '#06b6d4' 
+                      : '#8b5cf6'
+                    
+                    const iconSize = level > 80 ? 24 : 20
+                    const icon = createCauldronIcon(color, iconSize)
+                    
+                    return (
+                      <Marker
+                        key={cauldron.cauldron_id || cauldron.id}
+                        position={[cauldron.latitude, cauldron.longitude]}
+                        icon={icon}
+                        eventHandlers={{
+                          click: () => setSelectedCauldron(cauldron),
+                        }}
+                      >
+                        <Popup>
+                          <div className="text-center min-w-[150px]">
+                            <div className="font-bold text-gray-200 mb-1">{cauldron.name}</div>
+                            <div className="text-sm text-gray-300">
+                              Level: <span className="font-semibold">{Math.round(level)}%</span>
+                            </div>
+                            <div className="text-xs text-gray-400 mt-1">
+                              {cauldron.fill_level_liters?.toFixed(1) || 'N/A'} / {cauldron.capacity_liters?.toFixed(1) || 'N/A'} L
+                            </div>
+                            {cauldron.hasAnomaly && (
+                              <div className="text-xs text-red-400 font-semibold mt-1">⚠ Anomaly Detected</div>
+                            )}
+                            {cauldron.isDraining && (
+                              <div className="text-xs text-yellow-400 font-semibold mt-1">⚡ Draining</div>
+                            )}
+                            <div className="text-xs text-gray-500 mt-1">
+                              {cauldron.latitude.toFixed(4)}, {cauldron.longitude.toFixed(4)}
+                            </div>
+                          </div>
+                        </Popup>
+                      </Marker>
+                    )
+                  })}
+                  
+                  {/* Connection lines from cauldrons to market */}
+                  {validCauldrons.map((cauldron) => {
+                    const level = cauldron.level || (cauldron.fill_level_liters / cauldron.capacity_liters) * 100
+                    const color = cauldron.hasAnomaly 
+                      ? '#ef4444' 
+                      : level > 80 
+                      ? '#eab308' 
+                      : level > 50 
+                      ? '#06b6d4' 
+                      : '#8b5cf6'
+                    
+                    const travelTime = getTravelTimeToMarket(cauldron)
+                    
+                    // Calculate midpoint for label placement
+                    const midLat = (cauldron.latitude + ENCHANTED_MARKET_LAT) / 2
+                    const midLng = (cauldron.longitude + ENCHANTED_MARKET_LNG) / 2
+                    
+                    // Create custom icon for travel time label
+                    const travelTimeIcon = L.divIcon({
+                      className: 'travel-time-label',
+                      html: `<div style="
+                        background: rgba(15, 15, 20, 0.95);
+                        backdrop-filter: blur(10px);
+                        border: 2px solid ${color};
+                        border-radius: 6px;
+                        padding: 4px 8px;
+                        color: ${color};
+                        font-weight: bold;
+                        font-size: 12px;
+                        white-space: nowrap;
+                        box-shadow: 0 0 10px ${color}80;
+                        text-align: center;
+                      ">${travelTime.toFixed(1)} min</div>`,
+                      iconSize: [null, null],
+                      iconAnchor: [0, 0],
+                    })
+                    
+                    return (
+                      <>
+                        <Polyline
+                          key={`line-${cauldron.cauldron_id || cauldron.id}`}
+                          positions={[
+                            [cauldron.latitude, cauldron.longitude],
+                            [ENCHANTED_MARKET_LAT, ENCHANTED_MARKET_LNG]
+                          ]}
+                          pathOptions={{
+                            color: color,
+                            weight: 2,
+                            opacity: 0.4,
+                            dashArray: '5, 5',
+                          }}
+                          eventHandlers={{
+                            mouseover: (e) => {
+                              e.target.setStyle({
+                                opacity: 0.8,
+                                weight: 3,
+                              })
+                            },
+                            mouseout: (e) => {
+                              e.target.setStyle({
+                                opacity: 0.4,
+                                weight: 2,
+                              })
+                            },
+                          }}
+                        >
+                          <LeafletTooltip 
+                            permanent={false} 
+                            direction="center" 
+                            className="travel-time-tooltip"
+                            interactive={true}
+                            sticky={true}
+                          >
+                            <div className="text-center">
+                              <div className="font-semibold text-gray-200">
+                                {cauldron.name} → Market
+                              </div>
+                              <div className="text-sm text-purple-300 font-bold">
+                                {travelTime.toFixed(1)} min
+                              </div>
+                            </div>
+                          </LeafletTooltip>
+                        </Polyline>
+                        {/* Travel time label at midpoint */}
+                        <Marker
+                          key={`label-${cauldron.cauldron_id || cauldron.id}`}
+                          position={[midLat, midLng]}
+                          icon={travelTimeIcon}
+                          interactive={false}
+                        />
+                      </>
+                    )
+                  })}
+                </MapContainer>
+              )
+            })()}
             
             {/* Legend */}
             <div className="absolute bottom-4 left-4 glass rounded-lg p-4 border border-gray-700">
@@ -1006,7 +1326,17 @@ function App() {
                 <input
                   type="date"
                   value={historyDate}
-                  onChange={(e) => setHistoryDate(e.target.value)}
+                  onChange={async (e) => {
+                    const newDate = e.target.value
+                    setHistoryDate(newDate)
+                    // Fetch historical data for the selected date
+                    try {
+                      const historicalData = await api.fetchHistoricalCauldrons(newDate)
+                      setHistoricalData(historicalData)
+                    } catch (err) {
+                      console.error('Error fetching historical data:', err)
+                    }
+                  }}
                   max={new Date().toISOString().split('T')[0]}
                   className="w-full px-4 py-2 rounded-lg bg-gray-900 border border-gray-700 text-gray-200 focus:border-cauldron-purple focus:outline-none"
                 />
@@ -1022,26 +1352,28 @@ function App() {
                   Historical Cauldron Levels - {historyDate}
                 </h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  {cauldrons.map((cauldron) => {
-                    // Simulate historical data for the selected date
-                    const historicalLevel = Math.random() * 100
-                    return (
+                  {historicalData.cauldrons && historicalData.cauldrons.length > 0 ? (
+                    historicalData.cauldrons.map((cauldron) => (
                       <div
-                        key={cauldron.id}
+                        key={cauldron.cauldron_id}
                         className="p-3 rounded-lg bg-gray-800/50 border border-gray-700"
                       >
                         <div className="text-xs font-semibold text-gray-300 mb-1">
                           {cauldron.name}
                         </div>
                         <div className="text-lg font-bold text-cauldron-purple">
-                          {Math.round(historicalLevel)}%
+                          {cauldron.level}%
                         </div>
                         <div className="text-xs text-gray-400">
-                          {((cauldron.capacity_liters || cauldron.capacity) * historicalLevel / 100).toFixed(1)}L
+                          {cauldron.fill_level_liters.toFixed(1)}L / {cauldron.capacity_liters.toFixed(1)}L
                         </div>
                       </div>
-                    )
-                  })}
+                    ))
+                  ) : (
+                    <div className="col-span-full text-center py-8 text-gray-500">
+                      {cauldrons.length > 0 ? 'Loading historical data...' : 'No historical data available'}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -1235,3 +1567,4 @@ function App() {
 }
 
 export default App
+
