@@ -46,29 +46,39 @@ class RouteOptimizer:
             current_location = pending[0] if pending else current_location
 
         route = [current_location]
-        total_distance = 0.0
+        total_travel_time_minutes = 0.0
+        total_distance_km = 0.0
+        has_network_data = len(self._network) > 0
 
         while pending:
             last = route[-1]
             next_stop = self._select_nearest(last, pending)
             if next_stop is None:
                 break
-            total_distance += self._distance_between(last, next_stop)
+            travel_time_or_distance = self._distance_between(last, next_stop)
+            
+            if has_network_data:
+                # Network map contains travel_time_minutes directly from API
+                total_travel_time_minutes += travel_time_or_distance
+                # Estimate distance from travel time for display purposes
+                total_distance_km += travel_time_or_distance * DEFAULT_SPEED_KM_PER_MINUTE
+            else:
+                # Fallback: treat as distance and convert to time
+                total_distance_km += travel_time_or_distance
+                total_travel_time_minutes += travel_time_or_distance / DEFAULT_SPEED_KM_PER_MINUTE
+            
             route.append(next_stop)
             pending.remove(next_stop)
 
-        # Calculate travel time
-        travel_minutes = total_distance / DEFAULT_SPEED_KM_PER_MINUTE if total_distance else 0.0
-        
         # EOG: Add 15 minutes unload time for each market visit
         # Count how many times route goes to market (assuming route ends at market)
         market_visits = 1  # At least one visit to drop off
-        estimated_minutes = travel_minutes + (market_visits * UNLOAD_TIME_MINUTES)
+        estimated_minutes = total_travel_time_minutes + (market_visits * UNLOAD_TIME_MINUTES)
 
         return RoutePlan(
             courier_id=courier_id,
             ordered_stops=route[1:],  # exclude starting location for clarity
-            total_distance_km=round(total_distance, 2),
+            total_distance_km=round(total_distance_km, 2),
             estimated_completion_minutes=round(estimated_minutes, 1),
         )
 
