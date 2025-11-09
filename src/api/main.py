@@ -306,60 +306,138 @@ async def get_historical_cauldrons(date: Optional[str] = None) -> Dict:
             data_resp.raise_for_status()
             historical_data = data_resp.json()
         
+        # Validate historical_data structure
+        if not isinstance(historical_data, list):
+            # If it's a dict, try to extract the list
+            if isinstance(historical_data, dict):
+                # Check for common response structures
+                if "data" in historical_data:
+                    historical_data = historical_data["data"]
+                elif "historical_data" in historical_data:
+                    historical_data = historical_data["historical_data"]
+                else:
+                    # Return empty result if structure is unexpected
+                    historical_data = []
+            else:
+                historical_data = []
+        
         # Get cauldron info
         cauldrons = await cauldron_client.fetch_current_levels()
+        if not cauldrons:
+            # Return empty result if no cauldrons
+            return {
+                "date": date or datetime.utcnow().date().isoformat(),
+                "cauldrons": []
+            }
+        
         cauldron_info_map = {c.cauldron_id: c for c in cauldrons}
         
         # Filter by date if provided
         target_date = date
+        cauldron_time_series = {}
+        
         if target_date:
             # Filter data points for the specified date
             filtered_data = []
             for data_point in historical_data:
-                timestamp = datetime.fromisoformat(data_point["timestamp"].replace("Z", "+00:00"))
-                if timestamp.date().isoformat() == target_date:
-                    filtered_data.append(data_point)
+                try:
+                    if not isinstance(data_point, dict):
+                        continue
+                    if "timestamp" not in data_point:
+                        continue
+                    
+                    timestamp_str = data_point["timestamp"]
+                    if isinstance(timestamp_str, str):
+                        timestamp = datetime.fromisoformat(timestamp_str.replace("Z", "+00:00"))
+                    else:
+                        continue
+                    
+                    if timestamp.date().isoformat() == target_date:
+                        filtered_data.append(data_point)
+                except (ValueError, KeyError, AttributeError) as e:
+                    # Skip invalid data points
+                    print(f"Warning: Skipping invalid data point: {e}")
+                    continue
             
-            # Get all unique timestamps for the date
-            timestamps = sorted(set(
-                datetime.fromisoformat(dp["timestamp"].replace("Z", "+00:00"))
-                for dp in filtered_data
-            ))
-            
-            # Build time series data for each cauldron
-            cauldron_time_series = {}
-            for cauldron in cauldrons:
-                cauldron_id = cauldron.cauldron_id
-                cauldron_time_series[cauldron_id] = []
+            if filtered_data:
+                # Get all unique timestamps for the date
+                timestamps = []
+                for dp in filtered_data:
+                    try:
+                        timestamp_str = dp["timestamp"]
+                        if isinstance(timestamp_str, str):
+                            timestamp = datetime.fromisoformat(timestamp_str.replace("Z", "+00:00"))
+                            timestamps.append(timestamp)
+                    except (ValueError, KeyError):
+                        continue
                 
-                for timestamp in timestamps:
-                    # Find closest data point for this timestamp
-                    closest_point = min(
-                        filtered_data,
-                        key=lambda dp: abs(
-                            (datetime.fromisoformat(dp["timestamp"].replace("Z", "+00:00")) - timestamp).total_seconds()
-                        )
-                    )
-                    level = closest_point["cauldron_levels"].get(cauldron_id, 0.0)
-                    cauldron_time_series[cauldron_id].append({
-                        "timestamp": timestamp.isoformat(),
-                        "level": round(level, 2),
-                    })
-        else:
-            # Return latest data
-            if historical_data:
-                latest = historical_data[-1]
-                timestamp = datetime.fromisoformat(latest["timestamp"].replace("Z", "+00:00"))
-                cauldron_time_series = {}
+                timestamps = sorted(set(timestamps))
+                
+                # Build time series data for each cauldron
                 for cauldron in cauldrons:
                     cauldron_id = cauldron.cauldron_id
-                    level = latest["cauldron_levels"].get(cauldron_id, 0.0)
-                    cauldron_time_series[cauldron_id] = [{
-                        "timestamp": timestamp.isoformat(),
-                        "level": round(level, 2),
-                    }]
+                    cauldron_time_series[cauldron_id] = []
+                    
+                    for timestamp in timestamps:
+                        try:
+                            # Find closest data point for this timestamp
+                            if not filtered_data:
+                                break
+                            
+                            closest_point = min(
+                                filtered_data,
+                                key=lambda dp: abs(
+                                    (datetime.fromisoformat(dp["timestamp"].replace("Z", "+00:00")) - timestamp).total_seconds()
+                                )
+                            )
+                            
+                            # Get level from cauldron_levels
+                            if "cauldron_levels" in closest_point and isinstance(closest_point["cauldron_levels"], dict):
+                                level = closest_point["cauldron_levels"].get(cauldron_id, 0.0)
+                            else:
+                                level = 0.0
+                            
+                            cauldron_time_series[cauldron_id].append({
+                                "timestamp": timestamp.isoformat(),
+                                "level": round(level, 2),
+                            })
+                        except (ValueError, KeyError, AttributeError) as e:
+                            # Skip invalid timestamps
+                            print(f"Warning: Error processing timestamp {timestamp}: {e}")
+                            continue
             else:
-                cauldron_time_series = {}
+                # No data for this date - initialize empty time series
+                for cauldron in cauldrons:
+                    cauldron_time_series[cauldron.cauldron_id] = []
+        else:
+            # Return latest data
+            if historical_data and len(historical_data) > 0:
+                try:
+                    latest = historical_data[-1]
+                    if isinstance(latest, dict) and "timestamp" in latest:
+                        timestamp = datetime.fromisoformat(latest["timestamp"].replace("Z", "+00:00"))
+                        for cauldron in cauldrons:
+                            cauldron_id = cauldron.cauldron_id
+                            if "cauldron_levels" in latest and isinstance(latest["cauldron_levels"], dict):
+                                level = latest["cauldron_levels"].get(cauldron_id, 0.0)
+                            else:
+                                level = 0.0
+                            cauldron_time_series[cauldron_id] = [{
+                                "timestamp": timestamp.isoformat(),
+                                "level": round(level, 2),
+                            }]
+                    else:
+                        # Invalid latest data structure
+                        for cauldron in cauldrons:
+                            cauldron_time_series[cauldron.cauldron_id] = []
+                except (ValueError, KeyError, AttributeError) as e:
+                    print(f"Warning: Error processing latest data: {e}")
+                    for cauldron in cauldrons:
+                        cauldron_time_series[cauldron.cauldron_id] = []
+            else:
+                # No historical data available
+                for cauldron in cauldrons:
+                    cauldron_time_series[cauldron.cauldron_id] = []
         
         # Build result
         result = {
@@ -371,8 +449,12 @@ async def get_historical_cauldrons(date: Optional[str] = None) -> Dict:
             cauldron_id = cauldron.cauldron_id
             time_series = cauldron_time_series.get(cauldron_id, [])
             
-            # Get latest level for this date
-            latest_level = time_series[-1]["level"] if time_series else 0.0
+            # Get latest level for this date (safely)
+            if time_series and len(time_series) > 0:
+                latest_level = time_series[-1].get("level", 0.0)
+            else:
+                # Fallback to current level if no historical data
+                latest_level = cauldron.fill_level_liters if hasattr(cauldron, 'fill_level_liters') else 0.0
             
             result["cauldrons"].append({
                 "cauldron_id": cauldron_id,
@@ -384,8 +466,61 @@ async def get_historical_cauldrons(date: Optional[str] = None) -> Dict:
             })
         
         return result
+    except HTTPException:
+        # Re-raise HTTP exceptions
+        raise
     except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        print(f"Error fetching historical data: {error_details}")
         raise HTTPException(status_code=500, detail=f"Error fetching historical data: {str(e)}")
+
+
+@app.get("/api/historical/anomalies")
+async def get_historical_anomalies() -> Dict:
+    """
+    Get historical anomaly analysis data.
+    
+    Returns pre-computed anomaly analysis from anomalies.json file.
+    """
+    try:
+        from pathlib import Path
+        
+        # Try to find anomalies.json in project root
+        root = Path(__file__).resolve().parents[2]
+        anomalies_path = root / "anomalies.json"
+        
+        if not anomalies_path.exists():
+            # Return empty structure if file doesn't exist
+            return {
+                "summary": {
+                    "total_tickets_reported": 0,
+                    "total_long_drain_events": 0,
+                    "matched_tickets": 0,
+                    "matched_events": 0,
+                    "faulty_ticket_count": 0,
+                    "unlogged_ticket_count": 0,
+                    "unaccounted_event_count": 0,
+                },
+                "faulty_tickets": [],
+                "unlogged_tickets": [],
+                "unaccounted_events": [],
+                "faulty_tickets_by_day": {},
+                "unlogged_tickets_by_day": {},
+                "unaccounted_events_by_day": {},
+                "daily_summary": {},
+            }
+        
+        with anomalies_path.open("r") as f:
+            import json
+            anomalies_data = json.load(f)
+        
+        return anomalies_data
+    except Exception as e:
+        import traceback
+        error_details = traceback.format_exc()
+        print(f"Error fetching historical anomalies: {error_details}")
+        raise HTTPException(status_code=500, detail=f"Error fetching historical anomalies: {str(e)}")
 
 
 @app.get("/api/anomalies")
@@ -514,7 +649,6 @@ async def get_network_map() -> Dict:
         raise HTTPException(status_code=500, detail=f"Error fetching network map: {str(e)}")
 
 
-<<<<<<< HEAD
 @app.get("/api/minimum-witches")
 async def get_minimum_witches(time_horizon_minutes: float = 480.0) -> Dict:
     """

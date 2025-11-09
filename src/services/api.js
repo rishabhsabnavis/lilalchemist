@@ -62,6 +62,13 @@ export async function fetchAnomalies() {
 }
 
 /**
+ * Fetch historical anomaly analysis data
+ */
+export async function fetchHistoricalAnomalies() {
+  return fetchAPI('/api/historical/anomalies');
+}
+
+/**
  * Fetch overflow forecasts
  */
 export async function fetchForecasts() {

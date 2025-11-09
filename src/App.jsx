@@ -165,7 +165,6 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [networkMap, setNetworkMap] = useState(FALLBACK_NETWORK_MAP)
-<<<<<<< HEAD
   const [forecasts, setForecasts] = useState([])
   const [minimumWitches, setMinimumWitches] = useState(null)
   const [optimalSchedule, setOptimalSchedule] = useState(null)
@@ -174,29 +173,55 @@ function App() {
   const [daysData, setDaysData] = useState([])
   const [selectedHistoricalCauldron, setSelectedHistoricalCauldron] = useState(null) // null = "All Cauldrons (Average)"
   const [loadingHistoricalData, setLoadingHistoricalData] = useState(false)
+  const [anomalies, setAnomalies] = useState([]) // Detailed anomalies from API
+  const [historicalAnomalies, setHistoricalAnomalies] = useState(null) // Historical anomaly analysis
+  const [showHistoricalAnomalies, setShowHistoricalAnomalies] = useState(false) // Toggle historical view
 
   // Transform API cauldron data to match frontend format
   const transformCauldron = (apiCauldron) => {
-    const level = apiCauldron.level || (apiCauldron.fill_level_liters / apiCauldron.capacity_liters) * 100
-    return {
-      ...apiCauldron,
-      level: Math.round(level),
-      isDraining: false, // Will be determined by ticket matching
-      hasAnomaly: false, // Will be determined by anomaly detection
-      fillRate: apiCauldron.fill_rate_liters_per_min || apiCauldron.fillRate || 2.5,
-      capacity: apiCauldron.capacity_liters,
-      forecastOverflow: null, // Will be set by forecasts
+    if (!apiCauldron) {
+      console.warn('transformCauldron: received null/undefined cauldron')
+      return null
+    }
+    
+    try {
+      const capacity = apiCauldron.capacity_liters || 100
+      const fillLevel = apiCauldron.fill_level_liters || 0
+      const level = apiCauldron.level || (capacity > 0 ? (fillLevel / capacity) * 100 : 0)
+      
+      return {
+        ...apiCauldron,
+        level: Math.round(level),
+        isDraining: false, // Will be determined by ticket matching
+        hasAnomaly: false, // Will be determined by anomaly detection
+        fillRate: apiCauldron.fill_rate_liters_per_min || apiCauldron.fillRate || 2.5,
+        capacity: capacity,
+        forecastOverflow: null, // Will be set by forecasts
+      }
+    } catch (err) {
+      console.error('Error transforming cauldron:', err, apiCauldron)
+      return null
     }
   }
 
   // Transform API ticket data to match frontend format
   const transformTicket = (apiTicket) => {
-    return {
-      ...apiTicket,
-      id: apiTicket.ticket_id || apiTicket.id,
-      cauldronId: apiTicket.cauldron_id,
-      volume: apiTicket.volume_liters || apiTicket.volume,
-      status: apiTicket.status || 'matched', // Default to matched, will be updated by matching logic
+    if (!apiTicket) {
+      console.warn('transformTicket: received null/undefined ticket')
+      return null
+    }
+    
+    try {
+      return {
+        ...apiTicket,
+        id: apiTicket.ticket_id || apiTicket.id,
+        cauldronId: apiTicket.cauldron_id,
+        volume: apiTicket.volume_liters || apiTicket.volume,
+        status: apiTicket.status || 'matched', // Default to matched, will be updated by matching logic
+      }
+    } catch (err) {
+      console.error('Error transforming ticket:', err, apiTicket)
+      return null
     }
   }
 
@@ -333,63 +358,124 @@ function App() {
 
   // Process chart data based on selected cauldron
   const processChartData = () => {
-    if (daysData.length === 0) return []
-    
-    const processedData = []
-    
-    for (const dayEntry of daysData) {
-      const date = new Date(dayEntry.date)
-      const dateLabel = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+    try {
+      if (!Array.isArray(daysData) || daysData.length === 0) return []
       
-      if (selectedHistoricalCauldron === null) {
-        // Calculate average across all cauldrons
-        const cauldrons = dayEntry.data?.cauldrons || []
-        if (cauldrons.length > 0) {
-          const avgLevel = cauldrons.reduce((sum, c) => {
-            return sum + (c.fill_level_liters || 0)
-          }, 0) / cauldrons.length
-          processedData.push({
-            date: dayEntry.date,
-            dateLabel,
-            fill_level_liters: avgLevel,
-            fullDate: date
-          })
-        } else {
-          // No data for this date - use 0
-          processedData.push({
-            date: dayEntry.date,
-            dateLabel,
-            fill_level_liters: 0,
-            fullDate: date
-          })
-        }
-      } else {
-        // Get data for specific cauldron
-        const cauldrons = dayEntry.data?.cauldrons || []
-        const cauldron = cauldrons.find(c => 
-          (c.cauldron_id || c.id) === selectedHistoricalCauldron
-        )
+      const processedData = []
+      
+      for (const dayEntry of daysData) {
+        if (!dayEntry || !dayEntry.date) continue
         
-        if (cauldron) {
-          processedData.push({
-            date: dayEntry.date,
-            dateLabel,
-            fill_level_liters: cauldron.fill_level_liters || 0,
-            fullDate: date
-          })
-        } else {
-          // Cauldron not found for this date - use 0
-          processedData.push({
-            date: dayEntry.date,
-            dateLabel,
-            fill_level_liters: 0,
-            fullDate: date
-          })
+        try {
+          const date = new Date(dayEntry.date)
+          if (isNaN(date.getTime())) continue // Invalid date
+          
+          const dateLabel = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+          
+          if (selectedHistoricalCauldron === null) {
+            // Calculate average across all cauldrons
+            const cauldrons = dayEntry.data?.cauldrons || []
+            if (cauldrons.length > 0) {
+              const avgLevel = cauldrons.reduce((sum, c) => {
+                return sum + (c.fill_level_liters || 0)
+              }, 0) / cauldrons.length
+              processedData.push({
+                date: dayEntry.date,
+                dateLabel,
+                fill_level_liters: avgLevel,
+                fullDate: date
+              })
+            } else {
+              // No data for this date - use 0
+              processedData.push({
+                date: dayEntry.date,
+                dateLabel,
+                fill_level_liters: 0,
+                fullDate: date
+              })
+            }
+          } else {
+            // Get data for specific cauldron
+            const cauldrons = dayEntry.data?.cauldrons || []
+            const cauldron = cauldrons.find(c => 
+              (c.cauldron_id || c.id) === selectedHistoricalCauldron
+            )
+            
+            if (cauldron) {
+              processedData.push({
+                date: dayEntry.date,
+                dateLabel,
+                fill_level_liters: cauldron.fill_level_liters || 0,
+                fullDate: date
+              })
+            } else {
+              // Cauldron not found for this date - use 0
+              processedData.push({
+                date: dayEntry.date,
+                dateLabel,
+                fill_level_liters: 0,
+                fullDate: date
+              })
+            }
+          }
+        } catch (err) {
+          console.error('Error processing day entry:', err, dayEntry)
+          continue
         }
       }
+      
+      return processedData
+    } catch (err) {
+      console.error('Error in processChartData:', err)
+      return []
     }
-    
-    return processedData
+  }
+
+  // Fetch anomalies from API
+  const fetchAnomaliesData = async () => {
+    try {
+      const anomaliesData = await api.fetchAnomalies()
+      setAnomalies(anomaliesData || [])
+      
+      // Update cauldrons with anomaly information
+      if (anomaliesData && anomaliesData.length > 0) {
+        setCauldrons(prev => prev.map(cauldron => {
+          const anomaly = anomaliesData.find(a => a.cauldron_id === cauldron.cauldron_id || a.cauldron_id === cauldron.id)
+          return {
+            ...cauldron,
+            hasAnomaly: !!anomaly,
+            anomalyType: anomaly?.anomaly_type || null,
+            anomalySeverity: anomaly?.severity || null,
+            anomalyDescription: anomaly?.description || null,
+            anomalyDetectedAt: anomaly?.detected_at ? new Date(anomaly.detected_at) : null,
+          }
+        }))
+      } else {
+        // Clear anomalies if none detected
+        setCauldrons(prev => prev.map(cauldron => ({
+          ...cauldron,
+          hasAnomaly: false,
+          anomalyType: null,
+          anomalySeverity: null,
+          anomalyDescription: null,
+          anomalyDetectedAt: null,
+        })))
+      }
+    } catch (err) {
+      console.error('Error fetching anomalies:', err)
+      // Don't set error state - anomalies are optional
+    }
+  }
+
+  // Fetch historical anomaly analysis
+  const fetchHistoricalAnomaliesData = async () => {
+    try {
+      const data = await api.fetchHistoricalAnomalies()
+      setHistoricalAnomalies(data)
+    } catch (err) {
+      console.error('Error fetching historical anomalies:', err)
+      setHistoricalAnomalies(null)
+    }
   }
 
   // Fetch forecasting and scheduling data
@@ -452,12 +538,16 @@ function App() {
         api.fetchTickets(20), // Fetch last 20 tickets
       ])
 
-      // Transform and set cauldrons
-      const transformedCauldrons = cauldronsData.map(transformCauldron)
+      // Transform and set cauldrons (filter out nulls)
+      const transformedCauldrons = (Array.isArray(cauldronsData) ? cauldronsData : [])
+        .map(transformCauldron)
+        .filter(c => c !== null)
       setCauldrons(transformedCauldrons)
 
-      // Transform and set tickets
-      const transformedTickets = ticketsData.map(transformTicket)
+      // Transform and set tickets (filter out nulls)
+      const transformedTickets = (Array.isArray(ticketsData) ? ticketsData : [])
+        .map(transformTicket)
+        .filter(t => t !== null)
       setTickets(transformedTickets)
       // Update time series data
       const now = new Date()
@@ -474,9 +564,14 @@ function App() {
         return newData.slice(-20) // Keep last 20 data points
       })
 
-      // Fetch forecasting data after cauldrons are loaded
-      await fetchForecastingData()
+      // Set loading to false immediately after core data is loaded
       setLoading(false)
+      
+      // Fetch additional data in parallel (non-blocking)
+      Promise.all([
+        fetchForecastingData().catch(err => console.error('Forecasting error:', err)),
+        fetchAnomaliesData().catch(err => console.error('Anomalies error:', err))
+      ])
     } catch (err) {
       console.error('Error fetching data:', err)
       setError(err.message || 'Failed to fetch data from API')
@@ -489,11 +584,16 @@ function App() {
   }
 
   useEffect(() => {
-    // Initial data fetch
+    // Initial data fetch - core data first
     fetchData()
-    fetchNetworkMapData() // Fetch network map once
-    fetchMarketLocation() // Fetch market location once
-    fetchDaysData() // Fetch historical data for Level Trends
+    
+    // Fetch non-critical data in parallel (don't block UI)
+    Promise.all([
+      fetchNetworkMapData().catch(err => console.error('Network map error:', err)),
+      fetchMarketLocation().catch(err => console.error('Market location error:', err)),
+      // Historical data can load in background
+      fetchDaysData().catch(err => console.error('Historical data error:', err))
+    ])
 
     // Set up polling for real-time updates
     const interval = setInterval(() => {
@@ -505,6 +605,11 @@ function App() {
       fetchForecastingData()
     }, 30000)
 
+    // Poll anomalies data (every 15 seconds)
+    const anomaliesInterval = setInterval(() => {
+      fetchAnomaliesData()
+    }, 15000)
+
     // Simulate workflow progression
     const workflowInterval = setInterval(() => {
       setActiveWorkflowStep(prev => {
@@ -513,20 +618,41 @@ function App() {
       })
     }, 3000)
 
+    // Timeout to prevent infinite loading - show fallback data after 10 seconds
+    const loadingTimeout = setTimeout(() => {
+      console.warn('Loading timeout - showing fallback data')
+      setCauldrons(prev => {
+        if (prev.length === 0) {
+          return generateCauldronData()
+        }
+        return prev
+      })
+      setTickets(prev => {
+        if (prev.length === 0) {
+          return generateTickets()
+        }
+        return prev
+      })
+      setLoading(false)
+    }, 10000)
+
     return () => {
       clearInterval(interval)
       clearInterval(forecastingInterval)
+      clearInterval(anomaliesInterval)
       clearInterval(workflowInterval)
+      clearTimeout(loadingTimeout)
     }
   }, [])
 
-  // Show loading state
-  if (loading && cauldrons.length === 0) {
+  // Show loading state - only show if we have no data at all
+  if (loading && cauldrons.length === 0 && tickets.length === 0) {
     return (
-      <div className="min-h-screen bg-cauldron-darker p-4 md:p-6 flex items-center justify-center">
+      <div className="min-h-screen bg-cauldron-darker p-4 md:p-6 flex items-center justify-center" style={{ backgroundColor: '#050508', minHeight: '100vh' }}>
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-cauldron-purple border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-400">Loading PotionMaster Dashboard...</p>
+          <p className="text-gray-400 text-lg">Loading PotionMaster Dashboard...</p>
+          <p className="text-gray-500 text-sm mt-2">Fetching cauldron data...</p>
         </div>
       </div>
     )
@@ -535,7 +661,7 @@ function App() {
   // Show error state (only if no data loaded)
   if (error && cauldrons.length === 0) {
     return (
-      <div className="min-h-screen bg-cauldron-darker p-4 md:p-6 flex items-center justify-center">
+      <div className="min-h-screen bg-cauldron-darker p-4 md:p-6 flex items-center justify-center" style={{ backgroundColor: '#050508', minHeight: '100vh' }}>
         <div className="text-center glass rounded-xl p-6 max-w-md">
           <AlertTriangle className="w-12 h-12 text-red-400 mx-auto mb-4" />
           <h2 className="text-xl font-bold text-gray-100 mb-2">Connection Error</h2>
@@ -552,14 +678,27 @@ function App() {
     )
   }
 
-  const totalPotion = cauldrons.reduce((sum, c) => sum + (c.fill_level_liters || c.level * (c.capacity_liters || 100) / 100), 0)
-  const avgLevel = cauldrons.length > 0 
-    ? Math.round(cauldrons.reduce((sum, c) => sum + (c.level || (c.fill_level_liters / (c.capacity_liters || 100)) * 100), 0) / cauldrons.length)
+  // Safe calculations with defensive checks
+  const totalPotion = (Array.isArray(cauldrons) ? cauldrons : []).reduce((sum, c) => {
+    if (!c) return sum
+    return sum + (c.fill_level_liters || (c.level || 0) * ((c.capacity_liters || 100) / 100))
+  }, 0)
+  
+  const avgLevel = (Array.isArray(cauldrons) && cauldrons.length > 0)
+    ? Math.round((cauldrons.reduce((sum, c) => {
+        if (!c) return sum
+        return sum + (c.level || ((c.fill_level_liters || 0) / (c.capacity_liters || 100)) * 100)
+      }, 0) / cauldrons.length))
     : 0
-  const anomalies = cauldrons.filter(c => c.hasAnomaly).length
-  const mismatches = tickets.filter(t => t.status === 'mismatch' || t.status === 'missing').length
-  const activeDrains = cauldrons.filter(c => c.isDraining).length
-  const overflowRisk = cauldrons.filter(c => c.level > 80).length
+  
+  const anomalyCountFromCauldrons = (Array.isArray(cauldrons) ? cauldrons : []).filter(c => c && c.hasAnomaly).length
+  // Use detailed anomalies from API if available, otherwise fallback to cauldron-based count
+  const anomalyCount = (Array.isArray(anomalies) && anomalies.length > 0) 
+    ? anomalies.length 
+    : anomalyCountFromCauldrons
+  const mismatches = (Array.isArray(tickets) ? tickets : []).filter(t => t && (t.status === 'mismatch' || t.status === 'missing')).length
+  const activeDrains = (Array.isArray(cauldrons) ? cauldrons : []).filter(c => c && c.isDraining).length
+  const overflowRisk = (Array.isArray(cauldrons) ? cauldrons : []).filter(c => c && (c.level || 0) > 80).length
 
   const getCauldronColor = (level, hasAnomaly) => {
     if (hasAnomaly) return 'bg-red-500'
@@ -575,7 +714,7 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-cauldron-darker p-4 md:p-6">
+    <div className="min-h-screen bg-cauldron-darker p-4 md:p-6" style={{ backgroundColor: '#050508', minHeight: '100vh' }}>
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
@@ -683,7 +822,7 @@ function App() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-400 text-xs">Anomalies</p>
-              <p className="text-2xl font-bold text-cauldron-pink">{anomalies}</p>
+              <p className="text-2xl font-bold text-cauldron-pink">{anomalyCount}</p>
             </div>
             <AlertTriangle className="w-8 h-8 text-cauldron-pink" />
           </div>
@@ -867,37 +1006,190 @@ function App() {
 
           {/* Anomalies Section */}
           <div className="mb-4">
-            <h3 className="text-lg font-semibold mb-3 text-gray-300 flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5 text-red-400" />
-              Anomalies Detected
-            </h3>
-            <div className="space-y-2">
-              {cauldrons
-                .filter(c => c.hasAnomaly)
-                .map(cauldron => (
-                  <div
-                    key={cauldron.id}
-                    className="p-3 rounded-lg bg-red-500/10 border border-red-500/30"
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <span className="text-sm font-medium text-red-400">
-                          {cauldron.name}
-                        </span>
-                        <div className="text-xs text-gray-400 mt-1">
-                          Suspicious activity detected • Level: {cauldron.level}%
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-lg font-semibold text-gray-300 flex items-center gap-2">
+                <AlertTriangle className="w-5 h-5 text-red-400" />
+                Anomalies Detected
+                {anomalies.length > 0 && (
+                  <span className="ml-2 px-2 py-0.5 bg-red-500/20 text-red-400 text-xs rounded-full">
+                    {anomalies.length}
+                  </span>
+                )}
+              </h3>
+              <button
+                onClick={() => {
+                  setShowHistoricalAnomalies(!showHistoricalAnomalies)
+                  if (!showHistoricalAnomalies && !historicalAnomalies) {
+                    fetchHistoricalAnomaliesData()
+                  }
+                }}
+                className="text-xs px-3 py-1 bg-cauldron-purple/20 text-cauldron-purple rounded-lg hover:bg-cauldron-purple/30 transition-colors flex items-center gap-1"
+              >
+                <History className="w-3 h-3" />
+                {showHistoricalAnomalies ? 'Hide' : 'Show'} Historical Analysis
+              </button>
+            </div>
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {anomalies.length > 0 ? (
+                anomalies.map((anomaly, idx) => {
+                  const cauldron = cauldrons.find(c => 
+                    (c.cauldron_id || c.id) === anomaly.cauldron_id
+                  )
+                  const severityColor = anomaly.severity >= 0.5 
+                    ? 'text-red-400' 
+                    : anomaly.severity >= 0.3 
+                    ? 'text-orange-400' 
+                    : 'text-yellow-400'
+                  
+                  return (
+                    <motion.div
+                      key={anomaly.cauldron_id || idx}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 hover:bg-red-500/15 transition-colors"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <AlertTriangle className="w-4 h-4 text-red-400 flex-shrink-0" />
+                            <span className="text-sm font-medium text-red-400">
+                              {cauldron?.name || anomaly.cauldron_id}
+                            </span>
+                            <span className={`text-xs font-semibold ${severityColor}`}>
+                              {anomaly.anomaly_type || 'Anomaly'}
+                            </span>
+                          </div>
+                          {anomaly.description && (
+                            <div className="text-xs text-gray-400 mt-1 mb-1">
+                              {anomaly.description}
+                            </div>
+                          )}
+                          <div className="flex items-center gap-3 text-xs text-gray-500 mt-1">
+                            <span>Severity: <span className={`font-semibold ${severityColor}`}>
+                              {(anomaly.severity * 100).toFixed(1)}%
+                            </span></span>
+                            {anomaly.detected_at && (
+                              <span>• Detected: {new Date(anomaly.detected_at).toLocaleTimeString()}</span>
+                            )}
+                            {cauldron && (
+                              <span>• Level: {cauldron.level}%</span>
+                            )}
+                          </div>
                         </div>
                       </div>
-                      <AlertTriangle className="w-4 h-4 text-red-400" />
-                    </div>
-                  </div>
-                ))}
-              {anomalies === 0 && (
+                    </motion.div>
+                  )
+                })
+              ) : (
                 <p className="text-sm text-gray-500 text-center py-4">
-                  No suspicious activity detected
+                  No anomalies detected
                 </p>
               )}
             </div>
+
+            {/* Historical Anomaly Analysis */}
+            {showHistoricalAnomalies && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="mt-4 pt-4 border-t border-gray-700"
+              >
+                <h4 className="text-md font-semibold mb-3 text-gray-300 flex items-center gap-2">
+                  <History className="w-4 h-4 text-cauldron-cyan" />
+                  Historical Anomaly Analysis
+                </h4>
+                {historicalAnomalies ? (
+                  <div className="space-y-4">
+                    {/* Summary Stats */}
+                    {historicalAnomalies.summary && (
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div className="p-3 rounded-lg bg-blue-500/10 border border-blue-500/30">
+                          <p className="text-xs text-gray-400 mb-1">Total Tickets</p>
+                          <p className="text-lg font-bold text-blue-400">
+                            {historicalAnomalies.summary.total_tickets_reported || 0}
+                          </p>
+                        </div>
+                        <div className="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30">
+                          <p className="text-xs text-gray-400 mb-1">Drain Events</p>
+                          <p className="text-lg font-bold text-yellow-400">
+                            {historicalAnomalies.summary.total_long_drain_events || 0}
+                          </p>
+                        </div>
+                        <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30">
+                          <p className="text-xs text-gray-400 mb-1">Faulty Tickets</p>
+                          <p className="text-lg font-bold text-red-400">
+                            {historicalAnomalies.summary.faulty_ticket_count || 0}
+                          </p>
+                        </div>
+                        <div className="p-3 rounded-lg bg-orange-500/10 border border-orange-500/30">
+                          <p className="text-xs text-gray-400 mb-1">Unlogged Tickets</p>
+                          <p className="text-lg font-bold text-orange-400">
+                            {historicalAnomalies.summary.unlogged_ticket_count || 0}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Daily Summary */}
+                    {historicalAnomalies.daily_summary && Object.keys(historicalAnomalies.daily_summary).length > 0 && (
+                      <div>
+                        <h5 className="text-sm font-semibold mb-2 text-gray-400">Daily Breakdown</h5>
+                        <div className="space-y-2 max-h-48 overflow-y-auto">
+                          {Object.entries(historicalAnomalies.daily_summary)
+                            .sort(([a], [b]) => a.localeCompare(b))
+                            .map(([day, stats]) => (
+                              <div key={day} className="p-2 rounded-lg bg-gray-800/50 border border-gray-700">
+                                <div className="flex items-center justify-between mb-1">
+                                  <span className="text-sm font-medium text-gray-300">{day}</span>
+                                  <span className="text-xs text-gray-500">
+                                    {stats.matched_tickets || 0} matched
+                                  </span>
+                                </div>
+                                <div className="grid grid-cols-3 gap-2 text-xs">
+                                  <div>
+                                    <span className="text-gray-500">Faulty: </span>
+                                    <span className="text-red-400 font-semibold">{stats.faulty_tickets || 0}</span>
+                                  </div>
+                                  <div>
+                                    <span className="text-gray-500">Unlogged: </span>
+                                    <span className="text-orange-400 font-semibold">{stats.unlogged_tickets || 0}</span>
+                                  </div>
+                                  <div>
+                                    <span className="text-gray-500">Unaccounted: </span>
+                                    <span className="text-yellow-400 font-semibold">{stats.unaccounted_events || 0}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Match Rate */}
+                    {historicalAnomalies.summary && (
+                      <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/30">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-300">Match Rate</span>
+                          <span className="text-lg font-bold text-green-400">
+                            {historicalAnomalies.summary.total_tickets_reported > 0
+                              ? ((historicalAnomalies.summary.matched_tickets / historicalAnomalies.summary.total_tickets_reported) * 100).toFixed(1)
+                              : 0}%
+                          </span>
+                        </div>
+                        <div className="mt-2 text-xs text-gray-400">
+                          {historicalAnomalies.summary.matched_tickets || 0} of {historicalAnomalies.summary.total_tickets_reported || 0} tickets matched with events
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-500 text-center py-4">
+                    Loading historical analysis...
+                  </p>
+                )}
+              </motion.div>
+            )}
           </div>
 
           <div className="pt-4 border-t border-gray-700">
@@ -1472,7 +1764,6 @@ function App() {
                     )
                   })}
                   
-<<<<<<< HEAD
                   {/* Route Polylines - Show optimal witch routes */}
                   {optimalSchedule && optimalSchedule.routes && optimalSchedule.routes.map((route, routeIdx) => {
                     const routeColors = ['#ec4899', '#8b5cf6', '#06b6d4', '#eab308', '#ef4444']
@@ -1646,7 +1937,6 @@ function App() {
                 </MapContainer>
               )
             })()}
-<<<<<<< HEAD
             
             {/* Clickable Witch Routes List - Top Right */}
             {optimalSchedule && optimalSchedule.routes && optimalSchedule.routes.length > 0 && (

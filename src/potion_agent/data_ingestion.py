@@ -156,7 +156,6 @@ class CauldronAPIClient:
         self._last_levels: Dict[str, float] = {}  # cauldron_id -> fill_level_liters
         self._last_timestamps: Dict[str, datetime] = {}  # cauldron_id -> last_updated
         self._last_fetch_time: Optional[datetime] = None
-<<<<<<< HEAD
         
         # Load calculated fill and drain rates from all_events.json
         self._calculated_fill_rates: Dict[str, float] = {}
@@ -265,7 +264,6 @@ class CauldronAPIClient:
             self._last_fetch_time = now
             return statuses
     
-<<<<<<< HEAD
     def _load_calculated_rates(self) -> None:
         """Load calculated fill and drain rates from all_events.json."""
         # Try multiple possible paths for all_events.json
