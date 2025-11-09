@@ -1,0 +1,76 @@
+CauldronDto{
+id	[...]
+name	[...]
+latitude	[...]
+longitude	[...]
+max_volume	[...]
+}
+CauldronLevelsDto{
+cauldron_001	[...]
+cauldron_002	[...]
+cauldron_003	[...]
+cauldron_004	[...]
+cauldron_005	[...]
+cauldron_006	[...]
+cauldron_007	[...]
+cauldron_008	[...]
+cauldron_009	[...]
+cauldron_010	[...]
+cauldron_011	[...]
+cauldron_012	[...]
+}
+CourierDto{
+courier_id	[...]
+name	[...]
+max_carrying_capacity	[...]
+}
+DateRange{
+start	[...]
+end	[...]
+}
+EdgeDto{
+from	[...]
+to	[...]
+travel_time_minutes	[...]
+}
+HistoricalDataDto{
+timestamp	[...]
+cauldron_levels	CauldronLevelsDto{...}
+}
+HistoricalDataMetadataDto{
+start_date	[...]
+end_date	[...]
+interval_minutes	[...]
+unit	[...]
+}
+MarketDto{
+id	[...]
+name	[...]
+latitude	[...]
+longitude	[...]
+description	[...]
+}
+NeighborDto{
+to	[...]
+cost	[...]
+}
+NetworkDto{
+edges	[...]
+description	[...]
+}
+TicketDto{
+ticket_id	[...]
+cauldron_id	[...]
+amount_collected	[...]
+courier_id	[...]
+date	[...]
+}
+TicketMetadataDto{
+total_tickets	[...]
+suspicious_tickets	[...]
+date_range	DateRange{...}
+}
+TicketsDto{
+metadata	TicketMetadataDto{...}
+transport_tickets	[...]
+}
