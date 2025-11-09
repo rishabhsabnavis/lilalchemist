@@ -1,0 +1,4321 @@
+{
+  "summary": {
+    "total_tickets_reported": 149,
+    "total_long_drain_events": 159,
+    "matched_tickets": 87,
+    "matched_events": 87,
+    "faulty_ticket_count": 62,
+    "unlogged_ticket_count": 24,
+    "unaccounted_event_count": 72,
+    "total_tickets_expected": 149
+  },
+  "faulty_tickets": [
+    {
+      "ticket_id": "TT_20251031_010",
+      "cauldron_id": "cauldron_002",
+      "amount_collected": 94.82,
+      "courier_id": "courier_witch_01",
+      "date": "2025-10-31"
+    },
+    {
+      "ticket_id": "TT_20251031_019",
+      "cauldron_id": "cauldron_008",
+      "amount_collected": 72.76,
+      "courier_id": "courier_witch_02",
+      "date": "2025-10-31"
+    },
+    {
+      "ticket_id": "TT_20251031_026",
+      "cauldron_id": "cauldron_008",
+      "amount_collected": 28.79,
+      "courier_id": "courier_witch_04",
+      "date": "2025-10-31"
+    },
+    {
+      "ticket_id": "TT_20251031_028",
+      "cauldron_id": "cauldron_005",
+      "amount_collected": 96.26,
+      "courier_id": "courier_witch_05",
+      "date": "2025-10-31"
+    },
+    {
+      "ticket_id": "TT_20251103_056",
+      "cauldron_id": "cauldron_008",
+      "amount_collected": 21.89,
+      "courier_id": "courier_witch_05",
+      "date": "2025-11-03"
+    },
+    {
+      "ticket_id": "TT_20251103_067",
+      "cauldron_id": "cauldron_011",
+      "amount_collected": 96.63,
+      "courier_id": "courier_witch_04",
+      "date": "2025-11-03"
+    },
+    {
+      "ticket_id": "TT_20251103_064",
+      "cauldron_id": "cauldron_007",
+      "amount_collected": 97.51,
+      "courier_id": "courier_witch_03",
+      "date": "2025-11-03"
+    },
+    {
+      "ticket_id": "TT_20251103_066",
+      "cauldron_id": "cauldron_009",
+      "amount_collected": 99.87,
+      "courier_id": "courier_witch_01",
+      "date": "2025-11-03"
+    },
+    {
+      "ticket_id": "TT_20251105_090",
+      "cauldron_id": "cauldron_011",
+      "amount_collected": 96.63,
+      "courier_id": "courier_witch_04",
+      "date": "2025-11-05"
+    },
+    {
+      "ticket_id": "TT_20251110_127",
+      "cauldron_id": "cauldron_002",
+      "amount_collected": 55.57,
+      "courier_id": "courier_witch_01",
+      "date": "2025-11-10"
+    },
+    {
+      "ticket_id": "TT_20251110_128",
+      "cauldron_id": "cauldron_001",
+      "amount_collected": 95.8,
+      "courier_id": "courier_witch_02",
+      "date": "2025-11-10"
+    },
+    {
+      "ticket_id": "TT_20251110_148",
+      "cauldron_id": "cauldron_010",
+      "amount_collected": 81.39,
+      "courier_id": "courier_witch_05",
+      "date": "2025-11-10"
+    },
+    {
+      "ticket_id": "TT_20251110_138",
+      "cauldron_id": "cauldron_005",
+      "amount_collected": 96.26,
+      "courier_id": "courier_witch_05",
+      "date": "2025-11-10"
+    },
+    {
+      "ticket_id": "TT_20251110_149",
+      "cauldron_id": "cauldron_009",
+      "amount_collected": 99.87,
+      "courier_id": "courier_witch_03",
+      "date": "2025-11-10"
+    },
+    {
+      "ticket_id": "TT_20251110_137",
+      "cauldron_id": "cauldron_004",
+      "amount_collected": 95.1,
+      "courier_id": "courier_witch_04",
+      "date": "2025-11-10"
+    },
+    {
+      "ticket_id": "TT_20251106_106",
+      "cauldron_id": "cauldron_008",
+      "amount_collected": 75.31,
+      "courier_id": "courier_witch_04",
+      "date": "2025-11-06"
+    },
+    {
+      "ticket_id": "TT_20251106_091",
+      "cauldron_id": "cauldron_007",
+      "amount_collected": 97.51,
+      "courier_id": "courier_witch_03",
+      "date": "2025-11-06"
+    },
+    {
+      "ticket_id": "TT_20251106_083",
+      "cauldron_id": "cauldron_009",
+      "amount_collected": 99.87,
+      "courier_id": "courier_witch_04",
+      "date": "2025-11-06"
+    },
+    {
+      "ticket_id": "TT_20251106_101",
+      "cauldron_id": "cauldron_009",
+      "amount_collected": 99.87,
+      "courier_id": "courier_witch_01",
+      "date": "2025-11-06"
+    },
+    {
+      "ticket_id": "TT_20251106_103",
+      "cauldron_id": "cauldron_009",
+      "amount_collected": 99.87,
+      "courier_id": "courier_witch_02",
+      "date": "2025-11-06"
+    },
+    {
+      "ticket_id": "TT_20251106_086",
+      "cauldron_id": "cauldron_003",
+      "amount_collected": 83.63,
+      "courier_id": "courier_witch_03",
+      "date": "2025-11-06"
+    },
+    {
+      "ticket_id": "TT_20251108_111",
+      "cauldron_id": "cauldron_008",
+      "amount_collected": 42.21,
+      "courier_id": "courier_witch_03",
+      "date": "2025-11-08"
+    },
+    {
+      "ticket_id": "TT_20251108_133",
+      "cauldron_id": "cauldron_008",
+      "amount_collected": 79.86,
+      "courier_id": "courier_witch_03",
+      "date": "2025-11-08"
+    },
+    {
+      "ticket_id": "TT_20251108_131",
+      "cauldron_id": "cauldron_012",
+      "amount_collected": 79.07,
+      "courier_id": "courier_witch_02",
+      "date": "2025-11-08"
+    },
+    {
+      "ticket_id": "TT_20251108_114",
+      "cauldron_id": "cauldron_005",
+      "amount_collected": 96.26,
+      "courier_id": "courier_witch_01",
+      "date": "2025-11-08"
+    },
+    {
+      "ticket_id": "TT_20251108_134",
+      "cauldron_id": "cauldron_004",
+      "amount_collected": 85.43,
+      "courier_id": "courier_witch_05",
+      "date": "2025-11-08"
+    },
+    {
+      "ticket_id": "TT_20251109_126",
+      "cauldron_id": "cauldron_003",
+      "amount_collected": 97.05,
+      "courier_id": "courier_witch_04",
+      "date": "2025-11-09"
+    },
+    {
+      "ticket_id": "TT_20251109_135",
+      "cauldron_id": "cauldron_008",
+      "amount_collected": 37.06,
+      "courier_id": "courier_witch_03",
+      "date": "2025-11-09"
+    },
+    {
+      "ticket_id": "TT_20251109_147",
+      "cauldron_id": "cauldron_011",
+      "amount_collected": 96.63,
+      "courier_id": "courier_witch_03",
+      "date": "2025-11-09"
+    },
+    {
+      "ticket_id": "TT_20251109_124",
+      "cauldron_id": "cauldron_009",
+      "amount_collected": 99.87,
+      "courier_id": "courier_witch_03",
+      "date": "2025-11-09"
+    },
+    {
+      "ticket_id": "TT_20251109_145",
+      "cauldron_id": "cauldron_009",
+      "amount_collected": 99.87,
+      "courier_id": "courier_witch_02",
+      "date": "2025-11-09"
+    },
+    {
+      "ticket_id": "TT_20251030_016",
+      "cauldron_id": "cauldron_010",
+      "amount_collected": 95.85,
+      "courier_id": "courier_witch_04",
+      "date": "2025-10-30"
+    },
+    {
+      "ticket_id": "TT_20251030_005",
+      "cauldron_id": "cauldron_007",
+      "amount_collected": 97.51,
+      "courier_id": "courier_witch_03",
+      "date": "2025-10-30"
+    },
+    {
+      "ticket_id": "TT_20251107_117",
+      "cauldron_id": "cauldron_011",
+      "amount_collected": 96.63,
+      "courier_id": "courier_witch_02",
+      "date": "2025-11-07"
+    },
+    {
+      "ticket_id": "TT_20251107_100",
+      "cauldron_id": "cauldron_007",
+      "amount_collected": 75.42,
+      "courier_id": "courier_witch_01",
+      "date": "2025-11-07"
+    },
+    {
+      "ticket_id": "TT_20251107_109",
+      "cauldron_id": "cauldron_009",
+      "amount_collected": 99.87,
+      "courier_id": "courier_witch_04",
+      "date": "2025-11-07"
+    },
+    {
+      "ticket_id": "TT_20251107_120",
+      "cauldron_id": "cauldron_009",
+      "amount_collected": 99.87,
+      "courier_id": "courier_witch_03",
+      "date": "2025-11-07"
+    },
+    {
+      "ticket_id": "TT_20251107_115",
+      "cauldron_id": "cauldron_001",
+      "amount_collected": 95.8,
+      "courier_id": "courier_witch_01",
+      "date": "2025-11-07"
+    },
+    {
+      "ticket_id": "TT_20251102_033",
+      "cauldron_id": "cauldron_002",
+      "amount_collected": 71.26,
+      "courier_id": "courier_witch_01",
+      "date": "2025-11-02"
+    },
+    {
+      "ticket_id": "TT_20251102_050",
+      "cauldron_id": "cauldron_008",
+      "amount_collected": 48.38,
+      "courier_id": "courier_witch_02",
+      "date": "2025-11-02"
+    },
+    {
+      "ticket_id": "TT_20251102_054",
+      "cauldron_id": "cauldron_008",
+      "amount_collected": 49.25,
+      "courier_id": "courier_witch_04",
+      "date": "2025-11-02"
+    },
+    {
+      "ticket_id": "TT_20251102_044",
+      "cauldron_id": "cauldron_007",
+      "amount_collected": 97.51,
+      "courier_id": "courier_witch_01",
+      "date": "2025-11-02"
+    },
+    {
+      "ticket_id": "TT_20251102_055",
+      "cauldron_id": "cauldron_005",
+      "amount_collected": 96.26,
+      "courier_id": "courier_witch_02",
+      "date": "2025-11-02"
+    },
+    {
+      "ticket_id": "TT_20251111_141",
+      "cauldron_id": "cauldron_006",
+      "amount_collected": 94.41,
+      "courier_id": "courier_witch_03",
+      "date": "2025-11-11"
+    },
+    {
+      "ticket_id": "TT_20251111_140",
+      "cauldron_id": "cauldron_008",
+      "amount_collected": 35.45,
+      "courier_id": "courier_witch_02",
+      "date": "2025-11-11"
+    },
+    {
+      "ticket_id": "TT_20251111_142",
+      "cauldron_id": "cauldron_007",
+      "amount_collected": 97.51,
+      "courier_id": "courier_witch_04",
+      "date": "2025-11-11"
+    },
+    {
+      "ticket_id": "TT_20251111_139",
+      "cauldron_id": "cauldron_012",
+      "amount_collected": 94.37,
+      "courier_id": "courier_witch_01",
+      "date": "2025-11-11"
+    },
+    {
+      "ticket_id": "TT_20251101_021",
+      "cauldron_id": "cauldron_010",
+      "amount_collected": 85.67,
+      "courier_id": "courier_witch_05",
+      "date": "2025-11-01"
+    },
+    {
+      "ticket_id": "TT_20251101_031",
+      "cauldron_id": "cauldron_003",
+      "amount_collected": 97.05,
+      "courier_id": "courier_witch_02",
+      "date": "2025-11-01"
+    },
+    {
+      "ticket_id": "TT_20251101_039",
+      "cauldron_id": "cauldron_003",
+      "amount_collected": 97.05,
+      "courier_id": "courier_witch_04",
+      "date": "2025-11-01"
+    },
+    {
+      "ticket_id": "TT_20251101_036",
+      "cauldron_id": "cauldron_008",
+      "amount_collected": 52.1,
+      "courier_id": "courier_witch_05",
+      "date": "2025-11-01"
+    },
+    {
+      "ticket_id": "TT_20251101_013",
+      "cauldron_id": "cauldron_012",
+      "amount_collected": 65.74,
+      "courier_id": "courier_witch_03",
+      "date": "2025-11-01"
+    },
+    {
+      "ticket_id": "TT_20251101_020",
+      "cauldron_id": "cauldron_007",
+      "amount_collected": 97.51,
+      "courier_id": "courier_witch_01",
+      "date": "2025-11-01"
+    },
+    {
+      "ticket_id": "TT_20251101_037",
+      "cauldron_id": "cauldron_009",
+      "amount_collected": 99.87,
+      "courier_id": "courier_witch_04",
+      "date": "2025-11-01"
+    },
+    {
+      "ticket_id": "TT_20251101_041",
+      "cauldron_id": "cauldron_009",
+      "amount_collected": 99.87,
+      "courier_id": "courier_witch_03",
+      "date": "2025-11-01"
+    },
+    {
+      "ticket_id": "TT_20251104_060",
+      "cauldron_id": "cauldron_008",
+      "amount_collected": 31.35,
+      "courier_id": "courier_witch_05",
+      "date": "2025-11-04"
+    },
+    {
+      "ticket_id": "TT_20251104_070",
+      "cauldron_id": "cauldron_007",
+      "amount_collected": 97.51,
+      "courier_id": "courier_witch_04",
+      "date": "2025-11-04"
+    },
+    {
+      "ticket_id": "TT_20251104_068",
+      "cauldron_id": "cauldron_009",
+      "amount_collected": 99.87,
+      "courier_id": "courier_witch_03",
+      "date": "2025-11-04"
+    },
+    {
+      "ticket_id": "TT_20251104_075",
+      "cauldron_id": "cauldron_009",
+      "amount_collected": 99.87,
+      "courier_id": "courier_witch_05",
+      "date": "2025-11-04"
+    },
+    {
+      "ticket_id": "TT_20251104_077",
+      "cauldron_id": "cauldron_009",
+      "amount_collected": 99.87,
+      "courier_id": "courier_witch_01",
+      "date": "2025-11-04"
+    },
+    {
+      "ticket_id": "TT_20251104_079",
+      "cauldron_id": "cauldron_005",
+      "amount_collected": 96.26,
+      "courier_id": "courier_witch_03",
+      "date": "2025-11-04"
+    },
+    {
+      "ticket_id": "TT_20251104_061",
+      "cauldron_id": "cauldron_006",
+      "amount_collected": 94.41,
+      "courier_id": "courier_witch_02",
+      "date": "2025-11-04"
+    }
+  ],
+  "unlogged_tickets": [
+    {
+      "day": "2025-10-31",
+      "cauldron": "cauldron_010",
+      "expected_ticket_for_event": {
+        "cauldron": "cauldron_010",
+        "day": "2025-10-31",
+        "event_type": "drain",
+        "start_timestamp": "2025-10-31T00:00:00Z",
+        "end_timestamp": "2025-10-31T01:36:00Z",
+        "duration_minutes": 96.0,
+        "num_samples": 97,
+        "start_level": 168.23,
+        "end_level": 124.07,
+        "net_change": -44.16,
+        "slope": -0.4600000000000002,
+        "true_drain_rate": 0.5370127242898957,
+        "drained_volume_estimate": 33.89926108513654
+      }
+    },
+    {
+      "day": "2025-11-03",
+      "cauldron": "cauldron_002",
+      "expected_ticket_for_event": {
+        "cauldron": "cauldron_002",
+        "day": "2025-11-03",
+        "event_type": "drain",
+        "start_timestamp": "2025-11-03T00:00:00Z",
+        "end_timestamp": "2025-11-03T00:55:00Z",
+        "duration_minutes": 55.0,
+        "num_samples": 56,
+        "start_level": 447.85,
+        "end_level": 422.55,
+        "net_change": -25.30000000000001,
+        "slope": -0.4600000000000001,
+        "true_drain_rate": 0.5255919966621672,
+        "drained_volume_estimate": 19.122187305975228
+      }
+    },
+    {
+      "day": "2025-11-03",
+      "cauldron": "cauldron_005",
+      "expected_ticket_for_event": {
+        "cauldron": "cauldron_005",
+        "day": "2025-11-03",
+        "event_type": "drain",
+        "start_timestamp": "2025-11-03T00:00:00Z",
+        "end_timestamp": "2025-11-03T01:26:00Z",
+        "duration_minutes": 86.0,
+        "num_samples": 87,
+        "start_level": 236.44,
+        "end_level": 205.49,
+        "net_change": -30.94999999999999,
+        "slope": -0.406339760880659,
+        "true_drain_rate": 0.4824459281568546,
+        "drained_volume_estimate": 38.41007428862256
+      }
+    },
+    {
+      "day": "2025-11-03",
+      "cauldron": "cauldron_005",
+      "expected_ticket_for_event": {
+        "cauldron": "cauldron_005",
+        "day": "2025-11-03",
+        "event_type": "drain",
+        "start_timestamp": "2025-11-03T17:54:00Z",
+        "end_timestamp": "2025-11-03T19:45:00Z",
+        "duration_minutes": 111.0,
+        "num_samples": 112,
+        "start_level": 281.45,
+        "end_level": 238.45,
+        "net_change": -43.0,
+        "slope": -0.3986374158608673,
+        "true_drain_rate": 0.4747435831370629,
+        "drained_volume_estimate": 49.575793558570986
+      }
+    },
+    {
+      "day": "2025-11-05",
+      "cauldron": "cauldron_006",
+      "expected_ticket_for_event": {
+        "cauldron": "cauldron_006",
+        "day": "2025-11-05",
+        "event_type": "drain",
+        "start_timestamp": "2025-11-05T00:00:00Z",
+        "end_timestamp": "2025-11-05T01:47:00Z",
+        "duration_minutes": 107.0,
+        "num_samples": 108,
+        "start_level": 317.06,
+        "end_level": 266.77,
+        "net_change": -50.29000000000002,
+        "slope": -0.47,
+        "true_drain_rate": 0.5266815676949775,
+        "drained_volume_estimate": 44.536311798281986
+      }
+    },
+    {
+      "day": "2025-11-05",
+      "cauldron": "cauldron_005",
+      "expected_ticket_for_event": {
+        "cauldron": "cauldron_005",
+        "day": "2025-11-05",
+        "event_type": "drain",
+        "start_timestamp": "2025-11-05T00:00:00Z",
+        "end_timestamp": "2025-11-05T02:56:00Z",
+        "duration_minutes": 176.0,
+        "num_samples": 177,
+        "start_level": 267.89,
+        "end_level": 186.93,
+        "net_change": -80.95999999999998,
+        "slope": -0.4600000000000001,
+        "true_drain_rate": 0.5361061672761956,
+        "drained_volume_estimate": 78.60666366043688
+      }
+    },
+    {
+      "day": "2025-11-06",
+      "cauldron": "cauldron_008",
+      "expected_ticket_for_event": {
+        "cauldron": "cauldron_008",
+        "day": "2025-11-06",
+        "event_type": "drain",
+        "start_timestamp": "2025-11-06T06:12:00Z",
+        "end_timestamp": "2025-11-06T09:14:00Z",
+        "duration_minutes": 182.0,
+        "num_samples": 183,
+        "start_level": 267.86,
+        "end_level": 186.39,
+        "net_change": -81.47000000000003,
+        "slope": -0.4499233784746971,
+        "true_drain_rate": 0.5297275651561737,
+        "drained_volume_estimate": 79.49315948772937
+      }
+    },
+    {
+      "day": "2025-11-08",
+      "cauldron": "cauldron_011",
+      "expected_ticket_for_event": {
+        "cauldron": "cauldron_011",
+        "day": "2025-11-08",
+        "event_type": "drain",
+        "start_timestamp": "2025-11-08T00:00:00Z",
+        "end_timestamp": "2025-11-08T01:35:00Z",
+        "duration_minutes": 95.0,
+        "num_samples": 96,
+        "start_level": 187.23,
+        "end_level": 144.48,
+        "net_change": -42.75,
+        "slope": -0.4500000000000003,
+        "true_drain_rate": 0.5412212047741731,
+        "drained_volume_estimate": 42.671440761586595
+      }
+    },
+    {
+      "day": "2025-11-08",
+      "cauldron": "cauldron_007",
+      "expected_ticket_for_event": {
+        "cauldron": "cauldron_007",
+        "day": "2025-11-08",
+        "event_type": "drain",
+        "start_timestamp": "2025-11-08T00:00:00Z",
+        "end_timestamp": "2025-11-08T01:30:00Z",
+        "duration_minutes": 90.0,
+        "num_samples": 91,
+        "start_level": 733.34,
+        "end_level": 704.32,
+        "net_change": -29.019999999999982,
+        "slope": -0.3661199235547064,
+        "true_drain_rate": 0.46946453301849295,
+        "drained_volume_estimate": 29.64445926217947
+      }
+    },
+    {
+      "day": "2025-11-08",
+      "cauldron": "cauldron_009",
+      "expected_ticket_for_event": {
+        "cauldron": "cauldron_009",
+        "day": "2025-11-08",
+        "event_type": "drain",
+        "start_timestamp": "2025-11-08T00:00:00Z",
+        "end_timestamp": "2025-11-08T01:36:00Z",
+        "duration_minutes": 96.0,
+        "num_samples": 97,
+        "start_level": 876.19,
+        "end_level": 838.34,
+        "net_change": -37.85000000000002,
+        "slope": -0.43126341258152767,
+        "true_drain_rate": 0.6173192968615947,
+        "drained_volume_estimate": 50.68325644369712
+      }
+    },
+    {
+      "day": "2025-11-09",
+      "cauldron": "cauldron_002",
+      "expected_ticket_for_event": {
+        "cauldron": "cauldron_002",
+        "day": "2025-11-09",
+        "event_type": "drain",
+        "start_timestamp": "2025-11-09T05:53:00Z",
+        "end_timestamp": "2025-11-09T07:19:00Z",
+        "duration_minutes": 86.0,
+        "num_samples": 87,
+        "start_level": 173.81,
+        "end_level": 139.41,
+        "net_change": -34.400000000000006,
+        "slope": -0.3999999999999999,
+        "true_drain_rate": 0.46559199666216705,
+        "drained_volume_estimate": 29.900147423888534
+      }
+    },
+    {
+      "day": "2025-11-09",
+      "cauldron": "cauldron_003",
+      "expected_ticket_for_event": {
+        "cauldron": "cauldron_003",
+        "day": "2025-11-09",
+        "event_type": "drain",
+        "start_timestamp": "2025-11-09T10:52:00Z",
+        "end_timestamp": "2025-11-09T14:07:00Z",
+        "duration_minutes": 195.0,
+        "num_samples": 196,
+        "start_level": 818.84,
+        "end_level": 747.88,
+        "net_change": -70.96000000000004,
+        "slope": -0.3842449298344877,
+        "true_drain_rate": 0.4811674475833725,
+        "drained_volume_estimate": 64.17628835245642
+      }
+    },
+    {
+      "day": "2025-11-09",
+      "cauldron": "cauldron_012",
+      "expected_ticket_for_event": {
+        "cauldron": "cauldron_012",
+        "day": "2025-11-09",
+        "event_type": "drain",
+        "start_timestamp": "2025-11-09T00:00:00Z",
+        "end_timestamp": "2025-11-09T01:34:00Z",
+        "duration_minutes": 94.0,
+        "num_samples": 95,
+        "start_level": 344.92,
+        "end_level": 304.0,
+        "net_change": -40.920000000000016,
+        "slope": -0.4555235162374022,
+        "true_drain_rate": 0.5204265455699247,
+        "drained_volume_estimate": 27.53523470399135
+      }
+    },
+    {
+      "day": "2025-11-09",
+      "cauldron": "cauldron_005",
+      "expected_ticket_for_event": {
+        "cauldron": "cauldron_005",
+        "day": "2025-11-09",
+        "event_type": "drain",
+        "start_timestamp": "2025-11-09T00:00:00Z",
+        "end_timestamp": "2025-11-09T01:23:00Z",
+        "duration_minutes": 83.0,
+        "num_samples": 84,
+        "start_level": 354.47,
+        "end_level": 318.99,
+        "net_change": -35.48000000000002,
+        "slope": -0.45312746785461194,
+        "true_drain_rate": 0.5292336351308076,
+        "drained_volume_estimate": 37.07018797622875
+      }
+    },
+    {
+      "day": "2025-11-09",
+      "cauldron": "cauldron_004",
+      "expected_ticket_for_event": {
+        "cauldron": "cauldron_004",
+        "day": "2025-11-09",
+        "event_type": "drain",
+        "start_timestamp": "2025-11-09T00:00:00Z",
+        "end_timestamp": "2025-11-09T00:56:00Z",
+        "duration_minutes": 56.0,
+        "num_samples": 57,
+        "start_level": 462.77,
+        "end_level": 439.84,
+        "net_change": -22.930000000000007,
+        "slope": -0.4444522945294272,
+        "true_drain_rate": 0.5123467547787091,
+        "drained_volume_estimate": 17.824137354433425
+      }
+    },
+    {
+      "day": "2025-10-30",
+      "cauldron": "cauldron_005",
+      "expected_ticket_for_event": {
+        "cauldron": "cauldron_005",
+        "day": "2025-10-30",
+        "event_type": "drain",
+        "start_timestamp": "2025-10-30T17:39:00Z",
+        "end_timestamp": "2025-10-30T19:50:00Z",
+        "duration_minutes": 131.0,
+        "num_samples": 132,
+        "start_level": 373.44,
+        "end_level": 339.35,
+        "net_change": -34.089999999999975,
+        "slope": -0.29685316692146746,
+        "true_drain_rate": 0.37295933419766303,
+        "drained_volume_estimate": 58.508368974529716
+      }
+    },
+    {
+      "day": "2025-11-07",
+      "cauldron": "cauldron_008",
+      "expected_ticket_for_event": {
+        "cauldron": "cauldron_008",
+        "day": "2025-11-07",
+        "event_type": "drain",
+        "start_timestamp": "2025-11-07T00:00:00Z",
+        "end_timestamp": "2025-11-07T01:42:00Z",
+        "duration_minutes": 102.0,
+        "num_samples": 103,
+        "start_level": 99.44,
+        "end_level": 64.76,
+        "net_change": -34.67999999999999,
+        "slope": -0.34000000000000025,
+        "true_drain_rate": 0.4198041866814768,
+        "drained_volume_estimate": 44.55111136125492
+      }
+    },
+    {
+      "day": "2025-11-07",
+      "cauldron": "cauldron_003",
+      "expected_ticket_for_event": {
+        "cauldron": "cauldron_003",
+        "day": "2025-11-07",
+        "event_type": "drain",
+        "start_timestamp": "2025-11-07T00:00:00Z",
+        "end_timestamp": "2025-11-07T01:02:00Z",
+        "duration_minutes": 62.0,
+        "num_samples": 63,
+        "start_level": 633.39,
+        "end_level": 615.45,
+        "net_change": -17.93999999999994,
+        "slope": -0.32616983486943163,
+        "true_drain_rate": 0.4230923526183164,
+        "drained_volume_estimate": 20.40476860437076
+      }
+    },
+    {
+      "day": "2025-11-02",
+      "cauldron": "cauldron_010",
+      "expected_ticket_for_event": {
+        "cauldron": "cauldron_010",
+        "day": "2025-11-02",
+        "event_type": "drain",
+        "start_timestamp": "2025-11-02T00:00:00Z",
+        "end_timestamp": "2025-11-02T03:00:00Z",
+        "duration_minutes": 180.0,
+        "num_samples": 181,
+        "start_level": 332.8,
+        "end_level": 263.13,
+        "net_change": -69.67000000000002,
+        "slope": -0.39874870985368227,
+        "true_drain_rate": 0.4757614341435777,
+        "drained_volume_estimate": 63.561114534631
+      }
+    },
+    {
+      "day": "2025-11-02",
+      "cauldron": "cauldron_003",
+      "expected_ticket_for_event": {
+        "cauldron": "cauldron_003",
+        "day": "2025-11-02",
+        "event_type": "drain",
+        "start_timestamp": "2025-11-02T00:00:00Z",
+        "end_timestamp": "2025-11-02T01:41:00Z",
+        "duration_minutes": 101.0,
+        "num_samples": 102,
+        "start_level": 426.42,
+        "end_level": 385.47,
+        "net_change": -40.94999999999999,
+        "slope": -0.4387368462717205,
+        "true_drain_rate": 0.5356593640206052,
+        "drained_volume_estimate": 33.240026274862046
+      }
+    },
+    {
+      "day": "2025-11-02",
+      "cauldron": "cauldron_009",
+      "expected_ticket_for_event": {
+        "cauldron": "cauldron_009",
+        "day": "2025-11-02",
+        "event_type": "drain",
+        "start_timestamp": "2025-11-02T00:00:00Z",
+        "end_timestamp": "2025-11-02T01:01:00Z",
+        "duration_minutes": 61.0,
+        "num_samples": 62,
+        "start_level": 590.2,
+        "end_level": 564.64,
+        "net_change": -25.56000000000006,
+        "slope": -0.44390899247060017,
+        "true_drain_rate": 0.6299648767506673,
+        "drained_volume_estimate": 32.20498586526588
+      }
+    },
+    {
+      "day": "2025-11-01",
+      "cauldron": "cauldron_002",
+      "expected_ticket_for_event": {
+        "cauldron": "cauldron_002",
+        "day": "2025-11-01",
+        "event_type": "drain",
+        "start_timestamp": "2025-11-01T00:00:00Z",
+        "end_timestamp": "2025-11-01T03:03:00Z",
+        "duration_minutes": 183.0,
+        "num_samples": 184,
+        "start_level": 407.31,
+        "end_level": 338.29,
+        "net_change": -69.01999999999998,
+        "slope": -0.42252773015353207,
+        "true_drain_rate": 0.4881197268156992,
+        "drained_volume_estimate": 63.62473230897211
+      }
+    },
+    {
+      "day": "2025-11-01",
+      "cauldron": "cauldron_005",
+      "expected_ticket_for_event": {
+        "cauldron": "cauldron_005",
+        "day": "2025-11-01",
+        "event_type": "drain",
+        "start_timestamp": "2025-11-01T00:00:00Z",
+        "end_timestamp": "2025-11-01T00:55:00Z",
+        "duration_minutes": 55.0,
+        "num_samples": 56,
+        "start_level": 206.57,
+        "end_level": 182.29,
+        "net_change": -24.28,
+        "slope": -0.45705023923444976,
+        "true_drain_rate": 0.5331564065106453,
+        "drained_volume_estimate": 24.56458239388652
+      }
+    },
+    {
+      "day": "2025-11-04",
+      "cauldron": "cauldron_011",
+      "expected_ticket_for_event": {
+        "cauldron": "cauldron_011",
+        "day": "2025-11-04",
+        "event_type": "drain",
+        "start_timestamp": "2025-11-04T00:00:00Z",
+        "end_timestamp": "2025-11-04T02:56:00Z",
+        "duration_minutes": 176.0,
+        "num_samples": 177,
+        "start_level": 182.6,
+        "end_level": 103.4,
+        "net_change": -79.19999999999999,
+        "slope": -0.45000000000000007,
+        "true_drain_rate": 0.5412212047741729,
+        "drained_volume_estimate": 79.05445867409728
+      }
+    }
+  ],
+  "unaccounted_events": [
+    {
+      "cauldron": "cauldron_010",
+      "day": "2025-10-31",
+      "event_type": "drain",
+      "start_timestamp": "2025-10-31T00:00:00Z",
+      "end_timestamp": "2025-10-31T01:36:00Z",
+      "duration_minutes": 96.0,
+      "num_samples": 97,
+      "start_level": 168.23,
+      "end_level": 124.07,
+      "net_change": -44.16,
+      "slope": -0.4600000000000002,
+      "true_drain_rate": 0.5370127242898957,
+      "drained_volume_estimate": 33.89926108513654
+    },
+    {
+      "cauldron": "cauldron_008",
+      "day": "2025-10-31",
+      "event_type": "drain",
+      "start_timestamp": "2025-10-31T09:53:00Z",
+      "end_timestamp": "2025-10-31T12:07:00Z",
+      "duration_minutes": 134.0,
+      "num_samples": 135,
+      "start_level": 89.85,
+      "end_level": 44.29,
+      "net_change": -45.559999999999995,
+      "slope": -0.3400000000000001,
+      "true_drain_rate": 0.4198041866814767,
+      "drained_volume_estimate": 58.5279306118447
+    },
+    {
+      "cauldron": "cauldron_008",
+      "day": "2025-10-31",
+      "event_type": "drain",
+      "start_timestamp": "2025-10-31T19:24:00Z",
+      "end_timestamp": "2025-10-31T20:33:00Z",
+      "duration_minutes": 69.0,
+      "num_samples": 70,
+      "start_level": 79.43,
+      "end_level": 55.97,
+      "net_change": -23.460000000000008,
+      "slope": -0.33999999999999997,
+      "true_drain_rate": 0.41980418668147657,
+      "drained_volume_estimate": 30.13751650908421
+    },
+    {
+      "cauldron": "cauldron_005",
+      "day": "2025-10-31",
+      "event_type": "drain",
+      "start_timestamp": "2025-10-31T21:52:00Z",
+      "end_timestamp": "2025-10-31T23:59:00Z",
+      "duration_minutes": 127.0,
+      "num_samples": 128,
+      "start_level": 265.45,
+      "end_level": 207.03,
+      "net_change": -58.41999999999999,
+      "slope": -0.4600000000000003,
+      "true_drain_rate": 0.5361061672761959,
+      "drained_volume_estimate": 56.72185389133797
+    },
+    {
+      "cauldron": "cauldron_002",
+      "day": "2025-11-03",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-03T00:00:00Z",
+      "end_timestamp": "2025-11-03T00:55:00Z",
+      "duration_minutes": 55.0,
+      "num_samples": 56,
+      "start_level": 447.85,
+      "end_level": 422.55,
+      "net_change": -25.30000000000001,
+      "slope": -0.4600000000000001,
+      "true_drain_rate": 0.5255919966621672,
+      "drained_volume_estimate": 19.122187305975228
+    },
+    {
+      "cauldron": "cauldron_008",
+      "day": "2025-11-03",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-03T03:17:00Z",
+      "end_timestamp": "2025-11-03T04:10:00Z",
+      "duration_minutes": 53.0,
+      "num_samples": 54,
+      "start_level": 63.17,
+      "end_level": 45.15,
+      "net_change": -18.020000000000003,
+      "slope": -0.33999999999999997,
+      "true_drain_rate": 0.41980418668147657,
+      "drained_volume_estimate": 23.149106883789322
+    },
+    {
+      "cauldron": "cauldron_007",
+      "day": "2025-11-03",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-03T07:11:00Z",
+      "end_timestamp": "2025-11-03T10:38:00Z",
+      "duration_minutes": 207.0,
+      "num_samples": 208,
+      "start_level": 634.6,
+      "end_level": 554.1,
+      "net_change": -80.5,
+      "slope": -0.4330296829410102,
+      "true_drain_rate": 0.5363742924047967,
+      "drained_volume_estimate": 68.18225630301278
+    },
+    {
+      "cauldron": "cauldron_009",
+      "day": "2025-11-03",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-03T17:41:00Z",
+      "end_timestamp": "2025-11-03T20:30:00Z",
+      "duration_minutes": 169.0,
+      "num_samples": 170,
+      "start_level": 893.67,
+      "end_level": 823.99,
+      "net_change": -69.67999999999995,
+      "slope": -0.44386927290380473,
+      "true_drain_rate": 0.6299251571838718,
+      "drained_volume_estimate": 89.22364936442514
+    },
+    {
+      "cauldron": "cauldron_005",
+      "day": "2025-11-03",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-03T00:00:00Z",
+      "end_timestamp": "2025-11-03T01:26:00Z",
+      "duration_minutes": 86.0,
+      "num_samples": 87,
+      "start_level": 236.44,
+      "end_level": 205.49,
+      "net_change": -30.94999999999999,
+      "slope": -0.406339760880659,
+      "true_drain_rate": 0.4824459281568546,
+      "drained_volume_estimate": 38.41007428862256
+    },
+    {
+      "cauldron": "cauldron_005",
+      "day": "2025-11-03",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-03T17:54:00Z",
+      "end_timestamp": "2025-11-03T19:45:00Z",
+      "duration_minutes": 111.0,
+      "num_samples": 112,
+      "start_level": 281.45,
+      "end_level": 238.45,
+      "net_change": -43.0,
+      "slope": -0.3986374158608673,
+      "true_drain_rate": 0.4747435831370629,
+      "drained_volume_estimate": 49.575793558570986
+    },
+    {
+      "cauldron": "cauldron_006",
+      "day": "2025-11-05",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-05T00:00:00Z",
+      "end_timestamp": "2025-11-05T01:47:00Z",
+      "duration_minutes": 107.0,
+      "num_samples": 108,
+      "start_level": 317.06,
+      "end_level": 266.77,
+      "net_change": -50.29000000000002,
+      "slope": -0.47,
+      "true_drain_rate": 0.5266815676949775,
+      "drained_volume_estimate": 44.536311798281986
+    },
+    {
+      "cauldron": "cauldron_011",
+      "day": "2025-11-05",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-05T09:18:00Z",
+      "end_timestamp": "2025-11-05T12:05:00Z",
+      "duration_minutes": 167.0,
+      "num_samples": 168,
+      "start_level": 264.43,
+      "end_level": 202.64,
+      "net_change": -61.79000000000002,
+      "slope": -0.37,
+      "true_drain_rate": 0.4612212047741729,
+      "drained_volume_estimate": 75.01190112826275
+    },
+    {
+      "cauldron": "cauldron_005",
+      "day": "2025-11-05",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-05T00:00:00Z",
+      "end_timestamp": "2025-11-05T02:56:00Z",
+      "duration_minutes": 176.0,
+      "num_samples": 177,
+      "start_level": 267.89,
+      "end_level": 186.93,
+      "net_change": -80.95999999999998,
+      "slope": -0.4600000000000001,
+      "true_drain_rate": 0.5361061672761956,
+      "drained_volume_estimate": 78.60666366043688
+    },
+    {
+      "cauldron": "cauldron_008",
+      "day": "2025-11-06",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-06T12:40:00Z",
+      "end_timestamp": "2025-11-06T13:46:00Z",
+      "duration_minutes": 66.0,
+      "num_samples": 67,
+      "start_level": 203.77,
+      "end_level": 179.06,
+      "net_change": -24.710000000000008,
+      "slope": -0.37951273046532036,
+      "true_drain_rate": 0.4593169171467969,
+      "drained_volume_estimate": 28.827189704341418
+    },
+    {
+      "cauldron": "cauldron_008",
+      "day": "2025-11-06",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-06T22:42:00Z",
+      "end_timestamp": "2025-11-06T23:59:00Z",
+      "duration_minutes": 77.0,
+      "num_samples": 78,
+      "start_level": 125.96,
+      "end_level": 99.78,
+      "net_change": -26.179999999999993,
+      "slope": -0.34,
+      "true_drain_rate": 0.41980418668147657,
+      "drained_volume_estimate": 33.63172132173165
+    },
+    {
+      "cauldron": "cauldron_007",
+      "day": "2025-11-06",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-06T02:28:00Z",
+      "end_timestamp": "2025-11-06T05:40:00Z",
+      "duration_minutes": 192.0,
+      "num_samples": 193,
+      "start_level": 639.86,
+      "end_level": 558.73,
+      "net_change": -81.13,
+      "slope": -0.44485747956839927,
+      "true_drain_rate": 0.5482020890321858,
+      "drained_volume_estimate": 63.24151309264954
+    },
+    {
+      "cauldron": "cauldron_009",
+      "day": "2025-11-06",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-06T00:00:00Z",
+      "end_timestamp": "2025-11-06T08:17:00Z",
+      "duration_minutes": 497.0,
+      "num_samples": 498,
+      "start_level": 949.97,
+      "end_level": 879.25,
+      "net_change": -70.72000000000003,
+      "slope": -0.11321192140650839,
+      "true_drain_rate": 0.29926780568657546,
+      "drained_volume_estimate": 262.3914422137236
+    },
+    {
+      "cauldron": "cauldron_009",
+      "day": "2025-11-06",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-06T09:32:00Z",
+      "end_timestamp": "2025-11-06T12:19:00Z",
+      "duration_minutes": 167.0,
+      "num_samples": 168,
+      "start_level": 896.62,
+      "end_level": 825.95,
+      "net_change": -70.66999999999996,
+      "slope": -0.44640823593725487,
+      "true_drain_rate": 0.6324641202173219,
+      "drained_volume_estimate": 88.16774818851478
+    },
+    {
+      "cauldron": "cauldron_009",
+      "day": "2025-11-06",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-06T20:05:00Z",
+      "end_timestamp": "2025-11-06T22:46:00Z",
+      "duration_minutes": 161.0,
+      "num_samples": 162,
+      "start_level": 906.43,
+      "end_level": 835.39,
+      "net_change": -71.03999999999996,
+      "slope": -0.4494619517585642,
+      "true_drain_rate": 0.6355178360386312,
+      "drained_volume_estimate": 85.00004466078371
+    },
+    {
+      "cauldron": "cauldron_003",
+      "day": "2025-11-06",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-06T21:40:00Z",
+      "end_timestamp": "2025-11-06T23:59:00Z",
+      "duration_minutes": 139.0,
+      "num_samples": 140,
+      "start_level": 695.76,
+      "end_level": 633.84,
+      "net_change": -61.91999999999996,
+      "slope": -0.4496826878922391,
+      "true_drain_rate": 0.5466052056411238,
+      "drained_volume_estimate": 45.74617477431509
+    },
+    {
+      "cauldron": "cauldron_008",
+      "day": "2025-11-08",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-08T08:58:00Z",
+      "end_timestamp": "2025-11-08T10:39:00Z",
+      "duration_minutes": 101.0,
+      "num_samples": 102,
+      "start_level": 212.52,
+      "end_level": 178.18,
+      "net_change": -34.34,
+      "slope": -0.3400000000000001,
+      "true_drain_rate": 0.4198041866814767,
+      "drained_volume_estimate": 44.11433575967399
+    },
+    {
+      "cauldron": "cauldron_008",
+      "day": "2025-11-08",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-08T17:11:00Z",
+      "end_timestamp": "2025-11-08T20:12:00Z",
+      "duration_minutes": 181.0,
+      "num_samples": 182,
+      "start_level": 113.83,
+      "end_level": 48.67,
+      "net_change": -65.16,
+      "slope": -0.36000000000000004,
+      "true_drain_rate": 0.4398041866814766,
+      "drained_volume_estimate": 79.05638388614844
+    },
+    {
+      "cauldron": "cauldron_011",
+      "day": "2025-11-08",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-08T00:00:00Z",
+      "end_timestamp": "2025-11-08T01:35:00Z",
+      "duration_minutes": 95.0,
+      "num_samples": 96,
+      "start_level": 187.23,
+      "end_level": 144.48,
+      "net_change": -42.75,
+      "slope": -0.4500000000000003,
+      "true_drain_rate": 0.5412212047741731,
+      "drained_volume_estimate": 42.671440761586595
+    },
+    {
+      "cauldron": "cauldron_012",
+      "day": "2025-11-08",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-08T22:25:00Z",
+      "end_timestamp": "2025-11-08T23:59:00Z",
+      "duration_minutes": 94.0,
+      "num_samples": 95,
+      "start_level": 387.46,
+      "end_level": 345.38,
+      "net_change": -42.079999999999984,
+      "slope": -0.45857180851063845,
+      "true_drain_rate": 0.523474837843161,
+      "drained_volume_estimate": 27.53523470399135
+    },
+    {
+      "cauldron": "cauldron_007",
+      "day": "2025-11-08",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-08T00:00:00Z",
+      "end_timestamp": "2025-11-08T01:30:00Z",
+      "duration_minutes": 90.0,
+      "num_samples": 91,
+      "start_level": 733.34,
+      "end_level": 704.32,
+      "net_change": -29.019999999999982,
+      "slope": -0.3661199235547064,
+      "true_drain_rate": 0.46946453301849295,
+      "drained_volume_estimate": 29.64445926217947
+    },
+    {
+      "cauldron": "cauldron_009",
+      "day": "2025-11-08",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-08T00:00:00Z",
+      "end_timestamp": "2025-11-08T01:36:00Z",
+      "duration_minutes": 96.0,
+      "num_samples": 97,
+      "start_level": 876.19,
+      "end_level": 838.34,
+      "net_change": -37.85000000000002,
+      "slope": -0.43126341258152767,
+      "true_drain_rate": 0.6173192968615947,
+      "drained_volume_estimate": 50.68325644369712
+    },
+    {
+      "cauldron": "cauldron_005",
+      "day": "2025-11-08",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-08T22:17:00Z",
+      "end_timestamp": "2025-11-08T23:59:00Z",
+      "duration_minutes": 102.0,
+      "num_samples": 103,
+      "start_level": 401.85,
+      "end_level": 354.93,
+      "net_change": -46.920000000000016,
+      "slope": -0.4600000000000004,
+      "true_drain_rate": 0.536106167276196,
+      "drained_volume_estimate": 45.55613462138955
+    },
+    {
+      "cauldron": "cauldron_004",
+      "day": "2025-11-08",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-08T21:50:00Z",
+      "end_timestamp": "2025-11-08T23:59:00Z",
+      "duration_minutes": 129.0,
+      "num_samples": 130,
+      "start_level": 522.57,
+      "end_level": 463.23,
+      "net_change": -59.34000000000003,
+      "slope": -0.4600000000000002,
+      "true_drain_rate": 0.527894460249282,
+      "drained_volume_estimate": 41.05917354860557
+    },
+    {
+      "cauldron": "cauldron_002",
+      "day": "2025-11-09",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-09T05:53:00Z",
+      "end_timestamp": "2025-11-09T07:19:00Z",
+      "duration_minutes": 86.0,
+      "num_samples": 87,
+      "start_level": 173.81,
+      "end_level": 139.41,
+      "net_change": -34.400000000000006,
+      "slope": -0.3999999999999999,
+      "true_drain_rate": 0.46559199666216705,
+      "drained_volume_estimate": 29.900147423888534
+    },
+    {
+      "cauldron": "cauldron_003",
+      "day": "2025-11-09",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-09T10:52:00Z",
+      "end_timestamp": "2025-11-09T14:07:00Z",
+      "duration_minutes": 195.0,
+      "num_samples": 196,
+      "start_level": 818.84,
+      "end_level": 747.88,
+      "net_change": -70.96000000000004,
+      "slope": -0.3842449298344877,
+      "true_drain_rate": 0.4811674475833725,
+      "drained_volume_estimate": 64.17628835245642
+    },
+    {
+      "cauldron": "cauldron_003",
+      "day": "2025-11-09",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-09T22:01:00Z",
+      "end_timestamp": "2025-11-09T23:59:00Z",
+      "duration_minutes": 118.0,
+      "num_samples": 119,
+      "start_level": 786.68,
+      "end_level": 757.48,
+      "net_change": -29.199999999999932,
+      "slope": -0.2522274604757157,
+      "true_drain_rate": 0.3491499782246005,
+      "drained_volume_estimate": 38.83488218251209
+    },
+    {
+      "cauldron": "cauldron_008",
+      "day": "2025-11-09",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-09T02:29:00Z",
+      "end_timestamp": "2025-11-09T03:58:00Z",
+      "duration_minutes": 89.0,
+      "num_samples": 90,
+      "start_level": 79.36,
+      "end_level": 49.1,
+      "net_change": -30.259999999999998,
+      "slope": -0.34000000000000014,
+      "true_drain_rate": 0.4198041866814767,
+      "drained_volume_estimate": 38.873028540702826
+    },
+    {
+      "cauldron": "cauldron_011",
+      "day": "2025-11-09",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-09T22:24:00Z",
+      "end_timestamp": "2025-11-09T23:59:00Z",
+      "duration_minutes": 95.0,
+      "num_samples": 96,
+      "start_level": 292.9,
+      "end_level": 250.15,
+      "net_change": -42.74999999999997,
+      "slope": -0.4500000000000003,
+      "true_drain_rate": 0.5412212047741731,
+      "drained_volume_estimate": 42.671440761586595
+    },
+    {
+      "cauldron": "cauldron_012",
+      "day": "2025-11-09",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-09T00:00:00Z",
+      "end_timestamp": "2025-11-09T01:34:00Z",
+      "duration_minutes": 94.0,
+      "num_samples": 95,
+      "start_level": 344.92,
+      "end_level": 304.0,
+      "net_change": -40.920000000000016,
+      "slope": -0.4555235162374022,
+      "true_drain_rate": 0.5204265455699247,
+      "drained_volume_estimate": 27.53523470399135
+    },
+    {
+      "cauldron": "cauldron_009",
+      "day": "2025-11-09",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-09T02:33:00Z",
+      "end_timestamp": "2025-11-09T13:34:00Z",
+      "duration_minutes": 661.0,
+      "num_samples": 662,
+      "start_level": 950.0,
+      "end_level": 883.76,
+      "net_change": -66.24000000000001,
+      "slope": -0.08316085739048344,
+      "true_drain_rate": 0.2692167416705505,
+      "drained_volume_estimate": 348.9753386383729
+    },
+    {
+      "cauldron": "cauldron_009",
+      "day": "2025-11-09",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-09T18:43:00Z",
+      "end_timestamp": "2025-11-09T21:23:00Z",
+      "duration_minutes": 160.0,
+      "num_samples": 161,
+      "start_level": 950.0,
+      "end_level": 878.2,
+      "net_change": -71.79999999999995,
+      "slope": -0.44995399125833907,
+      "true_drain_rate": 0.6360098755384062,
+      "drained_volume_estimate": 84.47209407282854
+    },
+    {
+      "cauldron": "cauldron_005",
+      "day": "2025-11-09",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-09T00:00:00Z",
+      "end_timestamp": "2025-11-09T01:23:00Z",
+      "duration_minutes": 83.0,
+      "num_samples": 84,
+      "start_level": 354.47,
+      "end_level": 318.99,
+      "net_change": -35.48000000000002,
+      "slope": -0.45312746785461194,
+      "true_drain_rate": 0.5292336351308076,
+      "drained_volume_estimate": 37.07018797622875
+    },
+    {
+      "cauldron": "cauldron_004",
+      "day": "2025-11-09",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-09T00:00:00Z",
+      "end_timestamp": "2025-11-09T00:56:00Z",
+      "duration_minutes": 56.0,
+      "num_samples": 57,
+      "start_level": 462.77,
+      "end_level": 439.84,
+      "net_change": -22.930000000000007,
+      "slope": -0.4444522945294272,
+      "true_drain_rate": 0.5123467547787091,
+      "drained_volume_estimate": 17.824137354433425
+    },
+    {
+      "cauldron": "cauldron_010",
+      "day": "2025-10-30",
+      "event_type": "drain",
+      "start_timestamp": "2025-10-30T22:35:00Z",
+      "end_timestamp": "2025-10-30T23:59:00Z",
+      "duration_minutes": 84.0,
+      "num_samples": 85,
+      "start_level": 207.33,
+      "end_level": 168.69,
+      "net_change": -38.640000000000015,
+      "slope": -0.4600000000000004,
+      "true_drain_rate": 0.5370127242898959,
+      "drained_volume_estimate": 29.66185344949447
+    },
+    {
+      "cauldron": "cauldron_007",
+      "day": "2025-10-30",
+      "event_type": "drain",
+      "start_timestamp": "2025-10-30T21:02:00Z",
+      "end_timestamp": "2025-10-30T23:59:00Z",
+      "duration_minutes": 177.0,
+      "num_samples": 178,
+      "start_level": 462.16,
+      "end_level": 382.87,
+      "net_change": -79.29000000000002,
+      "slope": -0.4499322076454715,
+      "true_drain_rate": 0.553276817109258,
+      "drained_volume_estimate": 58.30076988228629
+    },
+    {
+      "cauldron": "cauldron_005",
+      "day": "2025-10-30",
+      "event_type": "drain",
+      "start_timestamp": "2025-10-30T17:39:00Z",
+      "end_timestamp": "2025-10-30T19:50:00Z",
+      "duration_minutes": 131.0,
+      "num_samples": 132,
+      "start_level": 373.44,
+      "end_level": 339.35,
+      "net_change": -34.089999999999975,
+      "slope": -0.29685316692146746,
+      "true_drain_rate": 0.37295933419766303,
+      "drained_volume_estimate": 58.508368974529716
+    },
+    {
+      "cauldron": "cauldron_008",
+      "day": "2025-11-07",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-07T00:00:00Z",
+      "end_timestamp": "2025-11-07T01:42:00Z",
+      "duration_minutes": 102.0,
+      "num_samples": 103,
+      "start_level": 99.44,
+      "end_level": 64.76,
+      "net_change": -34.67999999999999,
+      "slope": -0.34000000000000025,
+      "true_drain_rate": 0.4198041866814768,
+      "drained_volume_estimate": 44.55111136125492
+    },
+    {
+      "cauldron": "cauldron_011",
+      "day": "2025-11-07",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-07T22:33:00Z",
+      "end_timestamp": "2025-11-07T23:59:00Z",
+      "duration_minutes": 86.0,
+      "num_samples": 87,
+      "start_level": 225.95,
+      "end_level": 187.68,
+      "net_change": -38.26999999999998,
+      "slope": -0.44966300940438847,
+      "true_drain_rate": 0.5408842141785614,
+      "drained_volume_estimate": 38.628883215752076
+    },
+    {
+      "cauldron": "cauldron_007",
+      "day": "2025-11-07",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-07T22:05:00Z",
+      "end_timestamp": "2025-11-07T23:59:00Z",
+      "duration_minutes": 114.0,
+      "num_samples": 115,
+      "start_level": 784.88,
+      "end_level": 733.79,
+      "net_change": -51.09000000000003,
+      "slope": -0.4499055472263868,
+      "true_drain_rate": 0.5532501566901733,
+      "drained_volume_estimate": 37.54964839876066
+    },
+    {
+      "cauldron": "cauldron_009",
+      "day": "2025-11-07",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-07T16:42:00Z",
+      "end_timestamp": "2025-11-07T19:35:00Z",
+      "duration_minutes": 173.0,
+      "num_samples": 174,
+      "start_level": 950.0,
+      "end_level": 879.91,
+      "net_change": -70.09000000000003,
+      "slope": -0.4383242689142629,
+      "true_drain_rate": 0.6243801531943299,
+      "drained_volume_estimate": 91.33545171624586
+    },
+    {
+      "cauldron": "cauldron_009",
+      "day": "2025-11-07",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-07T22:44:00Z",
+      "end_timestamp": "2025-11-07T23:59:00Z",
+      "duration_minutes": 75.0,
+      "num_samples": 76,
+      "start_level": 910.18,
+      "end_level": 876.64,
+      "net_change": -33.539999999999964,
+      "slope": -0.4497846889952152,
+      "true_drain_rate": 0.6358405732752822,
+      "drained_volume_estimate": 39.596294096638374
+    },
+    {
+      "cauldron": "cauldron_003",
+      "day": "2025-11-07",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-07T00:00:00Z",
+      "end_timestamp": "2025-11-07T01:02:00Z",
+      "duration_minutes": 62.0,
+      "num_samples": 63,
+      "start_level": 633.39,
+      "end_level": 615.45,
+      "net_change": -17.93999999999994,
+      "slope": -0.32616983486943163,
+      "true_drain_rate": 0.4230923526183164,
+      "drained_volume_estimate": 20.40476860437076
+    },
+    {
+      "cauldron": "cauldron_001",
+      "day": "2025-11-07",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-07T03:10:00Z",
+      "end_timestamp": "2025-11-07T09:17:00Z",
+      "duration_minutes": 367.0,
+      "num_samples": 368,
+      "start_level": 682.77,
+      "end_level": 531.24,
+      "net_change": -151.52999999999997,
+      "slope": -0.4119688478516107,
+      "true_drain_rate": 0.5033017087494969,
+      "drained_volume_estimate": 115.77213604610202
+    },
+    {
+      "cauldron": "cauldron_010",
+      "day": "2025-11-02",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-02T00:00:00Z",
+      "end_timestamp": "2025-11-02T03:00:00Z",
+      "duration_minutes": 180.0,
+      "num_samples": 181,
+      "start_level": 332.8,
+      "end_level": 263.13,
+      "net_change": -69.67000000000002,
+      "slope": -0.39874870985368227,
+      "true_drain_rate": 0.4757614341435777,
+      "drained_volume_estimate": 63.561114534631
+    },
+    {
+      "cauldron": "cauldron_002",
+      "day": "2025-11-02",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-02T21:54:00Z",
+      "end_timestamp": "2025-11-02T23:59:00Z",
+      "duration_minutes": 125.0,
+      "num_samples": 126,
+      "start_level": 505.81,
+      "end_level": 448.31,
+      "net_change": -57.5,
+      "slope": -0.46000000000000024,
+      "true_drain_rate": 0.5255919966621674,
+      "drained_volume_estimate": 43.45951660448915
+    },
+    {
+      "cauldron": "cauldron_003",
+      "day": "2025-11-02",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-02T00:00:00Z",
+      "end_timestamp": "2025-11-02T01:41:00Z",
+      "duration_minutes": 101.0,
+      "num_samples": 102,
+      "start_level": 426.42,
+      "end_level": 385.47,
+      "net_change": -40.94999999999999,
+      "slope": -0.4387368462717205,
+      "true_drain_rate": 0.5356593640206052,
+      "drained_volume_estimate": 33.240026274862046
+    },
+    {
+      "cauldron": "cauldron_008",
+      "day": "2025-11-02",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-02T07:39:00Z",
+      "end_timestamp": "2025-11-02T09:13:00Z",
+      "duration_minutes": 94.0,
+      "num_samples": 95,
+      "start_level": 106.48,
+      "end_level": 74.52,
+      "net_change": -31.960000000000008,
+      "slope": -0.34000000000000014,
+      "true_drain_rate": 0.4198041866814767,
+      "drained_volume_estimate": 41.05690654860748
+    },
+    {
+      "cauldron": "cauldron_008",
+      "day": "2025-11-02",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-02T18:02:00Z",
+      "end_timestamp": "2025-11-02T20:00:00Z",
+      "duration_minutes": 118.0,
+      "num_samples": 119,
+      "start_level": 68.25,
+      "end_level": 28.13,
+      "net_change": -40.120000000000005,
+      "slope": -0.3399999999999999,
+      "true_drain_rate": 0.41980418668147645,
+      "drained_volume_estimate": 51.53952098654981
+    },
+    {
+      "cauldron": "cauldron_007",
+      "day": "2025-11-02",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-02T11:28:00Z",
+      "end_timestamp": "2025-11-02T14:53:00Z",
+      "duration_minutes": 205.0,
+      "num_samples": 206,
+      "start_level": 615.15,
+      "end_level": 535.35,
+      "net_change": -79.79999999999995,
+      "slope": -0.4308427829656093,
+      "true_drain_rate": 0.5341873924293958,
+      "drained_volume_estimate": 67.52349054163102
+    },
+    {
+      "cauldron": "cauldron_009",
+      "day": "2025-11-02",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-02T00:00:00Z",
+      "end_timestamp": "2025-11-02T01:01:00Z",
+      "duration_minutes": 61.0,
+      "num_samples": 62,
+      "start_level": 590.2,
+      "end_level": 564.64,
+      "net_change": -25.56000000000006,
+      "slope": -0.44390899247060017,
+      "true_drain_rate": 0.6299648767506673,
+      "drained_volume_estimate": 32.20498586526588
+    },
+    {
+      "cauldron": "cauldron_005",
+      "day": "2025-11-02",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-02T22:07:00Z",
+      "end_timestamp": "2025-11-02T23:59:00Z",
+      "duration_minutes": 112.0,
+      "num_samples": 113,
+      "start_level": 287.97,
+      "end_level": 236.9,
+      "net_change": -51.07000000000002,
+      "slope": -0.45979040521658143,
+      "true_drain_rate": 0.535896572492777,
+      "drained_volume_estimate": 50.02242232936892
+    },
+    {
+      "cauldron": "cauldron_002",
+      "day": "2025-11-01",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-01T00:00:00Z",
+      "end_timestamp": "2025-11-01T03:03:00Z",
+      "duration_minutes": 183.0,
+      "num_samples": 184,
+      "start_level": 407.31,
+      "end_level": 338.29,
+      "net_change": -69.01999999999998,
+      "slope": -0.42252773015353207,
+      "true_drain_rate": 0.4881197268156992,
+      "drained_volume_estimate": 63.62473230897211
+    },
+    {
+      "cauldron": "cauldron_003",
+      "day": "2025-11-01",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-01T11:28:00Z",
+      "end_timestamp": "2025-11-01T14:45:00Z",
+      "duration_minutes": 197.0,
+      "num_samples": 198,
+      "start_level": 505.93,
+      "end_level": 425.41,
+      "net_change": -80.51999999999998,
+      "slope": -0.439341083204053,
+      "true_drain_rate": 0.5362636009529378,
+      "drained_volume_estimate": 64.83450669453289
+    },
+    {
+      "cauldron": "cauldron_003",
+      "day": "2025-11-01",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-01T22:32:00Z",
+      "end_timestamp": "2025-11-01T23:59:00Z",
+      "duration_minutes": 87.0,
+      "num_samples": 88,
+      "start_level": 466.02,
+      "end_level": 426.87,
+      "net_change": -39.14999999999998,
+      "slope": -0.44999999999999996,
+      "true_drain_rate": 0.5469225177488847,
+      "drained_volume_estimate": 28.63249788032671
+    },
+    {
+      "cauldron": "cauldron_008",
+      "day": "2025-11-01",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-01T07:50:00Z",
+      "end_timestamp": "2025-11-01T09:27:00Z",
+      "duration_minutes": 97.0,
+      "num_samples": 98,
+      "start_level": 110.01,
+      "end_level": 77.03,
+      "net_change": -32.980000000000004,
+      "slope": -0.34000000000000014,
+      "true_drain_rate": 0.4198041866814767,
+      "drained_volume_estimate": 42.367233353350265
+    },
+    {
+      "cauldron": "cauldron_012",
+      "day": "2025-11-01",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-01T13:33:00Z",
+      "end_timestamp": "2025-11-01T16:36:00Z",
+      "duration_minutes": 183.0,
+      "num_samples": 184,
+      "start_level": 318.75,
+      "end_level": 264.58,
+      "net_change": -54.170000000000016,
+      "slope": -0.30848109263932505,
+      "true_drain_rate": 0.37338412197184756,
+      "drained_volume_estimate": 53.60582926415337
+    },
+    {
+      "cauldron": "cauldron_007",
+      "day": "2025-11-01",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-01T18:39:00Z",
+      "end_timestamp": "2025-11-01T22:15:00Z",
+      "duration_minutes": 216.0,
+      "num_samples": 217,
+      "start_level": 610.75,
+      "end_level": 532.16,
+      "net_change": -78.59000000000003,
+      "slope": -0.41099636174880355,
+      "true_drain_rate": 0.5143409712125901,
+      "drained_volume_estimate": 71.14670222923073
+    },
+    {
+      "cauldron": "cauldron_009",
+      "day": "2025-11-01",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-01T14:27:00Z",
+      "end_timestamp": "2025-11-01T17:10:00Z",
+      "duration_minutes": 163.0,
+      "num_samples": 164,
+      "start_level": 649.18,
+      "end_level": 578.19,
+      "net_change": -70.9899999999999,
+      "slope": -0.44862692312924285,
+      "true_drain_rate": 0.6346828074093099,
+      "drained_volume_estimate": 86.05594583669406
+    },
+    {
+      "cauldron": "cauldron_009",
+      "day": "2025-11-01",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-01T22:19:00Z",
+      "end_timestamp": "2025-11-01T23:59:00Z",
+      "duration_minutes": 100.0,
+      "num_samples": 101,
+      "start_level": 635.65,
+      "end_level": 590.65,
+      "net_change": -45.0,
+      "slope": -0.45000000000000023,
+      "true_drain_rate": 0.6360558842800673,
+      "drained_volume_estimate": 52.79505879551783
+    },
+    {
+      "cauldron": "cauldron_005",
+      "day": "2025-11-01",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-01T00:00:00Z",
+      "end_timestamp": "2025-11-01T00:55:00Z",
+      "duration_minutes": 55.0,
+      "num_samples": 56,
+      "start_level": 206.57,
+      "end_level": 182.29,
+      "net_change": -24.28,
+      "slope": -0.45705023923444976,
+      "true_drain_rate": 0.5331564065106453,
+      "drained_volume_estimate": 24.56458239388652
+    },
+    {
+      "cauldron": "cauldron_008",
+      "day": "2025-11-04",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-04T19:57:00Z",
+      "end_timestamp": "2025-11-04T21:12:00Z",
+      "duration_minutes": 75.0,
+      "num_samples": 76,
+      "start_level": 235.07,
+      "end_level": 209.57,
+      "net_change": -25.5,
+      "slope": -0.33999999999999986,
+      "true_drain_rate": 0.41980418668147645,
+      "drained_volume_estimate": 32.758170118569794
+    },
+    {
+      "cauldron": "cauldron_011",
+      "day": "2025-11-04",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-04T00:00:00Z",
+      "end_timestamp": "2025-11-04T02:56:00Z",
+      "duration_minutes": 176.0,
+      "num_samples": 177,
+      "start_level": 182.6,
+      "end_level": 103.4,
+      "net_change": -79.19999999999999,
+      "slope": -0.45000000000000007,
+      "true_drain_rate": 0.5412212047741729,
+      "drained_volume_estimate": 79.05445867409728
+    },
+    {
+      "cauldron": "cauldron_007",
+      "day": "2025-11-04",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-04T17:58:00Z",
+      "end_timestamp": "2025-11-04T21:16:00Z",
+      "duration_minutes": 198.0,
+      "num_samples": 199,
+      "start_level": 642.84,
+      "end_level": 562.48,
+      "net_change": -80.36000000000001,
+      "slope": -0.43866515912897786,
+      "true_drain_rate": 0.5420097685927644,
+      "drained_volume_estimate": 65.21781037679483
+    },
+    {
+      "cauldron": "cauldron_009",
+      "day": "2025-11-04",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-04T06:30:00Z",
+      "end_timestamp": "2025-11-04T09:19:00Z",
+      "duration_minutes": 169.0,
+      "num_samples": 170,
+      "start_level": 945.23,
+      "end_level": 874.62,
+      "net_change": -70.61000000000001,
+      "slope": -0.44377629594347845,
+      "true_drain_rate": 0.6298321802235455,
+      "drained_volume_estimate": 89.22364936442514
+    },
+    {
+      "cauldron": "cauldron_009",
+      "day": "2025-11-04",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-04T10:28:00Z",
+      "end_timestamp": "2025-11-04T13:10:00Z",
+      "duration_minutes": 162.0,
+      "num_samples": 163,
+      "start_level": 886.56,
+      "end_level": 814.74,
+      "net_change": -71.81999999999994,
+      "slope": -0.4496600550872586,
+      "true_drain_rate": 0.6357159393673256,
+      "drained_volume_estimate": 85.52799524873889
+    },
+    {
+      "cauldron": "cauldron_009",
+      "day": "2025-11-04",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-04T21:37:00Z",
+      "end_timestamp": "2025-11-04T23:59:00Z",
+      "duration_minutes": 142.0,
+      "num_samples": 143,
+      "start_level": 909.03,
+      "end_level": 845.13,
+      "net_change": -63.89999999999998,
+      "slope": -0.44999999999999996,
+      "true_drain_rate": 0.636055884280067,
+      "drained_volume_estimate": 74.96898348963532
+    },
+    {
+      "cauldron": "cauldron_006",
+      "day": "2025-11-04",
+      "event_type": "drain",
+      "start_timestamp": "2025-11-04T22:46:00Z",
+      "end_timestamp": "2025-11-04T23:59:00Z",
+      "duration_minutes": 73.0,
+      "num_samples": 74,
+      "start_level": 351.84,
+      "end_level": 317.53,
+      "net_change": -34.31,
+      "slope": -0.4699999999999998,
+      "true_drain_rate": 0.5266815676949773,
+      "drained_volume_estimate": 30.384586553968084
+    }
+  ],
+  "faulty_tickets_by_day": {
+    "2025-10-31": {
+      "cauldron_002": [
+        {
+          "ticket_id": "TT_20251031_010",
+          "cauldron_id": "cauldron_002",
+          "amount_collected": 94.82,
+          "courier_id": "courier_witch_01",
+          "date": "2025-10-31"
+        }
+      ],
+      "cauldron_008": [
+        {
+          "ticket_id": "TT_20251031_019",
+          "cauldron_id": "cauldron_008",
+          "amount_collected": 72.76,
+          "courier_id": "courier_witch_02",
+          "date": "2025-10-31"
+        },
+        {
+          "ticket_id": "TT_20251031_026",
+          "cauldron_id": "cauldron_008",
+          "amount_collected": 28.79,
+          "courier_id": "courier_witch_04",
+          "date": "2025-10-31"
+        }
+      ],
+      "cauldron_005": [
+        {
+          "ticket_id": "TT_20251031_028",
+          "cauldron_id": "cauldron_005",
+          "amount_collected": 96.26,
+          "courier_id": "courier_witch_05",
+          "date": "2025-10-31"
+        }
+      ]
+    },
+    "2025-11-03": {
+      "cauldron_008": [
+        {
+          "ticket_id": "TT_20251103_056",
+          "cauldron_id": "cauldron_008",
+          "amount_collected": 21.89,
+          "courier_id": "courier_witch_05",
+          "date": "2025-11-03"
+        }
+      ],
+      "cauldron_011": [
+        {
+          "ticket_id": "TT_20251103_067",
+          "cauldron_id": "cauldron_011",
+          "amount_collected": 96.63,
+          "courier_id": "courier_witch_04",
+          "date": "2025-11-03"
+        }
+      ],
+      "cauldron_007": [
+        {
+          "ticket_id": "TT_20251103_064",
+          "cauldron_id": "cauldron_007",
+          "amount_collected": 97.51,
+          "courier_id": "courier_witch_03",
+          "date": "2025-11-03"
+        }
+      ],
+      "cauldron_009": [
+        {
+          "ticket_id": "TT_20251103_066",
+          "cauldron_id": "cauldron_009",
+          "amount_collected": 99.87,
+          "courier_id": "courier_witch_01",
+          "date": "2025-11-03"
+        }
+      ]
+    },
+    "2025-11-05": {
+      "cauldron_011": [
+        {
+          "ticket_id": "TT_20251105_090",
+          "cauldron_id": "cauldron_011",
+          "amount_collected": 96.63,
+          "courier_id": "courier_witch_04",
+          "date": "2025-11-05"
+        }
+      ]
+    },
+    "2025-11-10": {
+      "cauldron_002": [
+        {
+          "ticket_id": "TT_20251110_127",
+          "cauldron_id": "cauldron_002",
+          "amount_collected": 55.57,
+          "courier_id": "courier_witch_01",
+          "date": "2025-11-10"
+        }
+      ],
+      "cauldron_001": [
+        {
+          "ticket_id": "TT_20251110_128",
+          "cauldron_id": "cauldron_001",
+          "amount_collected": 95.8,
+          "courier_id": "courier_witch_02",
+          "date": "2025-11-10"
+        }
+      ],
+      "cauldron_010": [
+        {
+          "ticket_id": "TT_20251110_148",
+          "cauldron_id": "cauldron_010",
+          "amount_collected": 81.39,
+          "courier_id": "courier_witch_05",
+          "date": "2025-11-10"
+        }
+      ],
+      "cauldron_005": [
+        {
+          "ticket_id": "TT_20251110_138",
+          "cauldron_id": "cauldron_005",
+          "amount_collected": 96.26,
+          "courier_id": "courier_witch_05",
+          "date": "2025-11-10"
+        }
+      ],
+      "cauldron_009": [
+        {
+          "ticket_id": "TT_20251110_149",
+          "cauldron_id": "cauldron_009",
+          "amount_collected": 99.87,
+          "courier_id": "courier_witch_03",
+          "date": "2025-11-10"
+        }
+      ],
+      "cauldron_004": [
+        {
+          "ticket_id": "TT_20251110_137",
+          "cauldron_id": "cauldron_004",
+          "amount_collected": 95.1,
+          "courier_id": "courier_witch_04",
+          "date": "2025-11-10"
+        }
+      ]
+    },
+    "2025-11-06": {
+      "cauldron_008": [
+        {
+          "ticket_id": "TT_20251106_106",
+          "cauldron_id": "cauldron_008",
+          "amount_collected": 75.31,
+          "courier_id": "courier_witch_04",
+          "date": "2025-11-06"
+        }
+      ],
+      "cauldron_007": [
+        {
+          "ticket_id": "TT_20251106_091",
+          "cauldron_id": "cauldron_007",
+          "amount_collected": 97.51,
+          "courier_id": "courier_witch_03",
+          "date": "2025-11-06"
+        }
+      ],
+      "cauldron_009": [
+        {
+          "ticket_id": "TT_20251106_083",
+          "cauldron_id": "cauldron_009",
+          "amount_collected": 99.87,
+          "courier_id": "courier_witch_04",
+          "date": "2025-11-06"
+        },
+        {
+          "ticket_id": "TT_20251106_101",
+          "cauldron_id": "cauldron_009",
+          "amount_collected": 99.87,
+          "courier_id": "courier_witch_01",
+          "date": "2025-11-06"
+        },
+        {
+          "ticket_id": "TT_20251106_103",
+          "cauldron_id": "cauldron_009",
+          "amount_collected": 99.87,
+          "courier_id": "courier_witch_02",
+          "date": "2025-11-06"
+        }
+      ],
+      "cauldron_003": [
+        {
+          "ticket_id": "TT_20251106_086",
+          "cauldron_id": "cauldron_003",
+          "amount_collected": 83.63,
+          "courier_id": "courier_witch_03",
+          "date": "2025-11-06"
+        }
+      ]
+    },
+    "2025-11-08": {
+      "cauldron_008": [
+        {
+          "ticket_id": "TT_20251108_111",
+          "cauldron_id": "cauldron_008",
+          "amount_collected": 42.21,
+          "courier_id": "courier_witch_03",
+          "date": "2025-11-08"
+        },
+        {
+          "ticket_id": "TT_20251108_133",
+          "cauldron_id": "cauldron_008",
+          "amount_collected": 79.86,
+          "courier_id": "courier_witch_03",
+          "date": "2025-11-08"
+        }
+      ],
+      "cauldron_012": [
+        {
+          "ticket_id": "TT_20251108_131",
+          "cauldron_id": "cauldron_012",
+          "amount_collected": 79.07,
+          "courier_id": "courier_witch_02",
+          "date": "2025-11-08"
+        }
+      ],
+      "cauldron_005": [
+        {
+          "ticket_id": "TT_20251108_114",
+          "cauldron_id": "cauldron_005",
+          "amount_collected": 96.26,
+          "courier_id": "courier_witch_01",
+          "date": "2025-11-08"
+        }
+      ],
+      "cauldron_004": [
+        {
+          "ticket_id": "TT_20251108_134",
+          "cauldron_id": "cauldron_004",
+          "amount_collected": 85.43,
+          "courier_id": "courier_witch_05",
+          "date": "2025-11-08"
+        }
+      ]
+    },
+    "2025-11-09": {
+      "cauldron_003": [
+        {
+          "ticket_id": "TT_20251109_126",
+          "cauldron_id": "cauldron_003",
+          "amount_collected": 97.05,
+          "courier_id": "courier_witch_04",
+          "date": "2025-11-09"
+        }
+      ],
+      "cauldron_008": [
+        {
+          "ticket_id": "TT_20251109_135",
+          "cauldron_id": "cauldron_008",
+          "amount_collected": 37.06,
+          "courier_id": "courier_witch_03",
+          "date": "2025-11-09"
+        }
+      ],
+      "cauldron_011": [
+        {
+          "ticket_id": "TT_20251109_147",
+          "cauldron_id": "cauldron_011",
+          "amount_collected": 96.63,
+          "courier_id": "courier_witch_03",
+          "date": "2025-11-09"
+        }
+      ],
+      "cauldron_009": [
+        {
+          "ticket_id": "TT_20251109_124",
+          "cauldron_id": "cauldron_009",
+          "amount_collected": 99.87,
+          "courier_id": "courier_witch_03",
+          "date": "2025-11-09"
+        },
+        {
+          "ticket_id": "TT_20251109_145",
+          "cauldron_id": "cauldron_009",
+          "amount_collected": 99.87,
+          "courier_id": "courier_witch_02",
+          "date": "2025-11-09"
+        }
+      ]
+    },
+    "2025-10-30": {
+      "cauldron_010": [
+        {
+          "ticket_id": "TT_20251030_016",
+          "cauldron_id": "cauldron_010",
+          "amount_collected": 95.85,
+          "courier_id": "courier_witch_04",
+          "date": "2025-10-30"
+        }
+      ],
+      "cauldron_007": [
+        {
+          "ticket_id": "TT_20251030_005",
+          "cauldron_id": "cauldron_007",
+          "amount_collected": 97.51,
+          "courier_id": "courier_witch_03",
+          "date": "2025-10-30"
+        }
+      ]
+    },
+    "2025-11-07": {
+      "cauldron_011": [
+        {
+          "ticket_id": "TT_20251107_117",
+          "cauldron_id": "cauldron_011",
+          "amount_collected": 96.63,
+          "courier_id": "courier_witch_02",
+          "date": "2025-11-07"
+        }
+      ],
+      "cauldron_007": [
+        {
+          "ticket_id": "TT_20251107_100",
+          "cauldron_id": "cauldron_007",
+          "amount_collected": 75.42,
+          "courier_id": "courier_witch_01",
+          "date": "2025-11-07"
+        }
+      ],
+      "cauldron_009": [
+        {
+          "ticket_id": "TT_20251107_109",
+          "cauldron_id": "cauldron_009",
+          "amount_collected": 99.87,
+          "courier_id": "courier_witch_04",
+          "date": "2025-11-07"
+        },
+        {
+          "ticket_id": "TT_20251107_120",
+          "cauldron_id": "cauldron_009",
+          "amount_collected": 99.87,
+          "courier_id": "courier_witch_03",
+          "date": "2025-11-07"
+        }
+      ],
+      "cauldron_001": [
+        {
+          "ticket_id": "TT_20251107_115",
+          "cauldron_id": "cauldron_001",
+          "amount_collected": 95.8,
+          "courier_id": "courier_witch_01",
+          "date": "2025-11-07"
+        }
+      ]
+    },
+    "2025-11-02": {
+      "cauldron_002": [
+        {
+          "ticket_id": "TT_20251102_033",
+          "cauldron_id": "cauldron_002",
+          "amount_collected": 71.26,
+          "courier_id": "courier_witch_01",
+          "date": "2025-11-02"
+        }
+      ],
+      "cauldron_008": [
+        {
+          "ticket_id": "TT_20251102_050",
+          "cauldron_id": "cauldron_008",
+          "amount_collected": 48.38,
+          "courier_id": "courier_witch_02",
+          "date": "2025-11-02"
+        },
+        {
+          "ticket_id": "TT_20251102_054",
+          "cauldron_id": "cauldron_008",
+          "amount_collected": 49.25,
+          "courier_id": "courier_witch_04",
+          "date": "2025-11-02"
+        }
+      ],
+      "cauldron_007": [
+        {
+          "ticket_id": "TT_20251102_044",
+          "cauldron_id": "cauldron_007",
+          "amount_collected": 97.51,
+          "courier_id": "courier_witch_01",
+          "date": "2025-11-02"
+        }
+      ],
+      "cauldron_005": [
+        {
+          "ticket_id": "TT_20251102_055",
+          "cauldron_id": "cauldron_005",
+          "amount_collected": 96.26,
+          "courier_id": "courier_witch_02",
+          "date": "2025-11-02"
+        }
+      ]
+    },
+    "2025-11-11": {
+      "cauldron_006": [
+        {
+          "ticket_id": "TT_20251111_141",
+          "cauldron_id": "cauldron_006",
+          "amount_collected": 94.41,
+          "courier_id": "courier_witch_03",
+          "date": "2025-11-11"
+        }
+      ],
+      "cauldron_008": [
+        {
+          "ticket_id": "TT_20251111_140",
+          "cauldron_id": "cauldron_008",
+          "amount_collected": 35.45,
+          "courier_id": "courier_witch_02",
+          "date": "2025-11-11"
+        }
+      ],
+      "cauldron_007": [
+        {
+          "ticket_id": "TT_20251111_142",
+          "cauldron_id": "cauldron_007",
+          "amount_collected": 97.51,
+          "courier_id": "courier_witch_04",
+          "date": "2025-11-11"
+        }
+      ],
+      "cauldron_012": [
+        {
+          "ticket_id": "TT_20251111_139",
+          "cauldron_id": "cauldron_012",
+          "amount_collected": 94.37,
+          "courier_id": "courier_witch_01",
+          "date": "2025-11-11"
+        }
+      ]
+    },
+    "2025-11-01": {
+      "cauldron_010": [
+        {
+          "ticket_id": "TT_20251101_021",
+          "cauldron_id": "cauldron_010",
+          "amount_collected": 85.67,
+          "courier_id": "courier_witch_05",
+          "date": "2025-11-01"
+        }
+      ],
+      "cauldron_003": [
+        {
+          "ticket_id": "TT_20251101_031",
+          "cauldron_id": "cauldron_003",
+          "amount_collected": 97.05,
+          "courier_id": "courier_witch_02",
+          "date": "2025-11-01"
+        },
+        {
+          "ticket_id": "TT_20251101_039",
+          "cauldron_id": "cauldron_003",
+          "amount_collected": 97.05,
+          "courier_id": "courier_witch_04",
+          "date": "2025-11-01"
+        }
+      ],
+      "cauldron_008": [
+        {
+          "ticket_id": "TT_20251101_036",
+          "cauldron_id": "cauldron_008",
+          "amount_collected": 52.1,
+          "courier_id": "courier_witch_05",
+          "date": "2025-11-01"
+        }
+      ],
+      "cauldron_012": [
+        {
+          "ticket_id": "TT_20251101_013",
+          "cauldron_id": "cauldron_012",
+          "amount_collected": 65.74,
+          "courier_id": "courier_witch_03",
+          "date": "2025-11-01"
+        }
+      ],
+      "cauldron_007": [
+        {
+          "ticket_id": "TT_20251101_020",
+          "cauldron_id": "cauldron_007",
+          "amount_collected": 97.51,
+          "courier_id": "courier_witch_01",
+          "date": "2025-11-01"
+        }
+      ],
+      "cauldron_009": [
+        {
+          "ticket_id": "TT_20251101_037",
+          "cauldron_id": "cauldron_009",
+          "amount_collected": 99.87,
+          "courier_id": "courier_witch_04",
+          "date": "2025-11-01"
+        },
+        {
+          "ticket_id": "TT_20251101_041",
+          "cauldron_id": "cauldron_009",
+          "amount_collected": 99.87,
+          "courier_id": "courier_witch_03",
+          "date": "2025-11-01"
+        }
+      ]
+    },
+    "2025-11-04": {
+      "cauldron_008": [
+        {
+          "ticket_id": "TT_20251104_060",
+          "cauldron_id": "cauldron_008",
+          "amount_collected": 31.35,
+          "courier_id": "courier_witch_05",
+          "date": "2025-11-04"
+        }
+      ],
+      "cauldron_007": [
+        {
+          "ticket_id": "TT_20251104_070",
+          "cauldron_id": "cauldron_007",
+          "amount_collected": 97.51,
+          "courier_id": "courier_witch_04",
+          "date": "2025-11-04"
+        }
+      ],
+      "cauldron_009": [
+        {
+          "ticket_id": "TT_20251104_068",
+          "cauldron_id": "cauldron_009",
+          "amount_collected": 99.87,
+          "courier_id": "courier_witch_03",
+          "date": "2025-11-04"
+        },
+        {
+          "ticket_id": "TT_20251104_075",
+          "cauldron_id": "cauldron_009",
+          "amount_collected": 99.87,
+          "courier_id": "courier_witch_05",
+          "date": "2025-11-04"
+        },
+        {
+          "ticket_id": "TT_20251104_077",
+          "cauldron_id": "cauldron_009",
+          "amount_collected": 99.87,
+          "courier_id": "courier_witch_01",
+          "date": "2025-11-04"
+        }
+      ],
+      "cauldron_005": [
+        {
+          "ticket_id": "TT_20251104_079",
+          "cauldron_id": "cauldron_005",
+          "amount_collected": 96.26,
+          "courier_id": "courier_witch_03",
+          "date": "2025-11-04"
+        }
+      ],
+      "cauldron_006": [
+        {
+          "ticket_id": "TT_20251104_061",
+          "cauldron_id": "cauldron_006",
+          "amount_collected": 94.41,
+          "courier_id": "courier_witch_02",
+          "date": "2025-11-04"
+        }
+      ]
+    }
+  },
+  "unlogged_tickets_by_day": {
+    "2025-10-31": {
+      "cauldron_010": [
+        {
+          "cauldron": "cauldron_010",
+          "day": "2025-10-31",
+          "event_type": "drain",
+          "start_timestamp": "2025-10-31T00:00:00Z",
+          "end_timestamp": "2025-10-31T01:36:00Z",
+          "duration_minutes": 96.0,
+          "num_samples": 97,
+          "start_level": 168.23,
+          "end_level": 124.07,
+          "net_change": -44.16,
+          "slope": -0.4600000000000002,
+          "true_drain_rate": 0.5370127242898957,
+          "drained_volume_estimate": 33.89926108513654
+        }
+      ]
+    },
+    "2025-11-03": {
+      "cauldron_002": [
+        {
+          "cauldron": "cauldron_002",
+          "day": "2025-11-03",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-03T00:00:00Z",
+          "end_timestamp": "2025-11-03T00:55:00Z",
+          "duration_minutes": 55.0,
+          "num_samples": 56,
+          "start_level": 447.85,
+          "end_level": 422.55,
+          "net_change": -25.30000000000001,
+          "slope": -0.4600000000000001,
+          "true_drain_rate": 0.5255919966621672,
+          "drained_volume_estimate": 19.122187305975228
+        }
+      ],
+      "cauldron_005": [
+        {
+          "cauldron": "cauldron_005",
+          "day": "2025-11-03",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-03T00:00:00Z",
+          "end_timestamp": "2025-11-03T01:26:00Z",
+          "duration_minutes": 86.0,
+          "num_samples": 87,
+          "start_level": 236.44,
+          "end_level": 205.49,
+          "net_change": -30.94999999999999,
+          "slope": -0.406339760880659,
+          "true_drain_rate": 0.4824459281568546,
+          "drained_volume_estimate": 38.41007428862256
+        },
+        {
+          "cauldron": "cauldron_005",
+          "day": "2025-11-03",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-03T17:54:00Z",
+          "end_timestamp": "2025-11-03T19:45:00Z",
+          "duration_minutes": 111.0,
+          "num_samples": 112,
+          "start_level": 281.45,
+          "end_level": 238.45,
+          "net_change": -43.0,
+          "slope": -0.3986374158608673,
+          "true_drain_rate": 0.4747435831370629,
+          "drained_volume_estimate": 49.575793558570986
+        }
+      ]
+    },
+    "2025-11-05": {
+      "cauldron_006": [
+        {
+          "cauldron": "cauldron_006",
+          "day": "2025-11-05",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-05T00:00:00Z",
+          "end_timestamp": "2025-11-05T01:47:00Z",
+          "duration_minutes": 107.0,
+          "num_samples": 108,
+          "start_level": 317.06,
+          "end_level": 266.77,
+          "net_change": -50.29000000000002,
+          "slope": -0.47,
+          "true_drain_rate": 0.5266815676949775,
+          "drained_volume_estimate": 44.536311798281986
+        }
+      ],
+      "cauldron_005": [
+        {
+          "cauldron": "cauldron_005",
+          "day": "2025-11-05",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-05T00:00:00Z",
+          "end_timestamp": "2025-11-05T02:56:00Z",
+          "duration_minutes": 176.0,
+          "num_samples": 177,
+          "start_level": 267.89,
+          "end_level": 186.93,
+          "net_change": -80.95999999999998,
+          "slope": -0.4600000000000001,
+          "true_drain_rate": 0.5361061672761956,
+          "drained_volume_estimate": 78.60666366043688
+        }
+      ]
+    },
+    "2025-11-06": {
+      "cauldron_008": [
+        {
+          "cauldron": "cauldron_008",
+          "day": "2025-11-06",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-06T06:12:00Z",
+          "end_timestamp": "2025-11-06T09:14:00Z",
+          "duration_minutes": 182.0,
+          "num_samples": 183,
+          "start_level": 267.86,
+          "end_level": 186.39,
+          "net_change": -81.47000000000003,
+          "slope": -0.4499233784746971,
+          "true_drain_rate": 0.5297275651561737,
+          "drained_volume_estimate": 79.49315948772937
+        }
+      ]
+    },
+    "2025-11-08": {
+      "cauldron_011": [
+        {
+          "cauldron": "cauldron_011",
+          "day": "2025-11-08",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-08T00:00:00Z",
+          "end_timestamp": "2025-11-08T01:35:00Z",
+          "duration_minutes": 95.0,
+          "num_samples": 96,
+          "start_level": 187.23,
+          "end_level": 144.48,
+          "net_change": -42.75,
+          "slope": -0.4500000000000003,
+          "true_drain_rate": 0.5412212047741731,
+          "drained_volume_estimate": 42.671440761586595
+        }
+      ],
+      "cauldron_007": [
+        {
+          "cauldron": "cauldron_007",
+          "day": "2025-11-08",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-08T00:00:00Z",
+          "end_timestamp": "2025-11-08T01:30:00Z",
+          "duration_minutes": 90.0,
+          "num_samples": 91,
+          "start_level": 733.34,
+          "end_level": 704.32,
+          "net_change": -29.019999999999982,
+          "slope": -0.3661199235547064,
+          "true_drain_rate": 0.46946453301849295,
+          "drained_volume_estimate": 29.64445926217947
+        }
+      ],
+      "cauldron_009": [
+        {
+          "cauldron": "cauldron_009",
+          "day": "2025-11-08",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-08T00:00:00Z",
+          "end_timestamp": "2025-11-08T01:36:00Z",
+          "duration_minutes": 96.0,
+          "num_samples": 97,
+          "start_level": 876.19,
+          "end_level": 838.34,
+          "net_change": -37.85000000000002,
+          "slope": -0.43126341258152767,
+          "true_drain_rate": 0.6173192968615947,
+          "drained_volume_estimate": 50.68325644369712
+        }
+      ]
+    },
+    "2025-11-09": {
+      "cauldron_002": [
+        {
+          "cauldron": "cauldron_002",
+          "day": "2025-11-09",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-09T05:53:00Z",
+          "end_timestamp": "2025-11-09T07:19:00Z",
+          "duration_minutes": 86.0,
+          "num_samples": 87,
+          "start_level": 173.81,
+          "end_level": 139.41,
+          "net_change": -34.400000000000006,
+          "slope": -0.3999999999999999,
+          "true_drain_rate": 0.46559199666216705,
+          "drained_volume_estimate": 29.900147423888534
+        }
+      ],
+      "cauldron_003": [
+        {
+          "cauldron": "cauldron_003",
+          "day": "2025-11-09",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-09T10:52:00Z",
+          "end_timestamp": "2025-11-09T14:07:00Z",
+          "duration_minutes": 195.0,
+          "num_samples": 196,
+          "start_level": 818.84,
+          "end_level": 747.88,
+          "net_change": -70.96000000000004,
+          "slope": -0.3842449298344877,
+          "true_drain_rate": 0.4811674475833725,
+          "drained_volume_estimate": 64.17628835245642
+        }
+      ],
+      "cauldron_012": [
+        {
+          "cauldron": "cauldron_012",
+          "day": "2025-11-09",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-09T00:00:00Z",
+          "end_timestamp": "2025-11-09T01:34:00Z",
+          "duration_minutes": 94.0,
+          "num_samples": 95,
+          "start_level": 344.92,
+          "end_level": 304.0,
+          "net_change": -40.920000000000016,
+          "slope": -0.4555235162374022,
+          "true_drain_rate": 0.5204265455699247,
+          "drained_volume_estimate": 27.53523470399135
+        }
+      ],
+      "cauldron_005": [
+        {
+          "cauldron": "cauldron_005",
+          "day": "2025-11-09",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-09T00:00:00Z",
+          "end_timestamp": "2025-11-09T01:23:00Z",
+          "duration_minutes": 83.0,
+          "num_samples": 84,
+          "start_level": 354.47,
+          "end_level": 318.99,
+          "net_change": -35.48000000000002,
+          "slope": -0.45312746785461194,
+          "true_drain_rate": 0.5292336351308076,
+          "drained_volume_estimate": 37.07018797622875
+        }
+      ],
+      "cauldron_004": [
+        {
+          "cauldron": "cauldron_004",
+          "day": "2025-11-09",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-09T00:00:00Z",
+          "end_timestamp": "2025-11-09T00:56:00Z",
+          "duration_minutes": 56.0,
+          "num_samples": 57,
+          "start_level": 462.77,
+          "end_level": 439.84,
+          "net_change": -22.930000000000007,
+          "slope": -0.4444522945294272,
+          "true_drain_rate": 0.5123467547787091,
+          "drained_volume_estimate": 17.824137354433425
+        }
+      ]
+    },
+    "2025-10-30": {
+      "cauldron_005": [
+        {
+          "cauldron": "cauldron_005",
+          "day": "2025-10-30",
+          "event_type": "drain",
+          "start_timestamp": "2025-10-30T17:39:00Z",
+          "end_timestamp": "2025-10-30T19:50:00Z",
+          "duration_minutes": 131.0,
+          "num_samples": 132,
+          "start_level": 373.44,
+          "end_level": 339.35,
+          "net_change": -34.089999999999975,
+          "slope": -0.29685316692146746,
+          "true_drain_rate": 0.37295933419766303,
+          "drained_volume_estimate": 58.508368974529716
+        }
+      ]
+    },
+    "2025-11-07": {
+      "cauldron_008": [
+        {
+          "cauldron": "cauldron_008",
+          "day": "2025-11-07",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-07T00:00:00Z",
+          "end_timestamp": "2025-11-07T01:42:00Z",
+          "duration_minutes": 102.0,
+          "num_samples": 103,
+          "start_level": 99.44,
+          "end_level": 64.76,
+          "net_change": -34.67999999999999,
+          "slope": -0.34000000000000025,
+          "true_drain_rate": 0.4198041866814768,
+          "drained_volume_estimate": 44.55111136125492
+        }
+      ],
+      "cauldron_003": [
+        {
+          "cauldron": "cauldron_003",
+          "day": "2025-11-07",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-07T00:00:00Z",
+          "end_timestamp": "2025-11-07T01:02:00Z",
+          "duration_minutes": 62.0,
+          "num_samples": 63,
+          "start_level": 633.39,
+          "end_level": 615.45,
+          "net_change": -17.93999999999994,
+          "slope": -0.32616983486943163,
+          "true_drain_rate": 0.4230923526183164,
+          "drained_volume_estimate": 20.40476860437076
+        }
+      ]
+    },
+    "2025-11-02": {
+      "cauldron_010": [
+        {
+          "cauldron": "cauldron_010",
+          "day": "2025-11-02",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-02T00:00:00Z",
+          "end_timestamp": "2025-11-02T03:00:00Z",
+          "duration_minutes": 180.0,
+          "num_samples": 181,
+          "start_level": 332.8,
+          "end_level": 263.13,
+          "net_change": -69.67000000000002,
+          "slope": -0.39874870985368227,
+          "true_drain_rate": 0.4757614341435777,
+          "drained_volume_estimate": 63.561114534631
+        }
+      ],
+      "cauldron_003": [
+        {
+          "cauldron": "cauldron_003",
+          "day": "2025-11-02",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-02T00:00:00Z",
+          "end_timestamp": "2025-11-02T01:41:00Z",
+          "duration_minutes": 101.0,
+          "num_samples": 102,
+          "start_level": 426.42,
+          "end_level": 385.47,
+          "net_change": -40.94999999999999,
+          "slope": -0.4387368462717205,
+          "true_drain_rate": 0.5356593640206052,
+          "drained_volume_estimate": 33.240026274862046
+        }
+      ],
+      "cauldron_009": [
+        {
+          "cauldron": "cauldron_009",
+          "day": "2025-11-02",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-02T00:00:00Z",
+          "end_timestamp": "2025-11-02T01:01:00Z",
+          "duration_minutes": 61.0,
+          "num_samples": 62,
+          "start_level": 590.2,
+          "end_level": 564.64,
+          "net_change": -25.56000000000006,
+          "slope": -0.44390899247060017,
+          "true_drain_rate": 0.6299648767506673,
+          "drained_volume_estimate": 32.20498586526588
+        }
+      ]
+    },
+    "2025-11-01": {
+      "cauldron_002": [
+        {
+          "cauldron": "cauldron_002",
+          "day": "2025-11-01",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-01T00:00:00Z",
+          "end_timestamp": "2025-11-01T03:03:00Z",
+          "duration_minutes": 183.0,
+          "num_samples": 184,
+          "start_level": 407.31,
+          "end_level": 338.29,
+          "net_change": -69.01999999999998,
+          "slope": -0.42252773015353207,
+          "true_drain_rate": 0.4881197268156992,
+          "drained_volume_estimate": 63.62473230897211
+        }
+      ],
+      "cauldron_005": [
+        {
+          "cauldron": "cauldron_005",
+          "day": "2025-11-01",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-01T00:00:00Z",
+          "end_timestamp": "2025-11-01T00:55:00Z",
+          "duration_minutes": 55.0,
+          "num_samples": 56,
+          "start_level": 206.57,
+          "end_level": 182.29,
+          "net_change": -24.28,
+          "slope": -0.45705023923444976,
+          "true_drain_rate": 0.5331564065106453,
+          "drained_volume_estimate": 24.56458239388652
+        }
+      ]
+    },
+    "2025-11-04": {
+      "cauldron_011": [
+        {
+          "cauldron": "cauldron_011",
+          "day": "2025-11-04",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-04T00:00:00Z",
+          "end_timestamp": "2025-11-04T02:56:00Z",
+          "duration_minutes": 176.0,
+          "num_samples": 177,
+          "start_level": 182.6,
+          "end_level": 103.4,
+          "net_change": -79.19999999999999,
+          "slope": -0.45000000000000007,
+          "true_drain_rate": 0.5412212047741729,
+          "drained_volume_estimate": 79.05445867409728
+        }
+      ]
+    }
+  },
+  "unaccounted_events_by_day": {
+    "2025-10-31": {
+      "cauldron_010": [
+        {
+          "cauldron": "cauldron_010",
+          "day": "2025-10-31",
+          "event_type": "drain",
+          "start_timestamp": "2025-10-31T00:00:00Z",
+          "end_timestamp": "2025-10-31T01:36:00Z",
+          "duration_minutes": 96.0,
+          "num_samples": 97,
+          "start_level": 168.23,
+          "end_level": 124.07,
+          "net_change": -44.16,
+          "slope": -0.4600000000000002,
+          "true_drain_rate": 0.5370127242898957,
+          "drained_volume_estimate": 33.89926108513654
+        }
+      ],
+      "cauldron_008": [
+        {
+          "cauldron": "cauldron_008",
+          "day": "2025-10-31",
+          "event_type": "drain",
+          "start_timestamp": "2025-10-31T09:53:00Z",
+          "end_timestamp": "2025-10-31T12:07:00Z",
+          "duration_minutes": 134.0,
+          "num_samples": 135,
+          "start_level": 89.85,
+          "end_level": 44.29,
+          "net_change": -45.559999999999995,
+          "slope": -0.3400000000000001,
+          "true_drain_rate": 0.4198041866814767,
+          "drained_volume_estimate": 58.5279306118447
+        },
+        {
+          "cauldron": "cauldron_008",
+          "day": "2025-10-31",
+          "event_type": "drain",
+          "start_timestamp": "2025-10-31T19:24:00Z",
+          "end_timestamp": "2025-10-31T20:33:00Z",
+          "duration_minutes": 69.0,
+          "num_samples": 70,
+          "start_level": 79.43,
+          "end_level": 55.97,
+          "net_change": -23.460000000000008,
+          "slope": -0.33999999999999997,
+          "true_drain_rate": 0.41980418668147657,
+          "drained_volume_estimate": 30.13751650908421
+        }
+      ],
+      "cauldron_005": [
+        {
+          "cauldron": "cauldron_005",
+          "day": "2025-10-31",
+          "event_type": "drain",
+          "start_timestamp": "2025-10-31T21:52:00Z",
+          "end_timestamp": "2025-10-31T23:59:00Z",
+          "duration_minutes": 127.0,
+          "num_samples": 128,
+          "start_level": 265.45,
+          "end_level": 207.03,
+          "net_change": -58.41999999999999,
+          "slope": -0.4600000000000003,
+          "true_drain_rate": 0.5361061672761959,
+          "drained_volume_estimate": 56.72185389133797
+        }
+      ]
+    },
+    "2025-11-03": {
+      "cauldron_002": [
+        {
+          "cauldron": "cauldron_002",
+          "day": "2025-11-03",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-03T00:00:00Z",
+          "end_timestamp": "2025-11-03T00:55:00Z",
+          "duration_minutes": 55.0,
+          "num_samples": 56,
+          "start_level": 447.85,
+          "end_level": 422.55,
+          "net_change": -25.30000000000001,
+          "slope": -0.4600000000000001,
+          "true_drain_rate": 0.5255919966621672,
+          "drained_volume_estimate": 19.122187305975228
+        }
+      ],
+      "cauldron_008": [
+        {
+          "cauldron": "cauldron_008",
+          "day": "2025-11-03",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-03T03:17:00Z",
+          "end_timestamp": "2025-11-03T04:10:00Z",
+          "duration_minutes": 53.0,
+          "num_samples": 54,
+          "start_level": 63.17,
+          "end_level": 45.15,
+          "net_change": -18.020000000000003,
+          "slope": -0.33999999999999997,
+          "true_drain_rate": 0.41980418668147657,
+          "drained_volume_estimate": 23.149106883789322
+        }
+      ],
+      "cauldron_007": [
+        {
+          "cauldron": "cauldron_007",
+          "day": "2025-11-03",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-03T07:11:00Z",
+          "end_timestamp": "2025-11-03T10:38:00Z",
+          "duration_minutes": 207.0,
+          "num_samples": 208,
+          "start_level": 634.6,
+          "end_level": 554.1,
+          "net_change": -80.5,
+          "slope": -0.4330296829410102,
+          "true_drain_rate": 0.5363742924047967,
+          "drained_volume_estimate": 68.18225630301278
+        }
+      ],
+      "cauldron_009": [
+        {
+          "cauldron": "cauldron_009",
+          "day": "2025-11-03",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-03T17:41:00Z",
+          "end_timestamp": "2025-11-03T20:30:00Z",
+          "duration_minutes": 169.0,
+          "num_samples": 170,
+          "start_level": 893.67,
+          "end_level": 823.99,
+          "net_change": -69.67999999999995,
+          "slope": -0.44386927290380473,
+          "true_drain_rate": 0.6299251571838718,
+          "drained_volume_estimate": 89.22364936442514
+        }
+      ],
+      "cauldron_005": [
+        {
+          "cauldron": "cauldron_005",
+          "day": "2025-11-03",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-03T00:00:00Z",
+          "end_timestamp": "2025-11-03T01:26:00Z",
+          "duration_minutes": 86.0,
+          "num_samples": 87,
+          "start_level": 236.44,
+          "end_level": 205.49,
+          "net_change": -30.94999999999999,
+          "slope": -0.406339760880659,
+          "true_drain_rate": 0.4824459281568546,
+          "drained_volume_estimate": 38.41007428862256
+        },
+        {
+          "cauldron": "cauldron_005",
+          "day": "2025-11-03",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-03T17:54:00Z",
+          "end_timestamp": "2025-11-03T19:45:00Z",
+          "duration_minutes": 111.0,
+          "num_samples": 112,
+          "start_level": 281.45,
+          "end_level": 238.45,
+          "net_change": -43.0,
+          "slope": -0.3986374158608673,
+          "true_drain_rate": 0.4747435831370629,
+          "drained_volume_estimate": 49.575793558570986
+        }
+      ]
+    },
+    "2025-11-05": {
+      "cauldron_006": [
+        {
+          "cauldron": "cauldron_006",
+          "day": "2025-11-05",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-05T00:00:00Z",
+          "end_timestamp": "2025-11-05T01:47:00Z",
+          "duration_minutes": 107.0,
+          "num_samples": 108,
+          "start_level": 317.06,
+          "end_level": 266.77,
+          "net_change": -50.29000000000002,
+          "slope": -0.47,
+          "true_drain_rate": 0.5266815676949775,
+          "drained_volume_estimate": 44.536311798281986
+        }
+      ],
+      "cauldron_011": [
+        {
+          "cauldron": "cauldron_011",
+          "day": "2025-11-05",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-05T09:18:00Z",
+          "end_timestamp": "2025-11-05T12:05:00Z",
+          "duration_minutes": 167.0,
+          "num_samples": 168,
+          "start_level": 264.43,
+          "end_level": 202.64,
+          "net_change": -61.79000000000002,
+          "slope": -0.37,
+          "true_drain_rate": 0.4612212047741729,
+          "drained_volume_estimate": 75.01190112826275
+        }
+      ],
+      "cauldron_005": [
+        {
+          "cauldron": "cauldron_005",
+          "day": "2025-11-05",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-05T00:00:00Z",
+          "end_timestamp": "2025-11-05T02:56:00Z",
+          "duration_minutes": 176.0,
+          "num_samples": 177,
+          "start_level": 267.89,
+          "end_level": 186.93,
+          "net_change": -80.95999999999998,
+          "slope": -0.4600000000000001,
+          "true_drain_rate": 0.5361061672761956,
+          "drained_volume_estimate": 78.60666366043688
+        }
+      ]
+    },
+    "2025-11-06": {
+      "cauldron_008": [
+        {
+          "cauldron": "cauldron_008",
+          "day": "2025-11-06",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-06T12:40:00Z",
+          "end_timestamp": "2025-11-06T13:46:00Z",
+          "duration_minutes": 66.0,
+          "num_samples": 67,
+          "start_level": 203.77,
+          "end_level": 179.06,
+          "net_change": -24.710000000000008,
+          "slope": -0.37951273046532036,
+          "true_drain_rate": 0.4593169171467969,
+          "drained_volume_estimate": 28.827189704341418
+        },
+        {
+          "cauldron": "cauldron_008",
+          "day": "2025-11-06",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-06T22:42:00Z",
+          "end_timestamp": "2025-11-06T23:59:00Z",
+          "duration_minutes": 77.0,
+          "num_samples": 78,
+          "start_level": 125.96,
+          "end_level": 99.78,
+          "net_change": -26.179999999999993,
+          "slope": -0.34,
+          "true_drain_rate": 0.41980418668147657,
+          "drained_volume_estimate": 33.63172132173165
+        }
+      ],
+      "cauldron_007": [
+        {
+          "cauldron": "cauldron_007",
+          "day": "2025-11-06",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-06T02:28:00Z",
+          "end_timestamp": "2025-11-06T05:40:00Z",
+          "duration_minutes": 192.0,
+          "num_samples": 193,
+          "start_level": 639.86,
+          "end_level": 558.73,
+          "net_change": -81.13,
+          "slope": -0.44485747956839927,
+          "true_drain_rate": 0.5482020890321858,
+          "drained_volume_estimate": 63.24151309264954
+        }
+      ],
+      "cauldron_009": [
+        {
+          "cauldron": "cauldron_009",
+          "day": "2025-11-06",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-06T00:00:00Z",
+          "end_timestamp": "2025-11-06T08:17:00Z",
+          "duration_minutes": 497.0,
+          "num_samples": 498,
+          "start_level": 949.97,
+          "end_level": 879.25,
+          "net_change": -70.72000000000003,
+          "slope": -0.11321192140650839,
+          "true_drain_rate": 0.29926780568657546,
+          "drained_volume_estimate": 262.3914422137236
+        },
+        {
+          "cauldron": "cauldron_009",
+          "day": "2025-11-06",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-06T09:32:00Z",
+          "end_timestamp": "2025-11-06T12:19:00Z",
+          "duration_minutes": 167.0,
+          "num_samples": 168,
+          "start_level": 896.62,
+          "end_level": 825.95,
+          "net_change": -70.66999999999996,
+          "slope": -0.44640823593725487,
+          "true_drain_rate": 0.6324641202173219,
+          "drained_volume_estimate": 88.16774818851478
+        },
+        {
+          "cauldron": "cauldron_009",
+          "day": "2025-11-06",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-06T20:05:00Z",
+          "end_timestamp": "2025-11-06T22:46:00Z",
+          "duration_minutes": 161.0,
+          "num_samples": 162,
+          "start_level": 906.43,
+          "end_level": 835.39,
+          "net_change": -71.03999999999996,
+          "slope": -0.4494619517585642,
+          "true_drain_rate": 0.6355178360386312,
+          "drained_volume_estimate": 85.00004466078371
+        }
+      ],
+      "cauldron_003": [
+        {
+          "cauldron": "cauldron_003",
+          "day": "2025-11-06",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-06T21:40:00Z",
+          "end_timestamp": "2025-11-06T23:59:00Z",
+          "duration_minutes": 139.0,
+          "num_samples": 140,
+          "start_level": 695.76,
+          "end_level": 633.84,
+          "net_change": -61.91999999999996,
+          "slope": -0.4496826878922391,
+          "true_drain_rate": 0.5466052056411238,
+          "drained_volume_estimate": 45.74617477431509
+        }
+      ]
+    },
+    "2025-11-08": {
+      "cauldron_008": [
+        {
+          "cauldron": "cauldron_008",
+          "day": "2025-11-08",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-08T08:58:00Z",
+          "end_timestamp": "2025-11-08T10:39:00Z",
+          "duration_minutes": 101.0,
+          "num_samples": 102,
+          "start_level": 212.52,
+          "end_level": 178.18,
+          "net_change": -34.34,
+          "slope": -0.3400000000000001,
+          "true_drain_rate": 0.4198041866814767,
+          "drained_volume_estimate": 44.11433575967399
+        },
+        {
+          "cauldron": "cauldron_008",
+          "day": "2025-11-08",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-08T17:11:00Z",
+          "end_timestamp": "2025-11-08T20:12:00Z",
+          "duration_minutes": 181.0,
+          "num_samples": 182,
+          "start_level": 113.83,
+          "end_level": 48.67,
+          "net_change": -65.16,
+          "slope": -0.36000000000000004,
+          "true_drain_rate": 0.4398041866814766,
+          "drained_volume_estimate": 79.05638388614844
+        }
+      ],
+      "cauldron_011": [
+        {
+          "cauldron": "cauldron_011",
+          "day": "2025-11-08",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-08T00:00:00Z",
+          "end_timestamp": "2025-11-08T01:35:00Z",
+          "duration_minutes": 95.0,
+          "num_samples": 96,
+          "start_level": 187.23,
+          "end_level": 144.48,
+          "net_change": -42.75,
+          "slope": -0.4500000000000003,
+          "true_drain_rate": 0.5412212047741731,
+          "drained_volume_estimate": 42.671440761586595
+        }
+      ],
+      "cauldron_012": [
+        {
+          "cauldron": "cauldron_012",
+          "day": "2025-11-08",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-08T22:25:00Z",
+          "end_timestamp": "2025-11-08T23:59:00Z",
+          "duration_minutes": 94.0,
+          "num_samples": 95,
+          "start_level": 387.46,
+          "end_level": 345.38,
+          "net_change": -42.079999999999984,
+          "slope": -0.45857180851063845,
+          "true_drain_rate": 0.523474837843161,
+          "drained_volume_estimate": 27.53523470399135
+        }
+      ],
+      "cauldron_007": [
+        {
+          "cauldron": "cauldron_007",
+          "day": "2025-11-08",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-08T00:00:00Z",
+          "end_timestamp": "2025-11-08T01:30:00Z",
+          "duration_minutes": 90.0,
+          "num_samples": 91,
+          "start_level": 733.34,
+          "end_level": 704.32,
+          "net_change": -29.019999999999982,
+          "slope": -0.3661199235547064,
+          "true_drain_rate": 0.46946453301849295,
+          "drained_volume_estimate": 29.64445926217947
+        }
+      ],
+      "cauldron_009": [
+        {
+          "cauldron": "cauldron_009",
+          "day": "2025-11-08",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-08T00:00:00Z",
+          "end_timestamp": "2025-11-08T01:36:00Z",
+          "duration_minutes": 96.0,
+          "num_samples": 97,
+          "start_level": 876.19,
+          "end_level": 838.34,
+          "net_change": -37.85000000000002,
+          "slope": -0.43126341258152767,
+          "true_drain_rate": 0.6173192968615947,
+          "drained_volume_estimate": 50.68325644369712
+        }
+      ],
+      "cauldron_005": [
+        {
+          "cauldron": "cauldron_005",
+          "day": "2025-11-08",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-08T22:17:00Z",
+          "end_timestamp": "2025-11-08T23:59:00Z",
+          "duration_minutes": 102.0,
+          "num_samples": 103,
+          "start_level": 401.85,
+          "end_level": 354.93,
+          "net_change": -46.920000000000016,
+          "slope": -0.4600000000000004,
+          "true_drain_rate": 0.536106167276196,
+          "drained_volume_estimate": 45.55613462138955
+        }
+      ],
+      "cauldron_004": [
+        {
+          "cauldron": "cauldron_004",
+          "day": "2025-11-08",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-08T21:50:00Z",
+          "end_timestamp": "2025-11-08T23:59:00Z",
+          "duration_minutes": 129.0,
+          "num_samples": 130,
+          "start_level": 522.57,
+          "end_level": 463.23,
+          "net_change": -59.34000000000003,
+          "slope": -0.4600000000000002,
+          "true_drain_rate": 0.527894460249282,
+          "drained_volume_estimate": 41.05917354860557
+        }
+      ]
+    },
+    "2025-11-09": {
+      "cauldron_002": [
+        {
+          "cauldron": "cauldron_002",
+          "day": "2025-11-09",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-09T05:53:00Z",
+          "end_timestamp": "2025-11-09T07:19:00Z",
+          "duration_minutes": 86.0,
+          "num_samples": 87,
+          "start_level": 173.81,
+          "end_level": 139.41,
+          "net_change": -34.400000000000006,
+          "slope": -0.3999999999999999,
+          "true_drain_rate": 0.46559199666216705,
+          "drained_volume_estimate": 29.900147423888534
+        }
+      ],
+      "cauldron_003": [
+        {
+          "cauldron": "cauldron_003",
+          "day": "2025-11-09",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-09T10:52:00Z",
+          "end_timestamp": "2025-11-09T14:07:00Z",
+          "duration_minutes": 195.0,
+          "num_samples": 196,
+          "start_level": 818.84,
+          "end_level": 747.88,
+          "net_change": -70.96000000000004,
+          "slope": -0.3842449298344877,
+          "true_drain_rate": 0.4811674475833725,
+          "drained_volume_estimate": 64.17628835245642
+        },
+        {
+          "cauldron": "cauldron_003",
+          "day": "2025-11-09",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-09T22:01:00Z",
+          "end_timestamp": "2025-11-09T23:59:00Z",
+          "duration_minutes": 118.0,
+          "num_samples": 119,
+          "start_level": 786.68,
+          "end_level": 757.48,
+          "net_change": -29.199999999999932,
+          "slope": -0.2522274604757157,
+          "true_drain_rate": 0.3491499782246005,
+          "drained_volume_estimate": 38.83488218251209
+        }
+      ],
+      "cauldron_008": [
+        {
+          "cauldron": "cauldron_008",
+          "day": "2025-11-09",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-09T02:29:00Z",
+          "end_timestamp": "2025-11-09T03:58:00Z",
+          "duration_minutes": 89.0,
+          "num_samples": 90,
+          "start_level": 79.36,
+          "end_level": 49.1,
+          "net_change": -30.259999999999998,
+          "slope": -0.34000000000000014,
+          "true_drain_rate": 0.4198041866814767,
+          "drained_volume_estimate": 38.873028540702826
+        }
+      ],
+      "cauldron_011": [
+        {
+          "cauldron": "cauldron_011",
+          "day": "2025-11-09",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-09T22:24:00Z",
+          "end_timestamp": "2025-11-09T23:59:00Z",
+          "duration_minutes": 95.0,
+          "num_samples": 96,
+          "start_level": 292.9,
+          "end_level": 250.15,
+          "net_change": -42.74999999999997,
+          "slope": -0.4500000000000003,
+          "true_drain_rate": 0.5412212047741731,
+          "drained_volume_estimate": 42.671440761586595
+        }
+      ],
+      "cauldron_012": [
+        {
+          "cauldron": "cauldron_012",
+          "day": "2025-11-09",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-09T00:00:00Z",
+          "end_timestamp": "2025-11-09T01:34:00Z",
+          "duration_minutes": 94.0,
+          "num_samples": 95,
+          "start_level": 344.92,
+          "end_level": 304.0,
+          "net_change": -40.920000000000016,
+          "slope": -0.4555235162374022,
+          "true_drain_rate": 0.5204265455699247,
+          "drained_volume_estimate": 27.53523470399135
+        }
+      ],
+      "cauldron_009": [
+        {
+          "cauldron": "cauldron_009",
+          "day": "2025-11-09",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-09T02:33:00Z",
+          "end_timestamp": "2025-11-09T13:34:00Z",
+          "duration_minutes": 661.0,
+          "num_samples": 662,
+          "start_level": 950.0,
+          "end_level": 883.76,
+          "net_change": -66.24000000000001,
+          "slope": -0.08316085739048344,
+          "true_drain_rate": 0.2692167416705505,
+          "drained_volume_estimate": 348.9753386383729
+        },
+        {
+          "cauldron": "cauldron_009",
+          "day": "2025-11-09",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-09T18:43:00Z",
+          "end_timestamp": "2025-11-09T21:23:00Z",
+          "duration_minutes": 160.0,
+          "num_samples": 161,
+          "start_level": 950.0,
+          "end_level": 878.2,
+          "net_change": -71.79999999999995,
+          "slope": -0.44995399125833907,
+          "true_drain_rate": 0.6360098755384062,
+          "drained_volume_estimate": 84.47209407282854
+        }
+      ],
+      "cauldron_005": [
+        {
+          "cauldron": "cauldron_005",
+          "day": "2025-11-09",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-09T00:00:00Z",
+          "end_timestamp": "2025-11-09T01:23:00Z",
+          "duration_minutes": 83.0,
+          "num_samples": 84,
+          "start_level": 354.47,
+          "end_level": 318.99,
+          "net_change": -35.48000000000002,
+          "slope": -0.45312746785461194,
+          "true_drain_rate": 0.5292336351308076,
+          "drained_volume_estimate": 37.07018797622875
+        }
+      ],
+      "cauldron_004": [
+        {
+          "cauldron": "cauldron_004",
+          "day": "2025-11-09",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-09T00:00:00Z",
+          "end_timestamp": "2025-11-09T00:56:00Z",
+          "duration_minutes": 56.0,
+          "num_samples": 57,
+          "start_level": 462.77,
+          "end_level": 439.84,
+          "net_change": -22.930000000000007,
+          "slope": -0.4444522945294272,
+          "true_drain_rate": 0.5123467547787091,
+          "drained_volume_estimate": 17.824137354433425
+        }
+      ]
+    },
+    "2025-10-30": {
+      "cauldron_010": [
+        {
+          "cauldron": "cauldron_010",
+          "day": "2025-10-30",
+          "event_type": "drain",
+          "start_timestamp": "2025-10-30T22:35:00Z",
+          "end_timestamp": "2025-10-30T23:59:00Z",
+          "duration_minutes": 84.0,
+          "num_samples": 85,
+          "start_level": 207.33,
+          "end_level": 168.69,
+          "net_change": -38.640000000000015,
+          "slope": -0.4600000000000004,
+          "true_drain_rate": 0.5370127242898959,
+          "drained_volume_estimate": 29.66185344949447
+        }
+      ],
+      "cauldron_007": [
+        {
+          "cauldron": "cauldron_007",
+          "day": "2025-10-30",
+          "event_type": "drain",
+          "start_timestamp": "2025-10-30T21:02:00Z",
+          "end_timestamp": "2025-10-30T23:59:00Z",
+          "duration_minutes": 177.0,
+          "num_samples": 178,
+          "start_level": 462.16,
+          "end_level": 382.87,
+          "net_change": -79.29000000000002,
+          "slope": -0.4499322076454715,
+          "true_drain_rate": 0.553276817109258,
+          "drained_volume_estimate": 58.30076988228629
+        }
+      ],
+      "cauldron_005": [
+        {
+          "cauldron": "cauldron_005",
+          "day": "2025-10-30",
+          "event_type": "drain",
+          "start_timestamp": "2025-10-30T17:39:00Z",
+          "end_timestamp": "2025-10-30T19:50:00Z",
+          "duration_minutes": 131.0,
+          "num_samples": 132,
+          "start_level": 373.44,
+          "end_level": 339.35,
+          "net_change": -34.089999999999975,
+          "slope": -0.29685316692146746,
+          "true_drain_rate": 0.37295933419766303,
+          "drained_volume_estimate": 58.508368974529716
+        }
+      ]
+    },
+    "2025-11-07": {
+      "cauldron_008": [
+        {
+          "cauldron": "cauldron_008",
+          "day": "2025-11-07",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-07T00:00:00Z",
+          "end_timestamp": "2025-11-07T01:42:00Z",
+          "duration_minutes": 102.0,
+          "num_samples": 103,
+          "start_level": 99.44,
+          "end_level": 64.76,
+          "net_change": -34.67999999999999,
+          "slope": -0.34000000000000025,
+          "true_drain_rate": 0.4198041866814768,
+          "drained_volume_estimate": 44.55111136125492
+        }
+      ],
+      "cauldron_011": [
+        {
+          "cauldron": "cauldron_011",
+          "day": "2025-11-07",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-07T22:33:00Z",
+          "end_timestamp": "2025-11-07T23:59:00Z",
+          "duration_minutes": 86.0,
+          "num_samples": 87,
+          "start_level": 225.95,
+          "end_level": 187.68,
+          "net_change": -38.26999999999998,
+          "slope": -0.44966300940438847,
+          "true_drain_rate": 0.5408842141785614,
+          "drained_volume_estimate": 38.628883215752076
+        }
+      ],
+      "cauldron_007": [
+        {
+          "cauldron": "cauldron_007",
+          "day": "2025-11-07",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-07T22:05:00Z",
+          "end_timestamp": "2025-11-07T23:59:00Z",
+          "duration_minutes": 114.0,
+          "num_samples": 115,
+          "start_level": 784.88,
+          "end_level": 733.79,
+          "net_change": -51.09000000000003,
+          "slope": -0.4499055472263868,
+          "true_drain_rate": 0.5532501566901733,
+          "drained_volume_estimate": 37.54964839876066
+        }
+      ],
+      "cauldron_009": [
+        {
+          "cauldron": "cauldron_009",
+          "day": "2025-11-07",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-07T16:42:00Z",
+          "end_timestamp": "2025-11-07T19:35:00Z",
+          "duration_minutes": 173.0,
+          "num_samples": 174,
+          "start_level": 950.0,
+          "end_level": 879.91,
+          "net_change": -70.09000000000003,
+          "slope": -0.4383242689142629,
+          "true_drain_rate": 0.6243801531943299,
+          "drained_volume_estimate": 91.33545171624586
+        },
+        {
+          "cauldron": "cauldron_009",
+          "day": "2025-11-07",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-07T22:44:00Z",
+          "end_timestamp": "2025-11-07T23:59:00Z",
+          "duration_minutes": 75.0,
+          "num_samples": 76,
+          "start_level": 910.18,
+          "end_level": 876.64,
+          "net_change": -33.539999999999964,
+          "slope": -0.4497846889952152,
+          "true_drain_rate": 0.6358405732752822,
+          "drained_volume_estimate": 39.596294096638374
+        }
+      ],
+      "cauldron_003": [
+        {
+          "cauldron": "cauldron_003",
+          "day": "2025-11-07",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-07T00:00:00Z",
+          "end_timestamp": "2025-11-07T01:02:00Z",
+          "duration_minutes": 62.0,
+          "num_samples": 63,
+          "start_level": 633.39,
+          "end_level": 615.45,
+          "net_change": -17.93999999999994,
+          "slope": -0.32616983486943163,
+          "true_drain_rate": 0.4230923526183164,
+          "drained_volume_estimate": 20.40476860437076
+        }
+      ],
+      "cauldron_001": [
+        {
+          "cauldron": "cauldron_001",
+          "day": "2025-11-07",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-07T03:10:00Z",
+          "end_timestamp": "2025-11-07T09:17:00Z",
+          "duration_minutes": 367.0,
+          "num_samples": 368,
+          "start_level": 682.77,
+          "end_level": 531.24,
+          "net_change": -151.52999999999997,
+          "slope": -0.4119688478516107,
+          "true_drain_rate": 0.5033017087494969,
+          "drained_volume_estimate": 115.77213604610202
+        }
+      ]
+    },
+    "2025-11-02": {
+      "cauldron_010": [
+        {
+          "cauldron": "cauldron_010",
+          "day": "2025-11-02",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-02T00:00:00Z",
+          "end_timestamp": "2025-11-02T03:00:00Z",
+          "duration_minutes": 180.0,
+          "num_samples": 181,
+          "start_level": 332.8,
+          "end_level": 263.13,
+          "net_change": -69.67000000000002,
+          "slope": -0.39874870985368227,
+          "true_drain_rate": 0.4757614341435777,
+          "drained_volume_estimate": 63.561114534631
+        }
+      ],
+      "cauldron_002": [
+        {
+          "cauldron": "cauldron_002",
+          "day": "2025-11-02",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-02T21:54:00Z",
+          "end_timestamp": "2025-11-02T23:59:00Z",
+          "duration_minutes": 125.0,
+          "num_samples": 126,
+          "start_level": 505.81,
+          "end_level": 448.31,
+          "net_change": -57.5,
+          "slope": -0.46000000000000024,
+          "true_drain_rate": 0.5255919966621674,
+          "drained_volume_estimate": 43.45951660448915
+        }
+      ],
+      "cauldron_003": [
+        {
+          "cauldron": "cauldron_003",
+          "day": "2025-11-02",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-02T00:00:00Z",
+          "end_timestamp": "2025-11-02T01:41:00Z",
+          "duration_minutes": 101.0,
+          "num_samples": 102,
+          "start_level": 426.42,
+          "end_level": 385.47,
+          "net_change": -40.94999999999999,
+          "slope": -0.4387368462717205,
+          "true_drain_rate": 0.5356593640206052,
+          "drained_volume_estimate": 33.240026274862046
+        }
+      ],
+      "cauldron_008": [
+        {
+          "cauldron": "cauldron_008",
+          "day": "2025-11-02",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-02T07:39:00Z",
+          "end_timestamp": "2025-11-02T09:13:00Z",
+          "duration_minutes": 94.0,
+          "num_samples": 95,
+          "start_level": 106.48,
+          "end_level": 74.52,
+          "net_change": -31.960000000000008,
+          "slope": -0.34000000000000014,
+          "true_drain_rate": 0.4198041866814767,
+          "drained_volume_estimate": 41.05690654860748
+        },
+        {
+          "cauldron": "cauldron_008",
+          "day": "2025-11-02",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-02T18:02:00Z",
+          "end_timestamp": "2025-11-02T20:00:00Z",
+          "duration_minutes": 118.0,
+          "num_samples": 119,
+          "start_level": 68.25,
+          "end_level": 28.13,
+          "net_change": -40.120000000000005,
+          "slope": -0.3399999999999999,
+          "true_drain_rate": 0.41980418668147645,
+          "drained_volume_estimate": 51.53952098654981
+        }
+      ],
+      "cauldron_007": [
+        {
+          "cauldron": "cauldron_007",
+          "day": "2025-11-02",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-02T11:28:00Z",
+          "end_timestamp": "2025-11-02T14:53:00Z",
+          "duration_minutes": 205.0,
+          "num_samples": 206,
+          "start_level": 615.15,
+          "end_level": 535.35,
+          "net_change": -79.79999999999995,
+          "slope": -0.4308427829656093,
+          "true_drain_rate": 0.5341873924293958,
+          "drained_volume_estimate": 67.52349054163102
+        }
+      ],
+      "cauldron_009": [
+        {
+          "cauldron": "cauldron_009",
+          "day": "2025-11-02",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-02T00:00:00Z",
+          "end_timestamp": "2025-11-02T01:01:00Z",
+          "duration_minutes": 61.0,
+          "num_samples": 62,
+          "start_level": 590.2,
+          "end_level": 564.64,
+          "net_change": -25.56000000000006,
+          "slope": -0.44390899247060017,
+          "true_drain_rate": 0.6299648767506673,
+          "drained_volume_estimate": 32.20498586526588
+        }
+      ],
+      "cauldron_005": [
+        {
+          "cauldron": "cauldron_005",
+          "day": "2025-11-02",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-02T22:07:00Z",
+          "end_timestamp": "2025-11-02T23:59:00Z",
+          "duration_minutes": 112.0,
+          "num_samples": 113,
+          "start_level": 287.97,
+          "end_level": 236.9,
+          "net_change": -51.07000000000002,
+          "slope": -0.45979040521658143,
+          "true_drain_rate": 0.535896572492777,
+          "drained_volume_estimate": 50.02242232936892
+        }
+      ]
+    },
+    "2025-11-01": {
+      "cauldron_002": [
+        {
+          "cauldron": "cauldron_002",
+          "day": "2025-11-01",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-01T00:00:00Z",
+          "end_timestamp": "2025-11-01T03:03:00Z",
+          "duration_minutes": 183.0,
+          "num_samples": 184,
+          "start_level": 407.31,
+          "end_level": 338.29,
+          "net_change": -69.01999999999998,
+          "slope": -0.42252773015353207,
+          "true_drain_rate": 0.4881197268156992,
+          "drained_volume_estimate": 63.62473230897211
+        }
+      ],
+      "cauldron_003": [
+        {
+          "cauldron": "cauldron_003",
+          "day": "2025-11-01",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-01T11:28:00Z",
+          "end_timestamp": "2025-11-01T14:45:00Z",
+          "duration_minutes": 197.0,
+          "num_samples": 198,
+          "start_level": 505.93,
+          "end_level": 425.41,
+          "net_change": -80.51999999999998,
+          "slope": -0.439341083204053,
+          "true_drain_rate": 0.5362636009529378,
+          "drained_volume_estimate": 64.83450669453289
+        },
+        {
+          "cauldron": "cauldron_003",
+          "day": "2025-11-01",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-01T22:32:00Z",
+          "end_timestamp": "2025-11-01T23:59:00Z",
+          "duration_minutes": 87.0,
+          "num_samples": 88,
+          "start_level": 466.02,
+          "end_level": 426.87,
+          "net_change": -39.14999999999998,
+          "slope": -0.44999999999999996,
+          "true_drain_rate": 0.5469225177488847,
+          "drained_volume_estimate": 28.63249788032671
+        }
+      ],
+      "cauldron_008": [
+        {
+          "cauldron": "cauldron_008",
+          "day": "2025-11-01",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-01T07:50:00Z",
+          "end_timestamp": "2025-11-01T09:27:00Z",
+          "duration_minutes": 97.0,
+          "num_samples": 98,
+          "start_level": 110.01,
+          "end_level": 77.03,
+          "net_change": -32.980000000000004,
+          "slope": -0.34000000000000014,
+          "true_drain_rate": 0.4198041866814767,
+          "drained_volume_estimate": 42.367233353350265
+        }
+      ],
+      "cauldron_012": [
+        {
+          "cauldron": "cauldron_012",
+          "day": "2025-11-01",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-01T13:33:00Z",
+          "end_timestamp": "2025-11-01T16:36:00Z",
+          "duration_minutes": 183.0,
+          "num_samples": 184,
+          "start_level": 318.75,
+          "end_level": 264.58,
+          "net_change": -54.170000000000016,
+          "slope": -0.30848109263932505,
+          "true_drain_rate": 0.37338412197184756,
+          "drained_volume_estimate": 53.60582926415337
+        }
+      ],
+      "cauldron_007": [
+        {
+          "cauldron": "cauldron_007",
+          "day": "2025-11-01",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-01T18:39:00Z",
+          "end_timestamp": "2025-11-01T22:15:00Z",
+          "duration_minutes": 216.0,
+          "num_samples": 217,
+          "start_level": 610.75,
+          "end_level": 532.16,
+          "net_change": -78.59000000000003,
+          "slope": -0.41099636174880355,
+          "true_drain_rate": 0.5143409712125901,
+          "drained_volume_estimate": 71.14670222923073
+        }
+      ],
+      "cauldron_009": [
+        {
+          "cauldron": "cauldron_009",
+          "day": "2025-11-01",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-01T14:27:00Z",
+          "end_timestamp": "2025-11-01T17:10:00Z",
+          "duration_minutes": 163.0,
+          "num_samples": 164,
+          "start_level": 649.18,
+          "end_level": 578.19,
+          "net_change": -70.9899999999999,
+          "slope": -0.44862692312924285,
+          "true_drain_rate": 0.6346828074093099,
+          "drained_volume_estimate": 86.05594583669406
+        },
+        {
+          "cauldron": "cauldron_009",
+          "day": "2025-11-01",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-01T22:19:00Z",
+          "end_timestamp": "2025-11-01T23:59:00Z",
+          "duration_minutes": 100.0,
+          "num_samples": 101,
+          "start_level": 635.65,
+          "end_level": 590.65,
+          "net_change": -45.0,
+          "slope": -0.45000000000000023,
+          "true_drain_rate": 0.6360558842800673,
+          "drained_volume_estimate": 52.79505879551783
+        }
+      ],
+      "cauldron_005": [
+        {
+          "cauldron": "cauldron_005",
+          "day": "2025-11-01",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-01T00:00:00Z",
+          "end_timestamp": "2025-11-01T00:55:00Z",
+          "duration_minutes": 55.0,
+          "num_samples": 56,
+          "start_level": 206.57,
+          "end_level": 182.29,
+          "net_change": -24.28,
+          "slope": -0.45705023923444976,
+          "true_drain_rate": 0.5331564065106453,
+          "drained_volume_estimate": 24.56458239388652
+        }
+      ]
+    },
+    "2025-11-04": {
+      "cauldron_008": [
+        {
+          "cauldron": "cauldron_008",
+          "day": "2025-11-04",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-04T19:57:00Z",
+          "end_timestamp": "2025-11-04T21:12:00Z",
+          "duration_minutes": 75.0,
+          "num_samples": 76,
+          "start_level": 235.07,
+          "end_level": 209.57,
+          "net_change": -25.5,
+          "slope": -0.33999999999999986,
+          "true_drain_rate": 0.41980418668147645,
+          "drained_volume_estimate": 32.758170118569794
+        }
+      ],
+      "cauldron_011": [
+        {
+          "cauldron": "cauldron_011",
+          "day": "2025-11-04",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-04T00:00:00Z",
+          "end_timestamp": "2025-11-04T02:56:00Z",
+          "duration_minutes": 176.0,
+          "num_samples": 177,
+          "start_level": 182.6,
+          "end_level": 103.4,
+          "net_change": -79.19999999999999,
+          "slope": -0.45000000000000007,
+          "true_drain_rate": 0.5412212047741729,
+          "drained_volume_estimate": 79.05445867409728
+        }
+      ],
+      "cauldron_007": [
+        {
+          "cauldron": "cauldron_007",
+          "day": "2025-11-04",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-04T17:58:00Z",
+          "end_timestamp": "2025-11-04T21:16:00Z",
+          "duration_minutes": 198.0,
+          "num_samples": 199,
+          "start_level": 642.84,
+          "end_level": 562.48,
+          "net_change": -80.36000000000001,
+          "slope": -0.43866515912897786,
+          "true_drain_rate": 0.5420097685927644,
+          "drained_volume_estimate": 65.21781037679483
+        }
+      ],
+      "cauldron_009": [
+        {
+          "cauldron": "cauldron_009",
+          "day": "2025-11-04",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-04T06:30:00Z",
+          "end_timestamp": "2025-11-04T09:19:00Z",
+          "duration_minutes": 169.0,
+          "num_samples": 170,
+          "start_level": 945.23,
+          "end_level": 874.62,
+          "net_change": -70.61000000000001,
+          "slope": -0.44377629594347845,
+          "true_drain_rate": 0.6298321802235455,
+          "drained_volume_estimate": 89.22364936442514
+        },
+        {
+          "cauldron": "cauldron_009",
+          "day": "2025-11-04",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-04T10:28:00Z",
+          "end_timestamp": "2025-11-04T13:10:00Z",
+          "duration_minutes": 162.0,
+          "num_samples": 163,
+          "start_level": 886.56,
+          "end_level": 814.74,
+          "net_change": -71.81999999999994,
+          "slope": -0.4496600550872586,
+          "true_drain_rate": 0.6357159393673256,
+          "drained_volume_estimate": 85.52799524873889
+        },
+        {
+          "cauldron": "cauldron_009",
+          "day": "2025-11-04",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-04T21:37:00Z",
+          "end_timestamp": "2025-11-04T23:59:00Z",
+          "duration_minutes": 142.0,
+          "num_samples": 143,
+          "start_level": 909.03,
+          "end_level": 845.13,
+          "net_change": -63.89999999999998,
+          "slope": -0.44999999999999996,
+          "true_drain_rate": 0.636055884280067,
+          "drained_volume_estimate": 74.96898348963532
+        }
+      ],
+      "cauldron_006": [
+        {
+          "cauldron": "cauldron_006",
+          "day": "2025-11-04",
+          "event_type": "drain",
+          "start_timestamp": "2025-11-04T22:46:00Z",
+          "end_timestamp": "2025-11-04T23:59:00Z",
+          "duration_minutes": 73.0,
+          "num_samples": 74,
+          "start_level": 351.84,
+          "end_level": 317.53,
+          "net_change": -34.31,
+          "slope": -0.4699999999999998,
+          "true_drain_rate": 0.5266815676949773,
+          "drained_volume_estimate": 30.384586553968084
+        }
+      ]
+    }
+  },
+  "daily_summary": {
+    "2025-10-31": {
+      "tickets_reported": 12,
+      "long_drain_events": 12,
+      "matched_tickets": 8,
+      "matched_events": 8,
+      "faulty_tickets": 4,
+      "unlogged_tickets": 1,
+      "unaccounted_events": 4
+    },
+    "2025-11-03": {
+      "tickets_reported": 12,
+      "long_drain_events": 14,
+      "matched_tickets": 8,
+      "matched_events": 8,
+      "faulty_tickets": 4,
+      "unlogged_tickets": 3,
+      "unaccounted_events": 6
+    },
+    "2025-11-05": {
+      "tickets_reported": 12,
+      "long_drain_events": 14,
+      "matched_tickets": 11,
+      "matched_events": 11,
+      "faulty_tickets": 1,
+      "unlogged_tickets": 2,
+      "unaccounted_events": 3
+    },
+    "2025-11-10": {
+      "tickets_reported": 6,
+      "long_drain_events": 0,
+      "matched_tickets": 0,
+      "matched_events": 0,
+      "faulty_tickets": 6,
+      "unlogged_tickets": 0,
+      "unaccounted_events": 0
+    },
+    "2025-11-06": {
+      "tickets_reported": 14,
+      "long_drain_events": 15,
+      "matched_tickets": 8,
+      "matched_events": 8,
+      "faulty_tickets": 6,
+      "unlogged_tickets": 1,
+      "unaccounted_events": 7
+    },
+    "2025-11-08": {
+      "tickets_reported": 14,
+      "long_drain_events": 17,
+      "matched_tickets": 9,
+      "matched_events": 9,
+      "faulty_tickets": 5,
+      "unlogged_tickets": 3,
+      "unaccounted_events": 8
+    },
+    "2025-11-09": {
+      "tickets_reported": 12,
+      "long_drain_events": 17,
+      "matched_tickets": 7,
+      "matched_events": 7,
+      "faulty_tickets": 5,
+      "unlogged_tickets": 5,
+      "unaccounted_events": 10
+    },
+    "2025-10-30": {
+      "tickets_reported": 9,
+      "long_drain_events": 10,
+      "matched_tickets": 7,
+      "matched_events": 7,
+      "faulty_tickets": 2,
+      "unlogged_tickets": 1,
+      "unaccounted_events": 3
+    },
+    "2025-11-07": {
+      "tickets_reported": 14,
+      "long_drain_events": 16,
+      "matched_tickets": 9,
+      "matched_events": 9,
+      "faulty_tickets": 5,
+      "unlogged_tickets": 2,
+      "unaccounted_events": 7
+    },
+    "2025-11-02": {
+      "tickets_reported": 12,
+      "long_drain_events": 15,
+      "matched_tickets": 7,
+      "matched_events": 7,
+      "faulty_tickets": 5,
+      "unlogged_tickets": 3,
+      "unaccounted_events": 8
+    },
+    "2025-11-11": {
+      "tickets_reported": 4,
+      "long_drain_events": 0,
+      "matched_tickets": 0,
+      "matched_events": 0,
+      "faulty_tickets": 4,
+      "unlogged_tickets": 0,
+      "unaccounted_events": 0
+    },
+    "2025-11-01": {
+      "tickets_reported": 14,
+      "long_drain_events": 15,
+      "matched_tickets": 6,
+      "matched_events": 6,
+      "faulty_tickets": 8,
+      "unlogged_tickets": 2,
+      "unaccounted_events": 9
+    },
+    "2025-11-04": {
+      "tickets_reported": 14,
+      "long_drain_events": 14,
+      "matched_tickets": 7,
+      "matched_events": 7,
+      "faulty_tickets": 7,
+      "unlogged_tickets": 1,
+      "unaccounted_events": 7
+    }
+  }
+}

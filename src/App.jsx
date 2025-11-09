@@ -165,6 +165,7 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [networkMap, setNetworkMap] = useState(FALLBACK_NETWORK_MAP)
+<<<<<<< HEAD
   const [forecasts, setForecasts] = useState([])
   const [minimumWitches, setMinimumWitches] = useState(null)
   const [optimalSchedule, setOptimalSchedule] = useState(null)
@@ -458,7 +459,6 @@ function App() {
       // Transform and set tickets
       const transformedTickets = ticketsData.map(transformTicket)
       setTickets(transformedTickets)
-
       // Update time series data
       const now = new Date()
       const avgLevel = transformedCauldrons.length > 0
@@ -476,7 +476,6 @@ function App() {
 
       // Fetch forecasting data after cauldrons are loaded
       await fetchForecastingData()
-
       setLoading(false)
     } catch (err) {
       console.error('Error fetching data:', err)
@@ -1473,6 +1472,7 @@ function App() {
                     )
                   })}
                   
+<<<<<<< HEAD
                   {/* Route Polylines - Show optimal witch routes */}
                   {optimalSchedule && optimalSchedule.routes && optimalSchedule.routes.map((route, routeIdx) => {
                     const routeColors = ['#ec4899', '#8b5cf6', '#06b6d4', '#eab308', '#ef4444']
@@ -1646,6 +1646,7 @@ function App() {
                 </MapContainer>
               )
             })()}
+<<<<<<< HEAD
             
             {/* Clickable Witch Routes List - Top Right */}
             {optimalSchedule && optimalSchedule.routes && optimalSchedule.routes.length > 0 && (

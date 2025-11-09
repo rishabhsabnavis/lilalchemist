@@ -156,6 +156,7 @@ class CauldronAPIClient:
         self._last_levels: Dict[str, float] = {}  # cauldron_id -> fill_level_liters
         self._last_timestamps: Dict[str, datetime] = {}  # cauldron_id -> last_updated
         self._last_fetch_time: Optional[datetime] = None
+<<<<<<< HEAD
         
         # Load calculated fill and drain rates from all_events.json
         self._calculated_fill_rates: Dict[str, float] = {}
@@ -264,6 +265,7 @@ class CauldronAPIClient:
             self._last_fetch_time = now
             return statuses
     
+<<<<<<< HEAD
     def _load_calculated_rates(self) -> None:
         """Load calculated fill and drain rates from all_events.json."""
         # Try multiple possible paths for all_events.json
@@ -286,7 +288,6 @@ class CauldronAPIClient:
         except Exception as e:
             print(f"Warning: Failed to load calculated rates from all_events.json: {e}")
             print("Will fall back to estimated rates")
-
     async def fetch_data_metadata(self) -> Dict:
         """Fetch metadata from the Data endpoint."""
         if not self._use_api:

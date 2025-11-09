@@ -514,6 +514,7 @@ async def get_network_map() -> Dict:
         raise HTTPException(status_code=500, detail=f"Error fetching network map: {str(e)}")
 
 
+<<<<<<< HEAD
 @app.get("/api/minimum-witches")
 async def get_minimum_witches(time_horizon_minutes: float = 480.0) -> Dict:
     """
