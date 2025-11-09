@@ -597,6 +597,36 @@ async def get_network_map() -> Dict:
         raise HTTPException(status_code=500, detail=f"Error fetching network map: {str(e)}")
 
 
+@app.get("/api/market")
+async def get_market_info() -> Dict:
+    """
+    Get Enchanted Market location and information.
+    
+    Returns market data including latitude, longitude, name, and description.
+    """
+    try:
+        market_info = await network_client.fetch_market_info()
+        if not market_info:
+            # Fallback to default values if API fails
+            return {
+                "id": "market_001",
+                "name": "The Enchanted Market",
+                "latitude": 33.2148,
+                "longitude": -97.13,
+                "description": "Central trading hub for all potion commerce"
+            }
+        return market_info
+    except Exception as e:
+        # Fallback to default values on error
+        return {
+            "id": "market_001",
+            "name": "The Enchanted Market",
+            "latitude": 33.2148,
+            "longitude": -97.13,
+            "description": "Central trading hub for all potion commerce"
+        }
+
+
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     """

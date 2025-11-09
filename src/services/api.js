@@ -105,6 +105,13 @@ export async function fetchOptimalSchedule(numWitches = null, timeHorizonMinutes
 }
 
 /**
+ * Fetch Enchanted Market location and information
+ */
+export async function fetchMarketInfo() {
+  return fetchAPI('/api/market');
+}
+
+/**
  * WebSocket connection for real-time updates
  */
 export function createWebSocketConnection(onMessage, onError) {

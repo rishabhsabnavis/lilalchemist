@@ -35,9 +35,9 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
 })
 
-// Enchanted Market coordinates (hardcoded)
-const ENCHANTED_MARKET_LAT = 33.2148
-const ENCHANTED_MARKET_LNG = -97.13
+// Enchanted Market coordinates (fallback values - will be fetched from API)
+const DEFAULT_MARKET_LAT = 33.2148
+const DEFAULT_MARKET_LNG = -97.13
 
 // Fallback network map (empty - use only API data)
 const FALLBACK_NETWORK_MAP = {}
@@ -169,6 +169,7 @@ function App() {
   const [minimumWitches, setMinimumWitches] = useState(null)
   const [optimalSchedule, setOptimalSchedule] = useState(null)
   const [selectedRoute, setSelectedRoute] = useState(null)
+  const [marketLocation, setMarketLocation] = useState({ lat: DEFAULT_MARKET_LAT, lng: DEFAULT_MARKET_LNG })
 
   // Transform API cauldron data to match frontend format
   const transformCauldron = (apiCauldron) => {
@@ -205,6 +206,23 @@ function App() {
     } catch (err) {
       console.error('Error fetching network map:', err)
       // Keep fallback network map on error
+    }
+  }
+
+  // Fetch market location from API
+  const fetchMarketLocation = async () => {
+    try {
+      const marketData = await api.fetchMarketInfo()
+      if (marketData && marketData.latitude && marketData.longitude) {
+        setMarketLocation({
+          lat: marketData.latitude,
+          lng: marketData.longitude
+        })
+      }
+    } catch (err) {
+      console.error('Error fetching market location:', err)
+      // Keep default values on error
+      setMarketLocation({ lat: DEFAULT_MARKET_LAT, lng: DEFAULT_MARKET_LNG })
     }
   }
 
@@ -251,10 +269,10 @@ function App() {
     console.log('Using fallback distance calculation')
     // Using Haversine formula for distance, then convert to time
     const R = 6371 // Earth radius in km
-    const dLat = (ENCHANTED_MARKET_LAT - cauldron.latitude) * Math.PI / 180
-    const dLng = (ENCHANTED_MARKET_LNG - cauldron.longitude) * Math.PI / 180
+    const dLat = (marketLocation.lat - cauldron.latitude) * Math.PI / 180
+    const dLng = (marketLocation.lng - cauldron.longitude) * Math.PI / 180
     const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(cauldron.latitude * Math.PI / 180) * Math.cos(ENCHANTED_MARKET_LAT * Math.PI / 180) *
+      Math.cos(cauldron.latitude * Math.PI / 180) * Math.cos(marketLocation.lat * Math.PI / 180) *
       Math.sin(dLng / 2) * Math.sin(dLng / 2)
     const haversineC = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
     const distanceKm = R * haversineC
@@ -366,6 +384,7 @@ function App() {
     // Initial data fetch
     fetchData()
     fetchNetworkMapData() // Fetch network map once
+    fetchMarketLocation() // Fetch market location once
 
     // Set up polling for real-time updates
     const interval = setInterval(() => {
@@ -1202,8 +1221,8 @@ function App() {
               }
               
               // Calculate bounds including all cauldrons and the market
-              const allLats = [...validCauldrons.map(c => c.latitude), ENCHANTED_MARKET_LAT]
-              const allLngs = [...validCauldrons.map(c => c.longitude), ENCHANTED_MARKET_LNG]
+              const allLats = [...validCauldrons.map(c => c.latitude), marketLocation.lat]
+              const allLngs = [...validCauldrons.map(c => c.longitude), marketLocation.lng]
               
               const centerLat = (Math.min(...allLats) + Math.max(...allLats)) / 2
               const centerLng = (Math.min(...allLngs) + Math.max(...allLngs)) / 2
@@ -1253,13 +1272,13 @@ function App() {
                   />
                   
                   {/* Enchanted Market marker */}
-                  <Marker position={[ENCHANTED_MARKET_LAT, ENCHANTED_MARKET_LNG]} icon={marketIcon}>
+                  <Marker position={[marketLocation.lat, marketLocation.lng]} icon={marketIcon}>
                     <Popup>
                       <div className="text-center">
                         <div className="font-bold text-purple-400 text-lg mb-1">🏪 Enchanted Market</div>
                         <div className="text-sm text-gray-300">Sales Point</div>
                         <div className="text-xs text-gray-400 mt-1">
-                          {ENCHANTED_MARKET_LAT.toFixed(4)}, {ENCHANTED_MARKET_LNG.toFixed(4)}
+                          {marketLocation.lat.toFixed(4)}, {marketLocation.lng.toFixed(4)}
                         </div>
                       </div>
                     </Popup>
@@ -1322,7 +1341,7 @@ function App() {
                     const routeCoordinates = []
                     
                     // Start at market
-                    routeCoordinates.push([ENCHANTED_MARKET_LAT, ENCHANTED_MARKET_LNG])
+                    routeCoordinates.push([marketLocation.lat, marketLocation.lng])
                     
                     // Add cauldron stops in order
                     route.ordered_stops.forEach(stopId => {
@@ -1333,7 +1352,7 @@ function App() {
                     })
                     
                     // Return to market
-                    routeCoordinates.push([ENCHANTED_MARKET_LAT, ENCHANTED_MARKET_LNG])
+                    routeCoordinates.push([marketLocation.lat, marketLocation.lng])
                     
                     if (routeCoordinates.length < 3) return null // Need at least market -> cauldron -> market
                     
@@ -1403,8 +1422,8 @@ function App() {
                     const travelTime = getTravelTimeToMarket(cauldron)
                     
                     // Calculate midpoint for label placement
-                    const midLat = (cauldron.latitude + ENCHANTED_MARKET_LAT) / 2
-                    const midLng = (cauldron.longitude + ENCHANTED_MARKET_LNG) / 2
+                    const midLat = (cauldron.latitude + marketLocation.lat) / 2
+                    const midLng = (cauldron.longitude + marketLocation.lng) / 2
                     
                     // Create custom icon for travel time label
                     const travelTimeIcon = L.divIcon({
@@ -1432,7 +1451,7 @@ function App() {
                           key={`line-${cauldron.cauldron_id || cauldron.id}`}
                           positions={[
                             [cauldron.latitude, cauldron.longitude],
-                            [ENCHANTED_MARKET_LAT, ENCHANTED_MARKET_LNG]
+                            [marketLocation.lat, marketLocation.lng]
                           ]}
                           pathOptions={{
                             color: color,
