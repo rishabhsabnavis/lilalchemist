@@ -53,6 +53,10 @@ class Settings:
     enable_structured_logging: bool = os.getenv(
         "POTION_STRUCTURED_LOGGING", "true"
     ).lower() in {"1", "true", "yes"}
+    
+    use_eog_api: bool = os.getenv(
+        "POTION_USE_EOG_API", "true"
+    ).lower() in {"1", "true", "yes"}
 
 
 @lru_cache(maxsize=1)

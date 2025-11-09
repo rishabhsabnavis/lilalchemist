@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
 
 @theme {
   --color-cauldron-purple: #8b5cf6;
@@ -38,4 +39,76 @@
     backdrop-filter: blur(10px);
     border: 1px solid rgba(139, 92, 246, 0.2);
   }
+}
+
+/* Leaflet map styling */
+.leaflet-container {
+  background: #1a1a1f;
+}
+
+.leaflet-popup-content-wrapper {
+  background: rgba(15, 15, 20, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  border-radius: 8px;
+  color: #e5e7eb;
+}
+
+.leaflet-popup-tip {
+  background: rgba(15, 15, 20, 0.95);
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.leaflet-control-zoom a {
+  background-color: rgba(15, 15, 20, 0.9);
+  color: #e5e7eb;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.leaflet-control-zoom a:hover {
+  background-color: rgba(139, 92, 246, 0.3);
+}
+
+.leaflet-control-attribution {
+  background-color: rgba(15, 15, 20, 0.7);
+  color: #9ca3af;
+}
+
+.custom-cauldron-icon,
+.custom-market-icon {
+  background: transparent !important;
+  border: none !important;
+}
+
+/* Travel time tooltip styling */
+.travel-time-tooltip .leaflet-tooltip-content-wrapper {
+  background: rgba(15, 15, 20, 0.95) !important;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(139, 92, 246, 0.5);
+  border-radius: 6px;
+  padding: 4px 8px;
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.3);
+  color: #e5e7eb !important;
+  z-index: 1000 !important;
+}
+
+.travel-time-tooltip .leaflet-tooltip-tip {
+  background: rgba(15, 15, 20, 0.95) !important;
+  border: 1px solid rgba(139, 92, 246, 0.5);
+}
+
+.leaflet-tooltip {
+  pointer-events: auto !important;
+  z-index: 1000 !important;
+}
+
+/* Travel time label styling */
+.travel-time-label {
+  background: transparent !important;
+  border: none !important;
+}
+
+.travel-time-label div {
+  pointer-events: none;
+  user-select: none;
 }
