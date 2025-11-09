@@ -170,6 +170,9 @@ function App() {
   const [optimalSchedule, setOptimalSchedule] = useState(null)
   const [selectedRoute, setSelectedRoute] = useState(null)
   const [marketLocation, setMarketLocation] = useState({ lat: DEFAULT_MARKET_LAT, lng: DEFAULT_MARKET_LNG })
+  const [daysData, setDaysData] = useState([])
+  const [selectedHistoricalCauldron, setSelectedHistoricalCauldron] = useState(null) // null = "All Cauldrons (Average)"
+  const [loadingHistoricalData, setLoadingHistoricalData] = useState(false)
 
   // Transform API cauldron data to match frontend format
   const transformCauldron = (apiCauldron) => {
@@ -282,6 +285,112 @@ function App() {
     return distanceKm / DEFAULT_SPEED_KM_PER_MIN
   }
 
+  // Fetch historical data for date range (Oct 30 - Nov 9, 2025)
+  const fetchDaysData = async () => {
+    setLoadingHistoricalData(true)
+    const startDate = new Date('2025-10-30')
+    const endDate = new Date('2025-11-09')
+    
+    // Generate all dates in range
+    const dates = []
+    const currentDate = new Date(startDate)
+    while (currentDate <= endDate) {
+      dates.push(new Date(currentDate))
+      currentDate.setDate(currentDate.getDate() + 1)
+    }
+    
+    // Fetch data for all dates in parallel for faster loading
+    const dateStrings = dates.map(date => date.toISOString().split('T')[0])
+    
+    // Fetch all dates in parallel
+    const fetchPromises = dateStrings.map(async (dateStr) => {
+      try {
+        const data = await api.fetchHistoricalCauldrons(dateStr)
+        return {
+          date: dateStr,
+          data: data
+        }
+      } catch (err) {
+        console.error(`Error fetching historical data for ${dateStr}:`, err)
+        // Return empty entry to maintain date range
+        return {
+          date: dateStr,
+          data: { cauldrons: [] }
+        }
+      }
+    })
+    
+    // Wait for all requests to complete (in parallel)
+    const daysDataArray = await Promise.all(fetchPromises)
+    
+    // Sort by date to ensure correct order
+    daysDataArray.sort((a, b) => a.date.localeCompare(b.date))
+    
+    setDaysData(daysDataArray)
+    setLoadingHistoricalData(false)
+  }
+
+  // Process chart data based on selected cauldron
+  const processChartData = () => {
+    if (daysData.length === 0) return []
+    
+    const processedData = []
+    
+    for (const dayEntry of daysData) {
+      const date = new Date(dayEntry.date)
+      const dateLabel = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+      
+      if (selectedHistoricalCauldron === null) {
+        // Calculate average across all cauldrons
+        const cauldrons = dayEntry.data?.cauldrons || []
+        if (cauldrons.length > 0) {
+          const avgLevel = cauldrons.reduce((sum, c) => {
+            return sum + (c.fill_level_liters || 0)
+          }, 0) / cauldrons.length
+          processedData.push({
+            date: dayEntry.date,
+            dateLabel,
+            fill_level_liters: avgLevel,
+            fullDate: date
+          })
+        } else {
+          // No data for this date - use 0
+          processedData.push({
+            date: dayEntry.date,
+            dateLabel,
+            fill_level_liters: 0,
+            fullDate: date
+          })
+        }
+      } else {
+        // Get data for specific cauldron
+        const cauldrons = dayEntry.data?.cauldrons || []
+        const cauldron = cauldrons.find(c => 
+          (c.cauldron_id || c.id) === selectedHistoricalCauldron
+        )
+        
+        if (cauldron) {
+          processedData.push({
+            date: dayEntry.date,
+            dateLabel,
+            fill_level_liters: cauldron.fill_level_liters || 0,
+            fullDate: date
+          })
+        } else {
+          // Cauldron not found for this date - use 0
+          processedData.push({
+            date: dayEntry.date,
+            dateLabel,
+            fill_level_liters: 0,
+            fullDate: date
+          })
+        }
+      }
+    }
+    
+    return processedData
+  }
+
   // Fetch forecasting and scheduling data
   const fetchForecastingData = async () => {
     try {
@@ -385,6 +494,7 @@ function App() {
     fetchData()
     fetchNetworkMapData() // Fetch network map once
     fetchMarketLocation() // Fetch market location once
+    fetchDaysData() // Fetch historical data for Level Trends
 
     // Set up polling for real-time updates
     const interval = setInterval(() => {
@@ -666,30 +776,80 @@ function App() {
             ))}
           </div>
 
-          {/* Time Series Chart */}
-          {timeSeriesData.length > 0 && (
-            <div className="mt-6">
-              <h3 className="text-lg font-semibold mb-3 text-gray-300">Level Trends</h3>
-              <ResponsiveContainer width="100%" height={200}>
-                <LineChart data={timeSeriesData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                  <XAxis dataKey="time" stroke="#9ca3af" fontSize={12} />
-                  <YAxis stroke="#9ca3af" fontSize={12} />
-                  <Tooltip
-                    contentStyle={{ backgroundColor: '#1a1a1f', border: '1px solid #8b5cf6' }}
-                    labelStyle={{ color: '#e5e7eb' }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="avgLevel"
-                    stroke="#8b5cf6"
-                    strokeWidth={2}
-                    dot={{ fill: '#8b5cf6', r: 3 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+          {/* Level Trends Chart - Historical Data (Oct 30 - Nov 9, 2025) */}
+          <div className="mt-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-300">Level Trends</h3>
+              <div className="flex items-center gap-2">
+                <label htmlFor="cauldron-select" className="text-sm text-gray-400">
+                  Select Cauldron:
+                </label>
+                <select
+                  id="cauldron-select"
+                  value={selectedHistoricalCauldron || ''}
+                  onChange={(e) => setSelectedHistoricalCauldron(e.target.value || null)}
+                  className="px-3 py-1.5 rounded-lg glass border border-gray-700 text-gray-200 text-sm bg-cauldron-darker focus:outline-none focus:border-cauldron-purple"
+                >
+                  <option value="">All Cauldrons (Average)</option>
+                  {cauldrons.map((cauldron) => (
+                    <option key={cauldron.cauldron_id || cauldron.id} value={cauldron.cauldron_id || cauldron.id}>
+                      {cauldron.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
-          )}
+            
+            {loadingHistoricalData && daysData.length === 0 ? (
+              <div className="flex items-center justify-center h-[300px]">
+                <div className="text-center">
+                  <div className="w-12 h-12 border-4 border-cauldron-purple border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>
+                  <p className="text-sm text-gray-400">Loading historical data...</p>
+                  <p className="text-xs text-gray-500 mt-1">Fetching 11 days of data in parallel...</p>
+                </div>
+              </div>
+            ) : (
+              <div className="relative">
+                {loadingHistoricalData && daysData.length > 0 && (
+                  <div className="absolute top-2 right-2 z-10 flex items-center gap-2 text-xs text-gray-400 bg-cauldron-darker/80 px-2 py-1 rounded">
+                    <div className="w-3 h-3 border-2 border-cauldron-purple border-t-transparent rounded-full animate-spin"></div>
+                    <span>Updating...</span>
+                  </div>
+                )}
+                <ResponsiveContainer width="100%" height={300}>
+                  <LineChart data={processChartData()}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                    <XAxis 
+                      dataKey="dateLabel" 
+                      stroke="#9ca3af" 
+                      fontSize={12}
+                      angle={-45}
+                      textAnchor="end"
+                      height={60}
+                    />
+                    <YAxis 
+                      stroke="#9ca3af" 
+                      fontSize={12}
+                      label={{ value: 'Level (L)', angle: -90, position: 'insideLeft' }}
+                    />
+                    <Tooltip
+                      contentStyle={{ backgroundColor: '#1a1a1f', border: '1px solid #8b5cf6' }}
+                      labelStyle={{ color: '#e5e7eb' }}
+                      formatter={(value) => `${Number(value).toFixed(1)} L`}
+                      labelFormatter={(label) => `Date: ${label}`}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="fill_level_liters"
+                      stroke="#8b5cf6"
+                      strokeWidth={2}
+                      dot={{ fill: '#8b5cf6', r: 4 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            )}
+          </div>
         </motion.div>
 
         {/* Overview Requirement: "Identifies suspicious activity" */}
