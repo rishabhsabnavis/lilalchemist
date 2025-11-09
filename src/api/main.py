@@ -32,6 +32,7 @@ from potion_agent.data_models import CauldronStatus, TransportTicket
 from potion_agent.forecasting import ForecastEngine
 from potion_agent.routing import RouteOptimizer
 from potion_agent.ticket_matching import TicketMatcher, DrainEvent
+from potion_agent.witch_scheduling import WitchScheduler
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -58,6 +59,7 @@ anomaly_detector = AnomalyDetector()
 forecast_engine = ForecastEngine()
 route_optimizer = RouteOptimizer()
 ticket_matcher = TicketMatcher()
+witch_scheduler = WitchScheduler(route_optimizer)
 
 # WebSocket connections for real-time updates
 active_connections: List[WebSocket] = []
@@ -498,6 +500,119 @@ async def get_routes() -> List[Dict]:
         raise HTTPException(status_code=500, detail=f"Error fetching routes: {str(e)}")
 
 
+@app.get("/api/minimum-witches")
+async def get_minimum_witches(time_horizon_minutes: float = 480.0) -> Dict:
+    """
+    Calculate minimum number of witches needed to prevent all overflows.
+    
+    EOG Bonus: Determines the minimum number of witches required to maintain
+    the entire operation without any cauldron overflows.
+    
+    Args:
+        time_horizon_minutes: Time horizon for scheduling (default: 480 = 8 hours)
+    
+    Returns:
+        Dictionary with minimum_witches count and details
+    """
+    try:
+        cauldrons = await cauldron_client.fetch_current_levels()
+        forecast_engine.update_history(cauldrons)
+        forecasts = forecast_engine.forecast_overflow(cauldrons)
+        
+        min_witches = witch_scheduler.calculate_minimum_witches(
+            cauldrons=cauldrons,
+            forecasts=forecasts,
+            time_horizon_minutes=time_horizon_minutes,
+        )
+        
+        # Count urgent cauldrons
+        urgent_count = sum(
+            1 for f in forecasts
+            if f.projected_overflow_time is not None
+        )
+        
+        return {
+            "minimum_witches": min_witches,
+            "urgent_cauldrons": urgent_count,
+            "total_cauldrons": len(cauldrons),
+            "time_horizon_minutes": time_horizon_minutes,
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error calculating minimum witches: {str(e)}")
+
+
+@app.get("/api/optimal-schedule")
+async def get_optimal_schedule(
+    num_witches: Optional[int] = None,
+    time_horizon_minutes: float = 480.0,
+) -> Dict:
+    """
+    Get optimal schedule for witches to prevent overflows.
+    
+    EOG Bonus: Creates an optimal schedule for the minimum number of witches
+    required to maintain the entire operation.
+    
+    Args:
+        num_witches: Number of witches to schedule (if None, calculates minimum)
+        time_horizon_minutes: Time horizon for scheduling (default: 480 = 8 hours)
+    
+    Returns:
+        Dictionary with schedule details including routes for each witch
+    """
+    try:
+        cauldrons = await cauldron_client.fetch_current_levels()
+        forecast_engine.update_history(cauldrons)
+        forecasts = forecast_engine.forecast_overflow(cauldrons)
+        
+        # Calculate minimum if not provided
+        if num_witches is None:
+            num_witches = witch_scheduler.calculate_minimum_witches(
+                cauldrons=cauldrons,
+                forecasts=forecasts,
+                time_horizon_minutes=time_horizon_minutes,
+            )
+        
+        # Create optimal schedule
+        routes = witch_scheduler.create_optimal_schedule(
+            cauldrons=cauldrons,
+            forecasts=forecasts,
+            num_witches=num_witches,
+            time_horizon_minutes=time_horizon_minutes,
+        )
+        
+        # Convert to JSON-serializable format
+        schedule = []
+        for route in routes:
+            schedule.append({
+                "courier_id": route.courier_id,
+                "ordered_stops": route.ordered_stops,
+                "total_distance_km": round(route.total_distance_km, 2),
+                "estimated_completion_minutes": round(route.estimated_completion_minutes, 2),
+                "stops_count": len(route.ordered_stops),
+            })
+        
+        # Get forecast details for urgent cauldrons
+        urgent_forecasts = [
+            {
+                "cauldron_id": f.cauldron_id,
+                "projected_overflow_time": f.projected_overflow_time.isoformat() if f.projected_overflow_time else None,
+                "confidence": round(f.confidence, 2),
+            }
+            for f in forecasts
+            if f.projected_overflow_time is not None
+        ]
+        
+        return {
+            "num_witches": num_witches,
+            "routes": schedule,
+            "urgent_forecasts": urgent_forecasts,
+            "time_horizon_minutes": time_horizon_minutes,
+            "total_routes": len(schedule),
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error creating optimal schedule: {str(e)}")
+
+
 @app.get("/api/network-map")
 async def get_network_map() -> Dict:
     """
@@ -510,6 +625,36 @@ async def get_network_map() -> Dict:
         return network_map
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error fetching network map: {str(e)}")
+
+
+@app.get("/api/market")
+async def get_market_info() -> Dict:
+    """
+    Get Enchanted Market location and information.
+    
+    Returns market data including latitude, longitude, name, and description.
+    """
+    try:
+        market_info = await network_client.fetch_market_info()
+        if not market_info:
+            # Fallback to default values if API fails
+            return {
+                "id": "market_001",
+                "name": "The Enchanted Market",
+                "latitude": 33.2148,
+                "longitude": -97.13,
+                "description": "Central trading hub for all potion commerce"
+            }
+        return market_info
+    except Exception as e:
+        # Fallback to default values on error
+        return {
+            "id": "market_001",
+            "name": "The Enchanted Market",
+            "latitude": 33.2148,
+            "longitude": -97.13,
+            "description": "Central trading hub for all potion commerce"
+        }
 
 
 @app.websocket("/ws")
