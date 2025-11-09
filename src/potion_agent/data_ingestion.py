@@ -11,6 +11,7 @@ import asyncio
 import json
 import math
 import random
+import sys
 from collections import deque
 from datetime import date, datetime, timedelta
 from pathlib import Path
@@ -21,6 +22,18 @@ try:
     HAS_HTTPX = True
 except ImportError:
     HAS_HTTPX = False
+
+# Import calculate_cauldron_rates from scripts directory
+# Add scripts directory to path for import
+_scripts_path = Path(__file__).resolve().parent.parent / "scripts"
+if str(_scripts_path) not in sys.path:
+    sys.path.insert(0, str(_scripts_path))
+
+try:
+    from calculate_rates import calculate_cauldron_rates
+    HAS_CALCULATE_RATES = True
+except ImportError:
+    HAS_CALCULATE_RATES = False
 
 from .config import get_settings
 from .data_models import CauldronStatus, TransportTicket
@@ -203,6 +216,16 @@ class CauldronAPIClient:
             # Current time for dynamic updates
             now = datetime.utcnow()
             
+            # Calculate fill and drain rates for all cauldrons using calculate_cauldron_rates
+            # This uses the sophisticated algorithm from calculate_rates.py
+            rate_map: Dict[str, List[Optional[float]]] = {}
+            if HAS_CALCULATE_RATES and historical_data:
+                try:
+                    rate_map = calculate_cauldron_rates(historical_data)
+                except Exception as e:
+                    print(f"Warning: calculate_cauldron_rates failed ({e}), using fallback method")
+                    rate_map = {}
+            
             # Combine cauldron info with current levels and apply dynamic updates
             statuses: List[CauldronStatus] = []
             for cauldron_info in self._cauldron_info_cache:
@@ -210,9 +233,19 @@ class CauldronAPIClient:
                 base_level = eog_levels.get(cauldron_id, 0.0)
                 capacity = cauldron_info["max_volume"]
                 
-                # Calculate fill rate from historical data
-                fill_rate = self._estimate_fill_rate(historical_data, cauldron_id)
-                drain_rate = 20.0  # Default drain rate (EOG API doesn't provide this)
+                # Get fill and drain rates from calculate_cauldron_rates if available
+                if cauldron_id in rate_map and rate_map[cauldron_id][0] is not None:
+                    fill_rate = rate_map[cauldron_id][0]
+                else:
+                    # Fallback to old method if calculate_cauldron_rates not available or failed
+                    fill_rate = self._estimate_fill_rate(historical_data, cauldron_id)
+                
+                # Get drain rate from calculate_cauldron_rates if available
+                if cauldron_id in rate_map and rate_map[cauldron_id][1] is not None:
+                    drain_rate = rate_map[cauldron_id][1]
+                else:
+                    # Fallback to default drain rate if not calculated
+                    drain_rate = 20.0  # Default drain rate (EOG API doesn't provide this)
                 
                 # Apply dynamic updates: simulate continuous filling since last update
                 if cauldron_id in self._last_levels and self._last_timestamps.get(cauldron_id):

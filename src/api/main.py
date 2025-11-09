@@ -253,13 +253,14 @@ async def get_tickets(limit: Optional[int] = None) -> List[Dict]:
 async def get_historical_cauldrons(date: Optional[str] = None) -> Dict:
     """
     Get historical cauldron data for a specific date.
+    Returns the earliest data point for that day (preferably at 00:01:00 or first timestamp of the day).
     
     EOG Requirement: Historic Data Playback - Ability to review historical potion levels.
     
     Args:
         date: Optional date in YYYY-MM-DD format. If not provided, returns latest data.
     
-    Returns historical cauldron levels for the specified date.
+    Returns historical cauldron levels for the specified date at 00:01:00.
     """
     try:
         if not HAS_HTTPX:
@@ -274,6 +275,9 @@ async def get_historical_cauldrons(date: Optional[str] = None) -> Dict:
             data_resp.raise_for_status()
             historical_data = data_resp.json()
         
+        if not historical_data:
+            raise HTTPException(status_code=404, detail="No historical data available")
+        
         # Get cauldron info
         cauldrons = await cauldron_client.fetch_current_levels()
         cauldron_info_map = {c.cauldron_id: c for c in cauldrons}
@@ -283,51 +287,65 @@ async def get_historical_cauldrons(date: Optional[str] = None) -> Dict:
         if target_date:
             # Filter data points for the specified date
             filtered_data = []
+            target_date_obj = datetime.fromisoformat(target_date + "T00:00:00+00:00").date()
+            
             for data_point in historical_data:
                 timestamp = datetime.fromisoformat(data_point["timestamp"].replace("Z", "+00:00"))
-                if timestamp.date().isoformat() == target_date:
+                if timestamp.date() == target_date_obj:
                     filtered_data.append(data_point)
             
-            # Get all unique timestamps for the date
-            timestamps = sorted(set(
-                datetime.fromisoformat(dp["timestamp"].replace("Z", "+00:00"))
-                for dp in filtered_data
-            ))
+            if not filtered_data:
+                # No data for this date, return empty result
+                result = {
+                    "date": target_date,
+                    "cauldrons": []
+                }
+                for cauldron in cauldrons:
+                    result["cauldrons"].append({
+                        "cauldron_id": cauldron.cauldron_id,
+                        "name": cauldron.name,
+                        "fill_level_liters": 0.0,
+                        "capacity_liters": round(cauldron.capacity_liters, 2),
+                        "level": 0.0,
+                        "time_series": [],
+                    })
+                return result
             
-            # Build time series data for each cauldron
+            # Find the earliest data point for this date (closest to 00:01:00)
+            # Target time is 00:01:00 of the day
+            target_time = datetime.fromisoformat(target_date + "T00:01:00+00:00")
+            
+            # Find the data point closest to 00:01:00
+            earliest_point = min(
+                filtered_data,
+                key=lambda dp: abs(
+                    (datetime.fromisoformat(dp["timestamp"].replace("Z", "+00:00")) - target_time).total_seconds()
+                )
+            )
+            earliest_timestamp = datetime.fromisoformat(earliest_point["timestamp"].replace("Z", "+00:00"))
+            
+            # Build time series data for each cauldron using the earliest point (at 00:01:00)
             cauldron_time_series = {}
             for cauldron in cauldrons:
                 cauldron_id = cauldron.cauldron_id
-                cauldron_time_series[cauldron_id] = []
-                
-                for timestamp in timestamps:
-                    # Find closest data point for this timestamp
-                    closest_point = min(
-                        filtered_data,
-                        key=lambda dp: abs(
-                            (datetime.fromisoformat(dp["timestamp"].replace("Z", "+00:00")) - timestamp).total_seconds()
-                        )
-                    )
-                    level = closest_point["cauldron_levels"].get(cauldron_id, 0.0)
-                    cauldron_time_series[cauldron_id].append({
-                        "timestamp": timestamp.isoformat(),
-                        "level": round(level, 2),
-                    })
+                level = earliest_point["cauldron_levels"].get(cauldron_id, 0.0)
+                cauldron_time_series[cauldron_id] = [{
+                    "timestamp": earliest_timestamp.isoformat(),
+                    "level": round(level, 2),
+                }]
         else:
             # Return latest data
-            if historical_data:
-                latest = historical_data[-1]
-                timestamp = datetime.fromisoformat(latest["timestamp"].replace("Z", "+00:00"))
-                cauldron_time_series = {}
-                for cauldron in cauldrons:
-                    cauldron_id = cauldron.cauldron_id
-                    level = latest["cauldron_levels"].get(cauldron_id, 0.0)
-                    cauldron_time_series[cauldron_id] = [{
-                        "timestamp": timestamp.isoformat(),
-                        "level": round(level, 2),
-                    }]
-            else:
-                cauldron_time_series = {}
+            latest = historical_data[-1]
+            timestamp = datetime.fromisoformat(latest["timestamp"].replace("Z", "+00:00"))
+            cauldron_time_series = {}
+            for cauldron in cauldrons:
+                cauldron_id = cauldron.cauldron_id
+                level = latest["cauldron_levels"].get(cauldron_id, 0.0)
+                cauldron_time_series[cauldron_id] = [{
+                    "timestamp": timestamp.isoformat(),
+                    "level": round(level, 2),
+                }]
+            target_date = timestamp.date().isoformat()
         
         # Build result
         result = {

@@ -60,6 +60,9 @@ function App() {
   const [showHistory, setShowHistory] = useState(false)
   const [historyDate, setHistoryDate] = useState(new Date().toISOString().split('T')[0])
   const [historicalData, setHistoricalData] = useState([])
+  const [selectedHistoricalCauldron, setSelectedHistoricalCauldron] = useState(null)
+  const [selectedDay, setSelectedDay] = useState(new Date().toISOString().split('T')[0])
+  const [daysData, setDaysData] = useState([]) // Store data for multiple days
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [networkMap, setNetworkMap] = useState(FALLBACK_NETWORK_MAP)
@@ -201,6 +204,51 @@ function App() {
     fetchData()
     fetchNetworkMapData() // Fetch network map once
 
+    // Fetch historical data for specific date range: Oct 30 to Nov 9
+    const fetchDaysData = async () => {
+      try {
+        const daysDataArray = []
+        
+        // Define the date range: October 30 to November 9 (2025)
+        const startDate = new Date('2025-10-30')
+        const endDate = new Date('2025-11-09')
+        
+        // Generate all dates in the range
+        const currentDate = new Date(startDate)
+        while (currentDate <= endDate) {
+          const dateStr = currentDate.toISOString().split('T')[0]
+          
+          try {
+            const dayData = await api.fetchHistoricalCauldrons(dateStr)
+            // Always add the date, even if data is empty or all zeros
+            // This ensures the graph shows all dates in the range
+            if (dayData && dayData.cauldrons) {
+              daysDataArray.push({ date: dateStr, data: dayData })
+            } else {
+              // If no data, create empty entry to maintain date range
+              daysDataArray.push({ date: dateStr, data: { cauldrons: [] } })
+            }
+          } catch (err) {
+            console.error(`Error fetching data for ${dateStr}:`, err)
+            // Still add the date even if fetch fails
+            daysDataArray.push({ date: dateStr, data: { cauldrons: [] } })
+          }
+          
+          // Move to next day
+          currentDate.setDate(currentDate.getDate() + 1)
+        }
+        
+        setDaysData(daysDataArray)
+        // Also set first day's data for backward compatibility
+        if (daysDataArray.length > 0) {
+          setHistoricalData(daysDataArray[0].data)
+        }
+      } catch (err) {
+        console.error('Error fetching days data:', err)
+      }
+    }
+    fetchDaysData()
+
     // Set up polling for real-time updates
     const interval = setInterval(() => {
       fetchData()
@@ -222,7 +270,7 @@ function App() {
 
   // Show loading state
   if (loading && cauldrons.length === 0) {
-    return (
+  return (
       <div className="min-h-screen bg-cauldron-darker p-4 md:p-6 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-cauldron-purple border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
@@ -351,10 +399,10 @@ function App() {
           className="glass rounded-lg p-4 glow-purple"
         >
           <div className="flex items-center justify-between">
-            <div>
+      <div>
               <p className="text-gray-400 text-xs">Total Potion</p>
               <p className="text-2xl font-bold text-cauldron-purple">{totalPotion.toFixed(0)}L</p>
-            </div>
+      </div>
             <Gauge className="w-8 h-8 text-cauldron-purple" />
           </div>
         </motion.div>
@@ -475,30 +523,179 @@ function App() {
             ))}
           </div>
 
-          {/* Time Series Chart */}
-          {timeSeriesData.length > 0 && (
-            <div className="mt-6">
-              <h3 className="text-lg font-semibold mb-3 text-gray-300">Level Trends</h3>
-              <ResponsiveContainer width="100%" height={200}>
-                <LineChart data={timeSeriesData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                  <XAxis dataKey="time" stroke="#9ca3af" fontSize={12} />
-                  <YAxis stroke="#9ca3af" fontSize={12} />
-                  <Tooltip
-                    contentStyle={{ backgroundColor: '#1a1a1f', border: '1px solid #8b5cf6' }}
-                    labelStyle={{ color: '#e5e7eb' }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="avgLevel"
-                    stroke="#8b5cf6"
-                    strokeWidth={2}
-                    dot={{ fill: '#8b5cf6', r: 3 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+          {/* Level Trends Chart */}
+          <div className="mt-6">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-lg font-semibold text-gray-300">Level Trends</h3>
+              {/* Cauldron Dropdown */}
+              <div className="flex items-center gap-2">
+                <label className="text-sm text-gray-400">Select Cauldron:</label>
+                <select
+                  value={selectedHistoricalCauldron || ''}
+                  onChange={(e) => setSelectedHistoricalCauldron(e.target.value || null)}
+                  className="px-3 py-1.5 rounded-lg bg-gray-900 border border-gray-700 text-gray-200 text-sm focus:border-cauldron-purple focus:outline-none"
+                >
+                  <option value="">All Cauldrons (Average)</option>
+                  {cauldrons.map((cauldron) => (
+                    <option key={cauldron.cauldron_id || cauldron.id} value={cauldron.cauldron_id || cauldron.id}>
+                      {cauldron.name || cauldron.cauldron_id || cauldron.id}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
-          )}
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={(() => {
+                // Process daysData to show levels vs days for selected cauldron
+                // Fallback to real-time data if historical data is not available
+                let processedData = []
+
+                // Always process daysData to show Oct 30 - Nov 9 range
+                if (daysData.length > 0) {
+                  // Use historical data
+                  if (selectedHistoricalCauldron) {
+                    // Show data for selected cauldron across all days
+                    daysData.forEach(({ date, data }) => {
+                      if (data && data.cauldrons) {
+                        const cauldronData = data.cauldrons.find(
+                          c => c.cauldron_id === selectedHistoricalCauldron
+                        )
+                        
+                        // Always add data point, even if cauldron not found or level is 0
+                        const levelInLiters = cauldronData ? (cauldronData.fill_level_liters || 0) : 0
+                        
+                        processedData.push({
+                          date: date,
+                          dateLabel: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                          fill_level_liters: levelInLiters,
+                          fullDate: new Date(date)
+                        })
+                      } else {
+                        // No data for this date, add 0
+                        processedData.push({
+                          date: date,
+                          dateLabel: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                          fill_level_liters: 0,
+                          fullDate: new Date(date)
+                        })
+                      }
+                    })
+                  } else {
+                    // Show average for all cauldrons across all days
+                    daysData.forEach(({ date, data }) => {
+                      if (data && data.cauldrons && data.cauldrons.length > 0) {
+                        // Calculate average level across all cauldrons for this day
+                        const allLevels = []
+                        
+                        data.cauldrons.forEach(cauldron => {
+                          // Use fill_level_liters (in liters) instead of level (percentage)
+                          // The backend returns the earliest data point for the day at 00:01:00
+                          const levelInLiters = cauldron.fill_level_liters || 0
+                          allLevels.push(levelInLiters)
+                        })
+                        
+                        const avgLevel = allLevels.length > 0 
+                          ? allLevels.reduce((sum, level) => sum + level, 0) / allLevels.length
+                          : 0
+                        
+                        processedData.push({
+                          date: date,
+                          dateLabel: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                          fill_level_liters: avgLevel,
+                          fullDate: new Date(date)
+                        })
+                      } else {
+                        // No data for this date, add 0
+                        processedData.push({
+                          date: date,
+                          dateLabel: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                          fill_level_liters: 0,
+                          fullDate: new Date(date)
+                        })
+                      }
+                    })
+                  }
+                } else if (cauldrons.length > 0) {
+                  // Fallback: Use current cauldron data for Oct 30 - Nov 9 range
+                  // Generate all dates in the range: October 30 to November 9 (2025)
+                  const startDate = new Date('2025-10-30')
+                  const endDate = new Date('2025-11-09')
+                  const currentDate = new Date(startDate)
+                  
+                  while (currentDate <= endDate) {
+                    const dateStr = currentDate.toISOString().split('T')[0]
+                    
+                    if (selectedHistoricalCauldron) {
+                      const cauldron = cauldrons.find(c => (c.cauldron_id || c.id) === selectedHistoricalCauldron)
+                      if (cauldron) {
+                        // Use current fill_level_liters for all days (since we don't have historical data)
+                        const levelInLiters = cauldron.fill_level_liters || 0
+                        processedData.push({
+                          date: dateStr,
+                          dateLabel: currentDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                          fill_level_liters: levelInLiters,
+                          fullDate: new Date(currentDate)
+                        })
+                      }
+                    } else {
+                      // Average of all cauldrons in liters
+                      const avgLevel = cauldrons.reduce((sum, c) => sum + (c.fill_level_liters || 0), 0) / cauldrons.length
+                      processedData.push({
+                        date: dateStr,
+                        dateLabel: currentDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                        fill_level_liters: avgLevel,
+                        fullDate: new Date(currentDate)
+                      })
+                    }
+                    
+                    // Move to next day
+                    currentDate.setDate(currentDate.getDate() + 1)
+                  }
+                }
+                
+                // Sort by date (oldest to newest)
+                return processedData.sort((a, b) => a.fullDate - b.fullDate)
+              })()}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                <XAxis 
+                  dataKey="dateLabel" 
+                  stroke="#9ca3af" 
+                  fontSize={11}
+                  angle={-45}
+                  textAnchor="end"
+                  height={60}
+                  label={{ value: 'Date', position: 'insideBottom', offset: -5, style: { textAnchor: 'middle', fill: '#9ca3af' } }}
+                />
+                <YAxis 
+                  stroke="#9ca3af" 
+                  fontSize={12}
+                  label={{ value: 'Level (L)', angle: -90, position: 'insideLeft', style: { textAnchor: 'middle', fill: '#9ca3af' } }}
+                />
+                <Tooltip
+                  contentStyle={{ backgroundColor: '#1a1a1f', border: '1px solid #8b5cf6' }}
+                  labelStyle={{ color: '#e5e7eb' }}
+                  formatter={(value) => [`${value.toFixed(1)} L`, 'Level']}
+                  labelFormatter={(label) => `Date: ${label}`}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="fill_level_liters"
+                  stroke="#8b5cf6"
+                  strokeWidth={2}
+                  dot={{ fill: '#8b5cf6', r: 4 }}
+                  name="Level"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+            <div className="mt-2 text-center">
+              <p className="text-xs text-gray-400">
+                {selectedHistoricalCauldron 
+                  ? `Showing levels vs days for ${cauldrons.find(c => (c.cauldron_id || c.id) === selectedHistoricalCauldron)?.name || selectedHistoricalCauldron}`
+                  : `Showing average levels vs days for all cauldrons`
+                }
+        </p>
+      </div>
+          </div>
         </motion.div>
 
         {/* Overview Requirement: "Identifies suspicious activity" */}
@@ -1350,7 +1547,10 @@ function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-            onClick={() => setShowHistory(false)}
+            onClick={() => {
+              setShowHistory(false)
+              setSelectedHistoricalCauldron(null) // Reset selection when modal closes
+            }}
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
@@ -1365,7 +1565,10 @@ function App() {
                   Historical Data Playback
                 </h2>
                 <button
-                  onClick={() => setShowHistory(false)}
+                  onClick={() => {
+                    setShowHistory(false)
+                    setSelectedHistoricalCauldron(null) // Reset selection when modal closes
+                  }}
                   className="text-gray-400 hover:text-white text-2xl"
                 >
                   ×
@@ -1384,6 +1587,7 @@ function App() {
                   onChange={async (e) => {
                     const newDate = e.target.value
                     setHistoryDate(newDate)
+                    setSelectedHistoricalCauldron(null) // Reset selection when date changes
                     // Fetch historical data for the selected date
                     try {
                       const historicalData = await api.fetchHistoricalCauldrons(newDate)
@@ -1484,28 +1688,6 @@ function App() {
                 </div>
               </div>
 
-              {/* Historical Chart */}
-              <div className="mt-6">
-                <h3 className="text-lg font-semibold text-gray-200 mb-3">Level Trends Over Time</h3>
-                <ResponsiveContainer width="100%" height={200}>
-                  <LineChart data={timeSeriesData}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                    <XAxis dataKey="time" stroke="#9ca3af" fontSize={12} />
-                    <YAxis stroke="#9ca3af" fontSize={12} />
-                    <Tooltip
-                      contentStyle={{ backgroundColor: '#1a1a1f', border: '1px solid #8b5cf6' }}
-                      labelStyle={{ color: '#e5e7eb' }}
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="avgLevel"
-                      stroke="#8b5cf6"
-                      strokeWidth={2}
-                      dot={{ fill: '#8b5cf6', r: 3 }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
             </motion.div>
           </motion.div>
         )}
