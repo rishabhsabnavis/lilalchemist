@@ -40,9 +40,11 @@ class RouteOptimizer:
             demand_order: Candidate cauldron IDs sorted by priority (e.g. overflow risk).
         """
 
-        pending = [loc for loc in demand_order if loc in self._network]
-        if current_location not in self._network:
-            pending.insert(0, pending.pop(0)) if pending else None
+        # Include all cauldrons in demand_order, even if not in network map
+        # We'll use fallback distance calculation for missing network data
+        pending = list(demand_order)
+        if current_location not in self._network and pending:
+            # If current location not in network, start from first pending location
             current_location = pending[0] if pending else current_location
 
         route = [current_location]

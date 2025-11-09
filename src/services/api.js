@@ -82,6 +82,14 @@ export async function fetchNetworkMap() {
   return fetchAPI('/api/network-map');
 }
 
+
+/**
+ * Fetch Enchanted Market location and information
+ */
+export async function fetchMarketInfo() {
+  return fetchAPI('/api/market');
+}
+
 /**
  * Fetch minimum number of witches required
  * @param {number} timeHorizonMinutes - Time horizon for scheduling (default: 480)
@@ -102,13 +110,6 @@ export async function fetchOptimalSchedule(numWitches = null, timeHorizonMinutes
   }
   params.append('time_horizon_minutes', timeHorizonMinutes);
   return fetchAPI(`/api/optimal-schedule?${params.toString()}`);
-}
-
-/**
- * Fetch Enchanted Market location and information
- */
-export async function fetchMarketInfo() {
-  return fetchAPI('/api/market');
 }
 
 /**

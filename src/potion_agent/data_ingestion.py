@@ -156,6 +156,11 @@ class CauldronAPIClient:
         self._last_levels: Dict[str, float] = {}  # cauldron_id -> fill_level_liters
         self._last_timestamps: Dict[str, datetime] = {}  # cauldron_id -> last_updated
         self._last_fetch_time: Optional[datetime] = None
+        
+        # Load calculated fill and drain rates from all_events.json
+        self._calculated_fill_rates: Dict[str, float] = {}
+        self._calculated_drain_rates: Dict[str, float] = {}
+        self._load_calculated_rates()
 
     async def fetch_current_levels(self) -> List[CauldronStatus]:
         """Fetch the latest cauldron states from EOG API or simulator."""
@@ -207,9 +212,16 @@ class CauldronAPIClient:
                 base_level = eog_levels.get(cauldron_id, 0.0)
                 capacity = cauldron_info["max_volume"]
                 
-                # Calculate fill rate from historical data
-                fill_rate = self._estimate_fill_rate(historical_data, cauldron_id)
-                drain_rate = 20.0  # Default drain rate (EOG API doesn't provide this)
+                # Use calculated rates from all_events.json if available, otherwise estimate
+                if cauldron_id in self._calculated_fill_rates:
+                    fill_rate = self._calculated_fill_rates[cauldron_id]
+                else:
+                    fill_rate = self._estimate_fill_rate(historical_data, cauldron_id)
+                
+                if cauldron_id in self._calculated_drain_rates:
+                    drain_rate = self._calculated_drain_rates[cauldron_id]
+                else:
+                    drain_rate = 20.0  # Default drain rate (fallback if not in calculated rates)
                 
                 # Apply dynamic updates: simulate continuous filling since last update
                 if cauldron_id in self._last_levels and self._last_timestamps.get(cauldron_id):
@@ -252,6 +264,29 @@ class CauldronAPIClient:
             self._last_fetch_time = now
             return statuses
     
+    def _load_calculated_rates(self) -> None:
+        """Load calculated fill and drain rates from all_events.json."""
+        # Try multiple possible paths for all_events.json
+        candidate_paths = [
+            Path(__file__).resolve().parents[2] / "all_events.json",  # Project root
+            Path("all_events.json").resolve(),  # Current directory
+        ]
+        
+        data_path = next((p for p in candidate_paths if p.exists()), None)
+        if data_path is None:
+            print("Warning: all_events.json not found, will use estimated rates")
+            return
+        
+        try:
+            with data_path.open("r") as f:
+                data = json.load(f)
+                self._calculated_fill_rates = data.get("fill_rates", {})
+                self._calculated_drain_rates = data.get("drain_rates", {})
+                print(f"Loaded calculated rates for {len(self._calculated_fill_rates)} cauldrons")
+        except Exception as e:
+            print(f"Warning: Failed to load calculated rates from all_events.json: {e}")
+            print("Will fall back to estimated rates")
+
     async def fetch_data_metadata(self) -> Dict:
         """Fetch metadata from the Data endpoint."""
         if not self._use_api:

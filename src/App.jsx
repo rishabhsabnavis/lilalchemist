@@ -304,7 +304,7 @@ function App() {
       console.log('Forecasting data received:', {
         forecasts: forecastsData?.length || 0,
         minWitches: minWitchesData,
-        schedule: scheduleData
+        schedule: scheduleData,
       })
 
       setForecasts(forecastsData || [])
@@ -649,7 +649,7 @@ function App() {
                 </div>
                 <div className="text-2xl font-bold text-white mb-1">{cauldron.level}%</div>
                 <div className="text-xs text-gray-300">
-                  Fill: {cauldron.fill_rate_liters_per_min?.toFixed(1) || cauldron.fillRate?.toFixed(1) || '0.0'}L/min
+                  Fill: {cauldron.fill_rate_liters_per_min?.toFixed(2) || cauldron.fillRate?.toFixed(2) || '0.00'}L/min
                 </div>
                 {cauldron.latitude && cauldron.longitude && (
                   <div className="text-xs text-gray-400 mt-1">
@@ -1188,24 +1188,6 @@ function App() {
               <Map className="w-6 h-6 text-cauldron-purple" />
               Geographic Map Visualization
             </h2>
-            {optimalSchedule && optimalSchedule.routes && optimalSchedule.routes.length > 0 && (
-              <div className="flex items-center gap-2 text-sm text-gray-400">
-                <span>Routes:</span>
-                {optimalSchedule.routes.map((route, idx) => {
-                  const routeColors = ['#ec4899', '#8b5cf6', '#06b6d4', '#eab308', '#ef4444']
-                  const routeColor = routeColors[idx % routeColors.length]
-                  return (
-                    <div key={route.courier_id} className="flex items-center gap-1">
-                      <div 
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: routeColor }}
-                      />
-                      <span className="text-xs">{route.courier_id.replace('_', ' ')}</span>
-                    </div>
-                  )
-                })}
-              </div>
-            )}
           </div>
           
           <div className="relative w-full h-[600px] bg-gray-900/50 rounded-lg border border-gray-700 overflow-hidden">
@@ -1505,32 +1487,46 @@ function App() {
               )
             })()}
             
-            {/* Legend */}
-            <div className="absolute bottom-4 left-4 glass rounded-lg p-4 border border-gray-700 z-[1000]">
-              <h3 className="text-sm font-semibold text-gray-200 mb-2">Legend</h3>
-              <div className="space-y-1 text-xs">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-cauldron-purple"></div>
-                  <span className="text-gray-300">Normal (&lt;50%)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-cauldron-cyan"></div>
-                  <span className="text-gray-300">Medium (50-80%)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                  <span className="text-gray-300">High (&gt;80%)</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                  <span className="text-gray-300">Anomaly</span>
-                </div>
-                <div className="flex items-center gap-2 mt-2">
-                  <Zap className="w-3 h-3 text-yellow-400" />
-                  <span className="text-gray-300">Draining</span>
+            {/* Clickable Witch Routes List - Top Right */}
+            {optimalSchedule && optimalSchedule.routes && optimalSchedule.routes.length > 0 && (
+              <div className="absolute top-4 right-4 glass rounded-lg p-3 border border-gray-700 z-[1000] max-w-xs">
+                <div className="text-xs text-gray-400 mb-2 font-semibold">Witch Routes</div>
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {optimalSchedule.routes.map((route, idx) => {
+                    const routeColors = ['#ec4899', '#8b5cf6', '#06b6d4', '#eab308', '#ef4444']
+                    const routeColor = routeColors[idx % routeColors.length]
+                    const isSelected = selectedRoute?.courier_id === route.courier_id
+                    
+                    return (
+                      <div
+                        key={route.courier_id}
+                        onClick={() => setSelectedRoute(isSelected ? null : route)}
+                        className={`p-2 rounded-md cursor-pointer transition-all ${
+                          isSelected
+                            ? 'bg-cauldron-purple/30 border-2 border-cauldron-purple'
+                            : 'bg-gray-800/50 border border-gray-700 hover:bg-gray-800/70 hover:border-gray-600'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 mb-1">
+                          <div 
+                            className="w-3 h-3 rounded-full flex-shrink-0"
+                            style={{ backgroundColor: routeColor }}
+                          />
+                          <span className={`text-xs font-medium ${
+                            isSelected ? 'text-gray-100' : 'text-gray-300'
+                          }`}>
+                            {route.courier_id.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                          </span>
+                        </div>
+                        <div className="text-xs text-gray-400 ml-5">
+                          {route.stops_count} stops • {Math.round(route.estimated_completion_minutes)} min
+                        </div>
+                      </div>
+                    )
+                  })}
                 </div>
               </div>
-            </div>
+            )}
             
             {/* Route Details Panel */}
             {selectedRoute && selectedRoute.courier_id && (
@@ -1604,8 +1600,45 @@ function App() {
               </motion.div>
             )}
             
+            {/* Stats overlay - positioned below witch routes or on left if no routes */}
+            <div className={`absolute ${optimalSchedule && optimalSchedule.routes && optimalSchedule.routes.length > 0 ? 'top-4 left-4' : 'top-4 right-4'} glass rounded-lg p-4 border border-gray-700 z-[999]`}>
+              <div className="text-xs text-gray-400 space-y-1">
+                <div>Total Cauldrons: <span className="text-gray-200 font-semibold">{cauldrons.length}</span></div>
+                <div>Active Drains: <span className="text-yellow-400 font-semibold">{activeDrains}</span></div>
+                <div>Anomalies: <span className="text-red-400 font-semibold">{anomalies}</span></div>
+                <div>Overflow Risk: <span className="text-yellow-400 font-semibold">{overflowRisk}</span></div>
+              </div>
+            </div>
+            
+            {/* Legend */}
+            <div className="absolute bottom-4 left-4 glass rounded-lg p-4 border border-gray-700 z-[1000]">
+              <h3 className="text-sm font-semibold text-gray-200 mb-2">Legend</h3>
+              <div className="space-y-1 text-xs">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-cauldron-purple"></div>
+                  <span className="text-gray-300">Normal (&lt;50%)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-cauldron-cyan"></div>
+                  <span className="text-gray-300">Medium (50-80%)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                  <span className="text-gray-300">High (&gt;80%)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                  <span className="text-gray-300">Anomaly</span>
+                </div>
+                <div className="flex items-center gap-2 mt-2">
+                  <Zap className="w-3 h-3 text-yellow-400" />
+                  <span className="text-gray-300">Draining</span>
+                </div>
+              </div>
+            </div>
+            
             {/* Stats overlay */}
-            <div className="absolute top-4 right-4 glass rounded-lg p-4 border border-gray-700">
+            <div className="absolute top-4 right-4 glass rounded-lg p-4 border border-gray-700 z-[999]">
               <div className="text-xs text-gray-400 space-y-1">
                 <div>Total Cauldrons: <span className="text-gray-200 font-semibold">{cauldrons.length}</span></div>
                 <div>Active Drains: <span className="text-yellow-400 font-semibold">{activeDrains}</span></div>
@@ -1835,13 +1868,13 @@ function App() {
                   <div className="p-3 rounded-lg bg-gray-800/50">
                     <div className="text-xs text-gray-400 mb-1">Fill Rate</div>
                     <div className="text-lg font-semibold text-cauldron-cyan">
-                      {selectedCauldron.fill_rate_liters_per_min?.toFixed(1) || selectedCauldron.fillRate?.toFixed(1) || '0.0'}L/min
+                      {selectedCauldron.fill_rate_liters_per_min?.toFixed(2) || selectedCauldron.fillRate?.toFixed(2) || '0.00'}L/min
                     </div>
                   </div>
                   <div className="p-3 rounded-lg bg-gray-800/50">
                     <div className="text-xs text-gray-400 mb-1">Drain Rate</div>
                     <div className="text-lg font-semibold text-cauldron-pink">
-                      {selectedCauldron.drain_rate_liters_per_min?.toFixed(1) || '0.0'}L/min
+                      {selectedCauldron.drain_rate_liters_per_min?.toFixed(2) || '0.00'}L/min
                     </div>
                   </div>
                 </div>

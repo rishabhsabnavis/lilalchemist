@@ -22,6 +22,7 @@ except ImportError:
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -34,11 +35,54 @@ from potion_agent.routing import RouteOptimizer
 from potion_agent.ticket_matching import TicketMatcher, DrainEvent
 from potion_agent.witch_scheduling import WitchScheduler
 
-# Initialize FastAPI app
+# Initialize backend clients and services (singleton instances)
+# These maintain state across requests for dynamic updates
+cauldron_client = CauldronAPIClient()
+transport_client = TransportLogAPIClient()
+network_client = NetworkAPIClient()
+anomaly_detector = AnomalyDetector()
+forecast_engine = ForecastEngine()
+
+# Initialize RouteOptimizer - will load network map on first use
+# Network map will be fetched from API when needed
+route_optimizer = RouteOptimizer()
+ticket_matcher = TicketMatcher()
+witch_scheduler = WitchScheduler(route_optimizer)
+
+# WebSocket connections for real-time updates
+active_connections: List[WebSocket] = []
+
+# Load network map from API and update RouteOptimizer on startup
+async def initialize_network_map():
+    """Load network map from API and update RouteOptimizer."""
+    try:
+        network_map = await network_client.fetch_network_map()
+        if network_map:
+            # Update RouteOptimizer with network map from API
+            route_optimizer._network = network_map
+            print(f"✓ Loaded network map from EOG API with {len(network_map)} nodes")
+            print(f"  Network map keys: {list(network_map.keys())[:10]}...")  # Show first 10 keys
+        else:
+            print("⚠ Warning: Network map is empty, using fallback distances")
+    except Exception as e:
+        print(f"⚠ Warning: Failed to load network map from API: {e}")
+        print("  Using fallback distance calculations (10 min default)")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Lifespan context manager for startup and shutdown."""
+    # Startup: Load network map from API
+    await initialize_network_map()
+    yield
+    # Shutdown: cleanup if needed
+    pass
+
+# Initialize FastAPI app with lifespan
 app = FastAPI(
     title="PotionMaster API",
     description="API bridge for PotionMaster frontend",
-    version="1.0.0"
+    version="1.0.0",
+    lifespan=lifespan
 )
 
 # Configure CORS for frontend access
@@ -49,20 +93,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# Initialize backend clients and services (singleton instances)
-# These maintain state across requests for dynamic updates
-cauldron_client = CauldronAPIClient()
-transport_client = TransportLogAPIClient()
-network_client = NetworkAPIClient()
-anomaly_detector = AnomalyDetector()
-forecast_engine = ForecastEngine()
-route_optimizer = RouteOptimizer()
-ticket_matcher = TicketMatcher()
-witch_scheduler = WitchScheduler(route_optimizer)
-
-# WebSocket connections for real-time updates
-active_connections: List[WebSocket] = []
 
 
 @app.get("/")
@@ -470,6 +500,20 @@ async def get_routes() -> List[Dict]:
         raise HTTPException(status_code=500, detail=f"Error fetching routes: {str(e)}")
 
 
+@app.get("/api/network-map")
+async def get_network_map() -> Dict:
+    """
+    Get the potion network map with travel times.
+    
+    Returns network map with nodes and edges (travel times in minutes).
+    """
+    try:
+        network_map = await network_client.fetch_network_map()
+        return network_map
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error fetching network map: {str(e)}")
+
+
 @app.get("/api/minimum-witches")
 async def get_minimum_witches(time_horizon_minutes: float = 480.0) -> Dict:
     """
@@ -534,19 +578,18 @@ async def get_optimal_schedule(
         forecast_engine.update_history(cauldrons)
         forecasts = forecast_engine.forecast_overflow(cauldrons)
         
-        # Calculate minimum if not provided
-        if num_witches is None:
-            num_witches = witch_scheduler.calculate_minimum_witches(
-                cauldrons=cauldrons,
-                forecasts=forecasts,
-                time_horizon_minutes=time_horizon_minutes,
-            )
-        
-        # Create optimal schedule
+        # Create optimal schedule (uses minimum witches if num_witches is None)
         routes = witch_scheduler.create_optimal_schedule(
             cauldrons=cauldrons,
             forecasts=forecasts,
-            num_witches=num_witches,
+            num_witches=num_witches,  # None = use minimum, otherwise limit to this number
+            time_horizon_minutes=time_horizon_minutes,
+        )
+        
+        # Calculate actual minimum for response metadata
+        actual_minimum = witch_scheduler.calculate_minimum_witches(
+            cauldrons=cauldrons,
+            forecasts=forecasts,
             time_horizon_minutes=time_horizon_minutes,
         )
         
@@ -572,8 +615,13 @@ async def get_optimal_schedule(
             if f.projected_overflow_time is not None
         ]
         
+        # Count unique witches from routes
+        unique_witches = len(set(route["courier_id"] for route in schedule))
+        
         return {
             "num_witches": num_witches,
+            "minimum_witches": actual_minimum,
+            "witches_used": unique_witches,
             "routes": schedule,
             "urgent_forecasts": urgent_forecasts,
             "time_horizon_minutes": time_horizon_minutes,
@@ -581,20 +629,6 @@ async def get_optimal_schedule(
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error creating optimal schedule: {str(e)}")
-
-
-@app.get("/api/network-map")
-async def get_network_map() -> Dict:
-    """
-    Get the potion network map with travel times.
-    
-    Returns network map with nodes and edges (travel times in minutes).
-    """
-    try:
-        network_map = await network_client.fetch_network_map()
-        return network_map
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error fetching network map: {str(e)}")
 
 
 @app.get("/api/market")
