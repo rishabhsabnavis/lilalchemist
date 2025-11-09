@@ -25,3 +25,10 @@ dist-ssr
 
 # Environment variables
 .env
+
+# Python virtual environment
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
