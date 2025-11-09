@@ -1,10 +1,26 @@
+import argparse
 import json
+import logging
 from collections import defaultdict
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 from typing import DefaultDict, Dict, List, Tuple
 
-MATCH_TOLERANCE = 0.20  # 10%
+import requests
+from requests import RequestException
+
+from calculations import (
+    DEFAULT_END_DATE,
+    DEFAULT_START_DATE,
+    annotate_drain_volumes,
+    collect_events,
+    compute_drain_rates,
+    compute_fill_rates,
+    load_level_data,
+)
+
+MATCH_TOLERANCE = 0.20  # 20%
+TICKETS_API_URL = "https://hackutd2025.eog.systems/api/tickets"
 
 
 @dataclass
@@ -23,17 +39,69 @@ class TicketRecord:
     matched_event: Dict | None = None
 
 
-def load_data(all_events_path: Path, tickets_path: Path) -> Tuple[Dict, List[Dict], int]:
-    with all_events_path.open("r") as f:
-        all_events = json.load(f)
+def prepare_long_drain_events(level_data: List[dict]) -> Dict[str, Dict[str, List[Dict]]]:
+    events = collect_events(level_data)
+    fill_rates = compute_fill_rates(events)
+    drain_rates = compute_drain_rates(events, fill_rates)
+    filtered = annotate_drain_volumes(events, drain_rates)
 
-    with tickets_path.open("r") as f:
-        tickets_payload = json.load(f)
+    return {
+        cauldron: {
+            day: [event.to_dict() for event in day_events]
+            for day, day_events in day_map.items()
+        }
+        for cauldron, day_map in filtered.items()
+    }
 
-    long_drain_events = all_events.get("long_drain_events", {})
+
+def load_long_events_and_tickets(
+    start_date: str,
+    end_date: str,
+    *,
+    use_local_file: bool,
+    tickets_url: str,
+    use_local_tickets: bool,
+    tickets_path: Path,
+) -> Tuple[Dict[str, Dict[str, List[Dict]]], List[Dict], int, str]:
+    candidate_paths = [
+        Path(__file__).resolve().parents[2] / "challengeresources" / "filllevels.json",
+        Path("filllevels.json").resolve(),
+    ]
+
+    level_data, source = load_level_data(
+        start_date,
+        end_date,
+        use_local_file=use_local_file,
+        candidate_paths=candidate_paths,
+    )
+    logging.info("Loaded %d readings from %s", len(level_data), source)
+
+    long_events = prepare_long_drain_events(level_data)
+
+    tickets_payload: Dict
+    tickets_source: str
+
+    if not use_local_tickets:
+        try:
+            response = requests.get(tickets_url, timeout=30)
+            response.raise_for_status()
+            tickets_payload = response.json()
+            tickets_source = tickets_url
+        except (RequestException, ValueError) as exc:
+            logging.warning("Failed to fetch tickets from API (%s); falling back to %s", exc, tickets_path)
+            use_local_tickets = True
+
+    if use_local_tickets:
+        if not tickets_path.exists():
+            raise FileNotFoundError(f"Missing ticket.json at {tickets_path}")
+        with tickets_path.open("r") as f:
+            tickets_payload = json.load(f)
+        tickets_source = str(tickets_path)
+
     transport_tickets = tickets_payload.get("transport_tickets", [])
     total_tickets = tickets_payload.get("metadata", {}).get("total_tickets", len(transport_tickets))
-    return long_drain_events, transport_tickets, total_tickets
+
+    return long_events, transport_tickets, total_tickets, source + f" | tickets:{tickets_source}"
 
 
 def group_long_drains(long_drain_events: Dict) -> Dict[str, Dict[str, List[Dict]]]:
@@ -202,23 +270,71 @@ def detect_anomalies(
 
 
 def main() -> None:
-    root = Path(__file__).resolve().parents[2]
-    all_events_path = root / "all_events.json"
-    tickets_path = root / "challengeresources" / "ticket.json"
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 
-    if not all_events_path.exists():
-        raise FileNotFoundError(f"Missing all_events.json at {all_events_path}")
-    if not tickets_path.exists():
-        raise FileNotFoundError(f"Missing ticket.json at {tickets_path}")
+    parser = argparse.ArgumentParser(
+        description="Detect anomalies between transport tickets and long drain events."
+    )
+    parser.add_argument(
+        "--start-date",
+        default=DEFAULT_START_DATE,
+        help="Start date parameter for the API (default: %(default)s).",
+    )
+    parser.add_argument(
+        "--end-date",
+        default=DEFAULT_END_DATE,
+        help="End date parameter for the API (default: %(default)s).",
+    )
+    parser.add_argument(
+        "--use-local-file",
+        action="store_true",
+        help="Skip API fetch and read from the local filllevels.json instead.",
+    )
+    parser.add_argument(
+        "--tickets-path",
+        default=str(Path(__file__).resolve().parents[2] / "challengeresources" / "ticket.json"),
+        help="Path to the transport tickets JSON file (used when --use-local-tickets is set or API fetch fails).",
+    )
+    parser.add_argument(
+        "--tickets-url",
+        default=TICKETS_API_URL,
+        help="API endpoint for fetching transport tickets.",
+    )
+    parser.add_argument(
+        "--use-local-tickets",
+        action="store_true",
+        help="Load tickets from the local JSON file instead of the API.",
+    )
+    parser.add_argument(
+        "--output",
+        default="anomalies.json",
+        help="Path to write the anomaly report (default: %(default)s).",
+    )
+    args = parser.parse_args()
 
-    long_drain_events, tickets, total_ticket_count = load_data(all_events_path, tickets_path)
+    tickets_path = Path(args.tickets_path)
+    long_drain_events, tickets, total_ticket_count, source = load_long_events_and_tickets(
+        args.start_date,
+        args.end_date,
+        use_local_file=args.use_local_file,
+        tickets_url=args.tickets_url,
+        use_local_tickets=args.use_local_tickets,
+        tickets_path=tickets_path,
+    )
+    logging.info(
+        "Computed long-drain events for %d cauldrons using data from %s",
+        len(long_drain_events),
+        source,
+    )
+
     anomalies = detect_anomalies(long_drain_events, tickets)
     anomalies["summary"]["total_tickets_expected"] = total_ticket_count
+    anomalies["summary"]["level_data_source"] = source
 
-    output_path = root / "anomalies.json"
+    output_path = Path(args.output)
     with output_path.open("w") as f:
         json.dump(anomalies, f, indent=2)
-    print(f"Wrote anomalies report to {output_path}")
+    logging.info("Wrote anomalies report to %s", output_path)
 
 
 if __name__ == "__main__":

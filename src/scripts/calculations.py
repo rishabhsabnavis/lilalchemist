@@ -1,4 +1,6 @@
+import argparse
 import json
+import logging
 from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime
@@ -6,6 +8,8 @@ from pathlib import Path
 from typing import Dict, List, Tuple
 
 import numpy as np  # type: ignore
+import requests
+from requests import RequestException
 
 try:
     from sklearn.linear_model import LinearRegression
@@ -15,6 +19,9 @@ except ImportError as exc:
         "Install it with 'pip install scikit-learn' or via your environment manager."
     ) from exc
 
+API_BASE_URL = "https://hackutd2025.eog.systems/api/Data/"
+DEFAULT_START_DATE = "0"
+DEFAULT_END_DATE = "2000000000"
 TURNAROUND_MINUTES = 5
 MIN_DRAIN_DURATION = 40.0  # minutes
 
@@ -269,21 +276,98 @@ def events_to_serializable(
     return serializable
 
 
+def fetch_level_data(
+    start_date: str = DEFAULT_START_DATE,
+    end_date: str = DEFAULT_END_DATE,
+    *,
+    session: requests.Session | None = None,
+) -> List[dict]:
+    """Fetch cauldron level data from the remote API."""
+    session = session or requests.Session()
+    params = {"start_date": start_date, "end_date": end_date}
+    response = session.get(API_BASE_URL, params=params, timeout=30)
+    response.raise_for_status()
+    data = response.json()
+    if not isinstance(data, list):
+        raise ValueError("Unexpected payload from API; expected a list of readings.")
+    return data
+
+
+def load_level_data(
+    start_date: str,
+    end_date: str,
+    *,
+    use_local_file: bool = False,
+    candidate_paths: List[Path] | None = None,
+) -> Tuple[List[dict], str]:
+    """
+    Fetch level data from the API, optionally falling back to a local file.
+
+    Returns:
+        (level_data, source_description)
+    """
+    if not use_local_file:
+        try:
+            data = fetch_level_data(start_date, end_date)
+            source = f"{API_BASE_URL}?start_date={start_date}&end_date={end_date}"
+            return data, source
+        except (RequestException, ValueError) as exc:
+            logging.warning(
+                "Failed to fetch data from API (%s). Falling back to local file.", exc
+            )
+
+    candidate_paths = candidate_paths or []
+    for path in candidate_paths:
+        if path.exists():
+            with path.open("r") as f:
+                logging.info("Loaded level data from %s", path)
+                return json.load(f), str(path)
+
+    raise FileNotFoundError(
+        "Could not retrieve level data from API or local fallback files."
+    )
+
+
 def main() -> None:
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+
+    parser = argparse.ArgumentParser(
+        description="Generate cauldron event summaries from fill level data."
+    )
+    parser.add_argument(
+        "--start-date",
+        default=DEFAULT_START_DATE,
+        help="Start date parameter for the API (default: %(default)s).",
+    )
+    parser.add_argument(
+        "--end-date",
+        default=DEFAULT_END_DATE,
+        help="End date parameter for the API (default: %(default)s).",
+    )
+    parser.add_argument(
+        "--use-local-file",
+        action="store_true",
+        help="Skip API fetch and read from the local filllevels.json instead.",
+    )
+    parser.add_argument(
+        "--no-write",
+        action="store_true",
+        help="Do not write all_events.json; useful when importing programmatically.",
+    )
+    args = parser.parse_args()
+
     candidate_paths = [
         Path(__file__).resolve().parents[2] / "challengeresources" / "filllevels.json",
         Path("filllevels.json").resolve(),
     ]
 
-    data_path = next((p for p in candidate_paths if p.exists()), None)
-    if data_path is None:
-        tried = "\n - ".join(str(p) for p in candidate_paths)
-        raise FileNotFoundError(
-            "Could not locate 'filllevels.json'. Checked:\n - " + tried
-        )
-
-    with data_path.open("r") as f:
-        level_data = json.load(f)
+    level_data, data_source = load_level_data(
+        args.start_date,
+        args.end_date,
+        use_local_file=args.use_local_file,
+        candidate_paths=candidate_paths,
+    )
+    logging.info("Loaded %d readings from %s", len(level_data), data_source)
 
     events = collect_events(level_data)
     fill_rates = compute_fill_rates(events)
@@ -303,8 +387,10 @@ def main() -> None:
         },
     }
 
-    with open("all_events.json", "w") as f:
-        json.dump(summary, f, indent=2)
+    if not args.no_write:
+        with open("all_events.json", "w") as f:
+            json.dump(summary, f, indent=2)
+        logging.info("Wrote summary to all_events.json")
 
 
 if __name__ == "__main__":
