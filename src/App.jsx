@@ -1533,20 +1533,24 @@ function App() {
             </div>
             
             {/* Route Details Panel */}
-            {selectedRoute && (
+            {selectedRoute && selectedRoute.courier_id && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
                 className="absolute bottom-4 right-4 glass rounded-lg p-4 border border-cauldron-purple/50 max-w-md z-[1001]"
               >
                 <div className="flex items-center justify-between mb-3">
                   <h3 className="text-lg font-bold text-gray-100 flex items-center gap-2">
                     <Users className="w-5 h-5 text-cauldron-pink" />
-                    {selectedRoute.courier_id.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                    <span className="truncate">
+                      {selectedRoute.courier_id.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                    </span>
                   </h3>
                   <button
                     onClick={() => setSelectedRoute(null)}
-                    className="text-gray-400 hover:text-gray-200 transition-colors"
+                    className="text-gray-400 hover:text-gray-200 transition-colors flex-shrink-0 ml-2"
+                    aria-label="Close route details"
                   >
                     ✕
                   </button>
