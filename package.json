@@ -12,9 +12,11 @@
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.17",
     "framer-motion": "^12.23.24",
+    "leaflet": "^1.9.4",
     "lucide-react": "^0.553.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-leaflet": "^5.0.0",
     "recharts": "^3.3.0"
   },
   "devDependencies": {
