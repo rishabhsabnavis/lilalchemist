@@ -11,7 +11,14 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 from functools import lru_cache
+from pathlib import Path
 from typing import Optional
+
+from dotenv import load_dotenv
+
+# Load environment variables from .env file if it exists
+env_path = Path(__file__).parent.parent.parent / ".env"
+load_dotenv(dotenv_path=env_path)
 
 
 @dataclass(frozen=True)
