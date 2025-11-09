@@ -35,9 +35,9 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
 })
 
-// Enchanted Market coordinates (hardcoded)
-const ENCHANTED_MARKET_LAT = 33.2148
-const ENCHANTED_MARKET_LNG = -97.13
+// Enchanted Market coordinates (fallback values - will be fetched from API)
+const DEFAULT_MARKET_LAT = 33.2148
+const DEFAULT_MARKET_LNG = -97.13
 
 // Fallback network map (empty - use only API data)
 const FALLBACK_NETWORK_MAP = {}
@@ -165,6 +165,11 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [networkMap, setNetworkMap] = useState(FALLBACK_NETWORK_MAP)
+  const [forecasts, setForecasts] = useState([])
+  const [minimumWitches, setMinimumWitches] = useState(null)
+  const [optimalSchedule, setOptimalSchedule] = useState(null)
+  const [selectedRoute, setSelectedRoute] = useState(null)
+  const [marketLocation, setMarketLocation] = useState({ lat: DEFAULT_MARKET_LAT, lng: DEFAULT_MARKET_LNG })
 
   // Transform API cauldron data to match frontend format
   const transformCauldron = (apiCauldron) => {
@@ -201,6 +206,23 @@ function App() {
     } catch (err) {
       console.error('Error fetching network map:', err)
       // Keep fallback network map on error
+    }
+  }
+
+  // Fetch market location from API
+  const fetchMarketLocation = async () => {
+    try {
+      const marketData = await api.fetchMarketInfo()
+      if (marketData && marketData.latitude && marketData.longitude) {
+        setMarketLocation({
+          lat: marketData.latitude,
+          lng: marketData.longitude
+        })
+      }
+    } catch (err) {
+      console.error('Error fetching market location:', err)
+      // Keep default values on error
+      setMarketLocation({ lat: DEFAULT_MARKET_LAT, lng: DEFAULT_MARKET_LNG })
     }
   }
 
@@ -247,10 +269,10 @@ function App() {
     console.log('Using fallback distance calculation')
     // Using Haversine formula for distance, then convert to time
     const R = 6371 // Earth radius in km
-    const dLat = (ENCHANTED_MARKET_LAT - cauldron.latitude) * Math.PI / 180
-    const dLng = (ENCHANTED_MARKET_LNG - cauldron.longitude) * Math.PI / 180
+    const dLat = (marketLocation.lat - cauldron.latitude) * Math.PI / 180
+    const dLng = (marketLocation.lng - cauldron.longitude) * Math.PI / 180
     const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(cauldron.latitude * Math.PI / 180) * Math.cos(ENCHANTED_MARKET_LAT * Math.PI / 180) *
+      Math.cos(cauldron.latitude * Math.PI / 180) * Math.cos(marketLocation.lat * Math.PI / 180) *
       Math.sin(dLng / 2) * Math.sin(dLng / 2)
     const haversineC = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
     const distanceKm = R * haversineC
@@ -258,6 +280,57 @@ function App() {
     // Convert distance to time (assuming 36 km/h = 0.6 km/min)
     const DEFAULT_SPEED_KM_PER_MIN = 0.6
     return distanceKm / DEFAULT_SPEED_KM_PER_MIN
+  }
+
+  // Fetch forecasting and scheduling data
+  const fetchForecastingData = async () => {
+    try {
+      console.log('Fetching forecasting data...')
+      const [forecastsData, minWitchesData, scheduleData] = await Promise.all([
+        api.fetchForecasts().catch(err => {
+          console.error('Error fetching forecasts:', err)
+          return []
+        }),
+        api.fetchMinimumWitches(480).catch(err => {
+          console.error('Error fetching minimum witches:', err)
+          return null
+        }),
+        api.fetchOptimalSchedule(null, 480).catch(err => {
+          console.error('Error fetching optimal schedule:', err)
+          return null
+        }),
+      ])
+
+      console.log('Forecasting data received:', {
+        forecasts: forecastsData?.length || 0,
+        minWitches: minWitchesData,
+        schedule: scheduleData
+      })
+
+      setForecasts(forecastsData || [])
+      setMinimumWitches(minWitchesData)
+      setOptimalSchedule(scheduleData)
+
+      // Update cauldrons with forecast data
+      if (forecastsData && forecastsData.length > 0) {
+        setCauldrons(prev => prev.map(cauldron => {
+          const forecast = forecastsData.find(f => f.cauldron_id === cauldron.cauldron_id)
+          return {
+            ...cauldron,
+            forecastOverflow: forecast?.projected_overflow_time 
+              ? new Date(forecast.projected_overflow_time) 
+              : null,
+            forecastConfidence: forecast?.confidence || 0,
+          }
+        }))
+      }
+    } catch (err) {
+      console.error('Error fetching forecasting data:', err)
+      // Set empty state on error so UI shows appropriate message
+      setForecasts([])
+      setMinimumWitches(null)
+      setOptimalSchedule(null)
+    }
   }
 
   // Fetch data from API
@@ -292,6 +365,9 @@ function App() {
         return newData.slice(-20) // Keep last 20 data points
       })
 
+      // Fetch forecasting data after cauldrons are loaded
+      await fetchForecastingData()
+
       setLoading(false)
     } catch (err) {
       console.error('Error fetching data:', err)
@@ -308,11 +384,17 @@ function App() {
     // Initial data fetch
     fetchData()
     fetchNetworkMapData() // Fetch network map once
+    fetchMarketLocation() // Fetch market location once
 
     // Set up polling for real-time updates
     const interval = setInterval(() => {
       fetchData()
     }, 5000) // Poll every 5 seconds
+
+    // Poll forecasting data less frequently (every 30 seconds)
+    const forecastingInterval = setInterval(() => {
+      fetchForecastingData()
+    }, 30000)
 
     // Simulate workflow progression
     const workflowInterval = setInterval(() => {
@@ -324,6 +406,7 @@ function App() {
 
     return () => {
       clearInterval(interval)
+      clearInterval(forecastingInterval)
       clearInterval(workflowInterval)
     }
   }, [])
@@ -936,33 +1019,60 @@ function App() {
 
           {/* Overflow Forecast */}
           <div className="mb-6">
-            <h3 className="text-lg font-semibold mb-3 text-gray-300">
-              Overflow Risk
+            <h3 className="text-lg font-semibold mb-3 text-gray-300 flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-yellow-400" />
+              Overflow Risk Forecast
             </h3>
             <div className="space-y-2">
-              {cauldrons
-                .filter(c => c.level > 80)
-                .map(cauldron => (
-                  <div
-                    key={cauldron.id}
-                    className="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30"
-                  >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-sm font-medium text-yellow-400">
-                        {cauldron.name}
-                      </span>
-                      <span className="text-xs text-gray-400">
-                        {cauldron.level}% full
-                      </span>
-                    </div>
-                    <div className="text-xs text-gray-400">
-                      Estimated overflow: {cauldron.forecastOverflow?.toLocaleTimeString() || 'Calculating...'}
-                    </div>
-                  </div>
-                ))}
-              {overflowRisk === 0 && (
+              {forecasts
+                .filter(f => f.projected_overflow_time)
+                .sort((a, b) => new Date(a.projected_overflow_time) - new Date(b.projected_overflow_time))
+                .map(forecast => {
+                  const cauldron = cauldrons.find(c => c.cauldron_id === forecast.cauldron_id)
+                  if (!cauldron) return null
+                  
+                  const overflowTime = new Date(forecast.projected_overflow_time)
+                  const now = new Date()
+                  const minutesUntilOverflow = Math.max(0, Math.round((overflowTime - now) / 60000))
+                  const hoursUntilOverflow = Math.floor(minutesUntilOverflow / 60)
+                  const minsRemaining = minutesUntilOverflow % 60
+                  
+                  return (
+                    <motion.div
+                      key={forecast.cauldron_id}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/30 hover:bg-yellow-500/20 transition-colors"
+                    >
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-sm font-medium text-yellow-400">
+                          {cauldron.name}
+                        </span>
+                        <span className="text-xs text-gray-400">
+                          {Math.round(cauldron.level)}% full
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="text-xs text-gray-300">
+                          Overflow in: <span className="font-bold text-yellow-400">
+                            {hoursUntilOverflow > 0 
+                              ? `${hoursUntilOverflow}h ${minsRemaining}m`
+                              : `${minsRemaining}m`}
+                          </span>
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          Confidence: {Math.round(forecast.confidence * 100)}%
+                        </div>
+                      </div>
+                      <div className="text-xs text-gray-400 mt-1">
+                        At: {overflowTime.toLocaleTimeString()}
+                      </div>
+                    </motion.div>
+                  )
+                })}
+              {forecasts.filter(f => f.projected_overflow_time).length === 0 && (
                 <p className="text-sm text-gray-500 text-center py-4">
-                  No overflow risk detected
+                  ✓ No overflow risk detected
                 </p>
               )}
             </div>
@@ -974,43 +1084,94 @@ function App() {
               <Users className="w-5 h-5 text-cauldron-pink" />
               Optimal Witch Routes
             </h3>
-            <div className="p-4 rounded-lg bg-cauldron-purple/10 border border-cauldron-purple/30">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-cauldron-purple">
-                  Minimum Witches Required
-                </span>
-                <span className="text-2xl font-bold text-cauldron-purple">
-                  {Math.ceil(activeDrains / 3)}
-                </span>
+            
+            {/* Minimum Witches Display */}
+            {minimumWitches && (
+              <div className="p-4 rounded-lg bg-cauldron-purple/10 border border-cauldron-purple/30 mb-4">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-cauldron-purple">
+                    Minimum Witches Required
+                  </span>
+                  <span className="text-3xl font-bold text-cauldron-purple">
+                    {minimumWitches.minimum_witches}
+                  </span>
+                </div>
+                <div className="text-xs text-gray-400 mt-2 space-y-1">
+                  <div>Urgent cauldrons: {minimumWitches.urgent_cauldrons}</div>
+                  <div>Total cauldrons: {minimumWitches.total_cauldrons}</div>
+                  <div>Time horizon: {minimumWitches.time_horizon_minutes / 60}h</div>
+                </div>
               </div>
-              <div className="text-xs text-gray-400 mt-2">
-                Based on active drains and route optimization
-              </div>
-            </div>
+            )}
 
             {/* Route Visualization */}
-            <div className="mt-4 space-y-2">
-              {Array.from({ length: Math.ceil(activeDrains / 3) }).map((_, idx) => (
-                <div
-                  key={idx}
-                  className="p-3 rounded-lg bg-gray-800/50 border border-gray-700"
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <Users className="w-4 h-4 text-cauldron-pink" />
-                    <span className="text-sm font-medium text-gray-300">
-                      Witch Route {idx + 1}
-                    </span>
-                  </div>
-                  <div className="text-xs text-gray-400">
-                    {cauldrons
-                      .filter(c => c.isDraining)
-                      .slice(idx * 3, (idx + 1) * 3)
-                      .map(c => c.name)
-                      .join(' → ')}
-                  </div>
-                </div>
-              ))}
-            </div>
+            {optimalSchedule && optimalSchedule.routes && optimalSchedule.routes.length > 0 ? (
+              <div className="space-y-3">
+                {optimalSchedule.routes.map((route, idx) => {
+                  const routeColors = ['#ec4899', '#8b5cf6', '#06b6d4', '#eab308', '#ef4444']
+                  const routeColor = routeColors[idx % routeColors.length]
+                  const isSelected = selectedRoute?.courier_id === route.courier_id
+                  
+                  return (
+                    <motion.div
+                      key={route.courier_id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.1 }}
+                      onClick={() => setSelectedRoute(isSelected ? null : route)}
+                      className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
+                        isSelected 
+                          ? 'bg-cauldron-purple/20 border-cauldron-purple' 
+                          : 'bg-gray-800/50 border-gray-700 hover:border-gray-600'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <div 
+                            className="w-4 h-4 rounded-full"
+                            style={{ backgroundColor: routeColor }}
+                          />
+                          <span className="text-sm font-medium text-gray-300">
+                            {route.courier_id.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                          </span>
+                        </div>
+                        <div className="text-xs text-gray-400">
+                          {route.stops_count} stops
+                        </div>
+                      </div>
+                      
+                      <div className="text-xs text-gray-400 mb-2">
+                        {route.ordered_stops.map((stopId, stopIdx) => {
+                          const cauldron = cauldrons.find(c => c.cauldron_id === stopId)
+                          const name = cauldron?.name || stopId
+                          return (
+                            <span key={stopIdx}>
+                              {stopIdx > 0 && <span className="mx-1 text-cauldron-purple">→</span>}
+                              {name}
+                            </span>
+                          )
+                        })}
+                      </div>
+                      
+                      <div className="flex items-center justify-between text-xs">
+                        <div className="text-gray-400">
+                          Distance: <span className="font-semibold text-gray-300">{route.total_distance_km} km</span>
+                        </div>
+                        <div className="text-gray-400">
+                          Time: <span className="font-semibold text-gray-300">
+                            {Math.round(route.estimated_completion_minutes)} min
+                          </span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )
+                })}
+              </div>
+            ) : (
+              <div className="p-4 rounded-lg bg-gray-800/30 border border-gray-700 text-center text-sm text-gray-500">
+                {optimalSchedule ? 'No routes needed - all cauldrons safe' : 'Calculating optimal routes...'}
+              </div>
+            )}
           </div>
         </motion.div>
       </div>
@@ -1022,10 +1183,30 @@ function App() {
           animate={{ opacity: 1, scale: 1 }}
           className="glass rounded-xl p-6 min-h-[600px]"
         >
-          <h2 className="text-2xl font-bold text-gray-100 mb-4 flex items-center gap-2">
-            <Map className="w-6 h-6 text-cauldron-purple" />
-            Geographic Map Visualization
-          </h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-bold text-gray-100 flex items-center gap-2">
+              <Map className="w-6 h-6 text-cauldron-purple" />
+              Geographic Map Visualization
+            </h2>
+            {optimalSchedule && optimalSchedule.routes && optimalSchedule.routes.length > 0 && (
+              <div className="flex items-center gap-2 text-sm text-gray-400">
+                <span>Routes:</span>
+                {optimalSchedule.routes.map((route, idx) => {
+                  const routeColors = ['#ec4899', '#8b5cf6', '#06b6d4', '#eab308', '#ef4444']
+                  const routeColor = routeColors[idx % routeColors.length]
+                  return (
+                    <div key={route.courier_id} className="flex items-center gap-1">
+                      <div 
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: routeColor }}
+                      />
+                      <span className="text-xs">{route.courier_id.replace('_', ' ')}</span>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </div>
           
           <div className="relative w-full h-[600px] bg-gray-900/50 rounded-lg border border-gray-700 overflow-hidden">
             {/* Leaflet Map Container */}
@@ -1040,8 +1221,8 @@ function App() {
               }
               
               // Calculate bounds including all cauldrons and the market
-              const allLats = [...validCauldrons.map(c => c.latitude), ENCHANTED_MARKET_LAT]
-              const allLngs = [...validCauldrons.map(c => c.longitude), ENCHANTED_MARKET_LNG]
+              const allLats = [...validCauldrons.map(c => c.latitude), marketLocation.lat]
+              const allLngs = [...validCauldrons.map(c => c.longitude), marketLocation.lng]
               
               const centerLat = (Math.min(...allLats) + Math.max(...allLats)) / 2
               const centerLng = (Math.min(...allLngs) + Math.max(...allLngs)) / 2
@@ -1091,13 +1272,13 @@ function App() {
                   />
                   
                   {/* Enchanted Market marker */}
-                  <Marker position={[ENCHANTED_MARKET_LAT, ENCHANTED_MARKET_LNG]} icon={marketIcon}>
+                  <Marker position={[marketLocation.lat, marketLocation.lng]} icon={marketIcon}>
                     <Popup>
                       <div className="text-center">
                         <div className="font-bold text-purple-400 text-lg mb-1">🏪 Enchanted Market</div>
                         <div className="text-sm text-gray-300">Sales Point</div>
                         <div className="text-xs text-gray-400 mt-1">
-                          {ENCHANTED_MARKET_LAT.toFixed(4)}, {ENCHANTED_MARKET_LNG.toFixed(4)}
+                          {marketLocation.lat.toFixed(4)}, {marketLocation.lng.toFixed(4)}
                         </div>
                       </div>
                     </Popup>
@@ -1150,8 +1331,85 @@ function App() {
                     )
                   })}
                   
-                  {/* Connection lines from cauldrons to market */}
-                  {validCauldrons.map((cauldron) => {
+                  {/* Route Polylines - Show optimal witch routes */}
+                  {optimalSchedule && optimalSchedule.routes && optimalSchedule.routes.map((route, routeIdx) => {
+                    const routeColors = ['#ec4899', '#8b5cf6', '#06b6d4', '#eab308', '#ef4444']
+                    const routeColor = routeColors[routeIdx % routeColors.length]
+                    const isSelected = selectedRoute?.courier_id === route.courier_id
+                    
+                    // Build route coordinates: market -> cauldrons -> market
+                    const routeCoordinates = []
+                    
+                    // Start at market
+                    routeCoordinates.push([marketLocation.lat, marketLocation.lng])
+                    
+                    // Add cauldron stops in order
+                    route.ordered_stops.forEach(stopId => {
+                      const cauldron = validCauldrons.find(c => c.cauldron_id === stopId)
+                      if (cauldron) {
+                        routeCoordinates.push([cauldron.latitude, cauldron.longitude])
+                      }
+                    })
+                    
+                    // Return to market
+                    routeCoordinates.push([marketLocation.lat, marketLocation.lng])
+                    
+                    if (routeCoordinates.length < 3) return null // Need at least market -> cauldron -> market
+                    
+                    return (
+                      <Polyline
+                        key={`route-${route.courier_id}`}
+                        positions={routeCoordinates}
+                        pathOptions={{
+                          color: routeColor,
+                          weight: isSelected ? 5 : 3,
+                          opacity: isSelected ? 0.9 : 0.6,
+                          dashArray: isSelected ? '10, 5' : '15, 10',
+                        }}
+                        eventHandlers={{
+                          click: () => setSelectedRoute(isSelected ? null : route),
+                          mouseover: (e) => {
+                            e.target.setStyle({
+                              weight: 5,
+                              opacity: 0.9,
+                            })
+                          },
+                          mouseout: (e) => {
+                            e.target.setStyle({
+                              weight: isSelected ? 5 : 3,
+                              opacity: isSelected ? 0.9 : 0.6,
+                            })
+                          },
+                        }}
+                      >
+                        <LeafletTooltip 
+                          permanent={false} 
+                          direction="center" 
+                          className="route-tooltip"
+                          interactive={true}
+                          sticky={true}
+                        >
+                          <div className="text-center min-w-[150px]">
+                            <div className="font-bold text-gray-200 mb-1">
+                              {route.courier_id.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                            </div>
+                            <div className="text-sm text-gray-300">
+                              {route.stops_count} stops • {route.total_distance_km} km
+                            </div>
+                            <div className="text-xs text-gray-400 mt-1">
+                              {Math.round(route.estimated_completion_minutes)} min
+                            </div>
+                            <div className="text-xs text-gray-500 mt-1">
+                              Click to select
+                            </div>
+                          </div>
+                        </LeafletTooltip>
+                      </Polyline>
+                    )
+                  })}
+                  
+                  {/* Connection lines from cauldrons to market (fallback when no routes) */}
+                  {(!optimalSchedule || !optimalSchedule.routes || optimalSchedule.routes.length === 0) && validCauldrons.map((cauldron) => {
                     const level = cauldron.level || (cauldron.fill_level_liters / cauldron.capacity_liters) * 100
                     const color = cauldron.hasAnomaly 
                       ? '#ef4444' 
@@ -1164,8 +1422,8 @@ function App() {
                     const travelTime = getTravelTimeToMarket(cauldron)
                     
                     // Calculate midpoint for label placement
-                    const midLat = (cauldron.latitude + ENCHANTED_MARKET_LAT) / 2
-                    const midLng = (cauldron.longitude + ENCHANTED_MARKET_LNG) / 2
+                    const midLat = (cauldron.latitude + marketLocation.lat) / 2
+                    const midLng = (cauldron.longitude + marketLocation.lng) / 2
                     
                     // Create custom icon for travel time label
                     const travelTimeIcon = L.divIcon({
@@ -1193,7 +1451,7 @@ function App() {
                           key={`line-${cauldron.cauldron_id || cauldron.id}`}
                           positions={[
                             [cauldron.latitude, cauldron.longitude],
-                            [ENCHANTED_MARKET_LAT, ENCHANTED_MARKET_LNG]
+                            [marketLocation.lat, marketLocation.lng]
                           ]}
                           pathOptions={{
                             color: color,
@@ -1248,7 +1506,7 @@ function App() {
             })()}
             
             {/* Legend */}
-            <div className="absolute bottom-4 left-4 glass rounded-lg p-4 border border-gray-700">
+            <div className="absolute bottom-4 left-4 glass rounded-lg p-4 border border-gray-700 z-[1000]">
               <h3 className="text-sm font-semibold text-gray-200 mb-2">Legend</h3>
               <div className="space-y-1 text-xs">
                 <div className="flex items-center gap-2">
@@ -1273,6 +1531,78 @@ function App() {
                 </div>
               </div>
             </div>
+            
+            {/* Route Details Panel */}
+            {selectedRoute && selectedRoute.courier_id && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                className="absolute bottom-4 right-4 glass rounded-lg p-4 border border-cauldron-purple/50 max-w-md z-[1001]"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-lg font-bold text-gray-100 flex items-center gap-2">
+                    <Users className="w-5 h-5 text-cauldron-pink" />
+                    <span className="truncate">
+                      {selectedRoute.courier_id.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                    </span>
+                  </h3>
+                  <button
+                    onClick={() => setSelectedRoute(null)}
+                    className="text-gray-400 hover:text-gray-200 transition-colors flex-shrink-0 ml-2"
+                    aria-label="Close route details"
+                  >
+                    ✕
+                  </button>
+                </div>
+                
+                <div className="space-y-2 mb-3">
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-400">Stops:</span>
+                    <span className="text-gray-200 font-semibold">{selectedRoute.stops_count}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-400">Distance:</span>
+                    <span className="text-gray-200 font-semibold">{selectedRoute.total_distance_km} km</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-400">Estimated Time:</span>
+                    <span className="text-gray-200 font-semibold">
+                      {Math.round(selectedRoute.estimated_completion_minutes)} minutes
+                    </span>
+                  </div>
+                </div>
+                
+                <div className="border-t border-gray-700 pt-3">
+                  <div className="text-xs text-gray-400 mb-2">Route Sequence:</div>
+                  <div className="text-sm text-gray-300 space-y-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-cauldron-purple">🏪</span>
+                      <span>Enchanted Market (Start)</span>
+                    </div>
+                    {selectedRoute.ordered_stops.map((stopId, idx) => {
+                      const cauldron = cauldrons.find(c => c.cauldron_id === stopId)
+                      const name = cauldron?.name || stopId
+                      return (
+                        <div key={idx} className="flex items-center gap-2">
+                          <span className="text-cauldron-purple">→</span>
+                          <span>{name}</span>
+                          {cauldron && (
+                            <span className="text-xs text-gray-500">
+                              ({Math.round(cauldron.level)}%)
+                            </span>
+                          )}
+                        </div>
+                      )
+                    })}
+                    <div className="flex items-center gap-2">
+                      <span className="text-cauldron-purple">🏪</span>
+                      <span>Enchanted Market (Return)</span>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
             
             {/* Stats overlay */}
             <div className="absolute top-4 right-4 glass rounded-lg p-4 border border-gray-700">

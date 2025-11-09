@@ -83,6 +83,35 @@ export async function fetchNetworkMap() {
 }
 
 /**
+ * Fetch minimum number of witches required
+ * @param {number} timeHorizonMinutes - Time horizon for scheduling (default: 480)
+ */
+export async function fetchMinimumWitches(timeHorizonMinutes = 480) {
+  return fetchAPI(`/api/minimum-witches?time_horizon_minutes=${timeHorizonMinutes}`);
+}
+
+/**
+ * Fetch optimal schedule for witches
+ * @param {number|null} numWitches - Number of witches (null to auto-calculate minimum)
+ * @param {number} timeHorizonMinutes - Time horizon for scheduling (default: 480)
+ */
+export async function fetchOptimalSchedule(numWitches = null, timeHorizonMinutes = 480) {
+  const params = new URLSearchParams();
+  if (numWitches !== null) {
+    params.append('num_witches', numWitches);
+  }
+  params.append('time_horizon_minutes', timeHorizonMinutes);
+  return fetchAPI(`/api/optimal-schedule?${params.toString()}`);
+}
+
+/**
+ * Fetch Enchanted Market location and information
+ */
+export async function fetchMarketInfo() {
+  return fetchAPI('/api/market');
+}
+
+/**
  * WebSocket connection for real-time updates
  */
 export function createWebSocketConnection(onMessage, onError) {
