@@ -89,7 +89,8 @@ class RouteOptimizer:
             return self._network[a][b]
         if b in self._network and a in self._network[b]:
             return self._network[b][a]
-        return 10.0  # fallback distance for disconnected nodes
+        # No fallback - raise error for disconnected nodes
+        raise ValueError(f"No connection found between nodes {a} and {b}")
 
     @staticmethod
     def _load_network_map(path: str) -> PotionNetworkMap:

@@ -14,7 +14,7 @@ from langchain.agents import AgentExecutor
 
 from .anomaly_detection import AnomalyDetector
 from .config import get_settings
-from .data_ingestion import CauldronAPIClient, TransportLogAPIClient
+from .data_ingestion import CauldronAPIClient, TransportLogAPIClient, NetworkAPIClient
 from .data_models import (
     AnomalyFlag,
     CauldronStatus,
@@ -201,9 +201,23 @@ class PotionLogisticsOrchestrator:
         if not demand_order:
             return []
 
-        couriers = ("wyvern_01", "wyvern_02", "griffin_03")
+        # Fetch couriers from API - no hardcoded fallback
+        network_client = NetworkAPIClient()
+        couriers_info = await network_client.fetch_couriers_info()
+        courier_ids = []
+        if couriers_info and isinstance(couriers_info, dict):
+            # Extract courier IDs from API response
+            if "couriers" in couriers_info:
+                courier_ids = [c.get("courier_id") or c.get("id") for c in couriers_info["couriers"] if c.get("courier_id") or c.get("id")]
+            elif isinstance(couriers_info, list):
+                courier_ids = [c.get("courier_id") or c.get("id") for c in couriers_info if c.get("courier_id") or c.get("id")]
+        
+        # If no couriers from API, return empty (no fallback)
+        if not courier_ids:
+            return []
+        
         routes: List[RoutePlan] = []
-        for index, courier in enumerate(couriers):
+        for index, courier in enumerate(courier_ids):
             if index >= len(demand_order):
                 break
             starting_node = demand_order[index % len(demand_order)]

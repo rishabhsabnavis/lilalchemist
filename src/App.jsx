@@ -39,110 +39,8 @@ L.Icon.Default.mergeOptions({
 const ENCHANTED_MARKET_LAT = 33.2148
 const ENCHANTED_MARKET_LNG = -97.13
 
-// Fallback network map (empty - use only API data)
+// Network map - use only API data
 const FALLBACK_NETWORK_MAP = {}
-
-// Simulated data generator - matches backend CauldronStatus schema
-const generateCauldronData = () => {
-  const cauldrons = []
-  // Sample coordinates (latitude, longitude) for different cauldrons
-  const sampleCoords = [
-    [40.7128, -74.0060], [40.7580, -73.9855], [40.7505, -73.9934], [40.7282, -74.0776],
-    [40.7614, -73.9776], [40.7489, -74.0050], [40.7282, -73.9942], [40.7505, -73.9855],
-    [40.7128, -73.9855], [40.7580, -74.0060], [40.7505, -74.0050], [40.7282, -73.9776],
-  ]
-  
-  for (let i = 1; i <= 12; i++) {
-    const capacityLiters = 500 + Math.random() * 200 // 500-700L capacity
-    const fillLevelLiters = Math.random() * capacityLiters
-    const levelPercent = (fillLevelLiters / capacityLiters) * 100
-    const isDraining = Math.random() > 0.85
-    const hasAnomaly = Math.random() > 0.9
-    const coord = sampleCoords[i - 1] || [40.7128, -74.0060]
-    
-    cauldrons.push({
-      cauldron_id: `cauldron_${i}`,
-      id: i, // Keep for UI compatibility
-      name: `Cauldron ${i}`,
-      fill_level_liters: Math.round(fillLevelLiters * 10) / 10,
-      capacity_liters: Math.round(capacityLiters),
-      level: Math.round(levelPercent), // Keep for UI compatibility
-      latitude: coord[0] + (Math.random() - 0.5) * 0.02,
-      longitude: coord[1] + (Math.random() - 0.5) * 0.02,
-      fill_rate_liters_per_min: Math.random() * 5 + 1, // 1-6 L/min
-      drain_rate_liters_per_min: Math.random() * 20 + 10, // 10-30 L/min
-      fillRate: Math.random() * 5 + 1, // Keep for UI compatibility
-      isDraining,
-      hasAnomaly,
-      last_updated: new Date(),
-      lastDrain: new Date(Date.now() - Math.random() * 3600000),
-      forecastOverflow: levelPercent > 80 ? new Date(Date.now() + (100 - levelPercent) * 60000) : null,
-    })
-  }
-  return cauldrons
-}
-
-// Ticket generator - matches backend TransportTicket schema
-const generateTickets = () => {
-  const now = new Date()
-  const today = now.toISOString().split('T')[0] // YYYY-MM-DD format
-  const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString().split('T')[0]
-  
-  return [
-    { 
-      ticket_id: 'T-001', 
-      id: 1, // Keep for UI compatibility
-      cauldron_id: 'cauldron_3',
-      cauldronId: 3, // Keep for UI compatibility
-      volume_liters: 45,
-      volume: 45, // Keep for UI compatibility
-      direction: 'pickup',
-      courier_id: 'wyvern_01',
-      date: today, // EOG requirement: date only
-      timestamp: new Date(Date.now() - 1800000), // Optional internal timestamp
-      status: 'matched' 
-    },
-    { 
-      ticket_id: 'T-002', 
-      id: 2,
-      cauldron_id: 'cauldron_7',
-      cauldronId: 7,
-      volume_liters: 32,
-      volume: 32,
-      direction: 'pickup',
-      courier_id: 'griffin_03',
-      date: today,
-      timestamp: new Date(Date.now() - 1200000),
-      status: 'matched' 
-    },
-    { 
-      ticket_id: 'T-003', 
-      id: 3,
-      cauldron_id: 'cauldron_2',
-      cauldronId: 2,
-      volume_liters: 28,
-      volume: 28,
-      direction: 'pickup',
-      courier_id: 'banshee_07',
-      date: yesterday,
-      timestamp: new Date(Date.now() - 900000),
-      status: 'mismatch' 
-    },
-    { 
-      ticket_id: 'T-004', 
-      id: 4,
-      cauldron_id: 'cauldron_5',
-      cauldronId: 5,
-      volume_liters: 0,
-      volume: 0,
-      direction: 'pickup',
-      courier_id: 'wyvern_02',
-      date: yesterday,
-      timestamp: new Date(Date.now() - 600000),
-      status: 'missing' 
-    },
-  ]
-}
 
 const agentWorkflowSteps = [
   { id: 1, name: 'Monitor', icon: Eye, status: 'active', description: 'Tracking all cauldron levels in real-time' },
@@ -165,6 +63,7 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [networkMap, setNetworkMap] = useState(FALLBACK_NETWORK_MAP)
+  const [hoveredNode, setHoveredNode] = useState(null) // Track which node is being hovered
 
   // Transform API cauldron data to match frontend format
   const transformCauldron = (apiCauldron) => {
@@ -204,6 +103,23 @@ function App() {
     }
   }
 
+  // Helper function to get travel time between two nodes
+  const getTravelTime = (fromNodeId, toNodeId) => {
+    if (!networkMap || !fromNodeId || !toNodeId) return null
+    
+    // Check direct connection
+    if (networkMap[fromNodeId] && networkMap[fromNodeId][toNodeId]) {
+      return networkMap[fromNodeId][toNodeId]
+    }
+    
+    // Check reverse direction (bidirectional)
+    if (networkMap[toNodeId] && networkMap[toNodeId][fromNodeId]) {
+      return networkMap[toNodeId][fromNodeId]
+    }
+    
+    return null
+  }
+
   // Helper function to get travel time between a cauldron and the market
   const getTravelTimeToMarket = (cauldron) => {
     // Try to find market node (could be "market_001", "enchanted_market", etc.)
@@ -214,37 +130,16 @@ function App() {
     // Try to match by cauldron_id first (e.g., "cauldron_001")
     const cauldronId = cauldron.cauldron_id || cauldron.id || ''
     
-    // Debug logging
-    console.log('Getting travel time for:', {
-      cauldronId,
-      cauldronName: cauldron.name,
-      marketNode,
-      networkMapKeys: Object.keys(networkMap),
-      hasMarketNode: !!networkMap[marketNode],
-      marketConnections: networkMap[marketNode] ? Object.keys(networkMap[marketNode]) : []
-    })
-    
-    // Check if cauldron_id matches a network map key
-    if (networkMap[marketNode] && networkMap[marketNode][cauldronId]) {
-      console.log('Found travel time (market->cauldron):', networkMap[marketNode][cauldronId])
-      return networkMap[marketNode][cauldronId]
-    }
-    
-    // Also check reverse direction (cauldron -> market)
-    if (networkMap[cauldronId] && networkMap[cauldronId][marketNode]) {
-      console.log('Found travel time (cauldron->market):', networkMap[cauldronId][marketNode])
-      return networkMap[cauldronId][marketNode]
-    }
+    // Use the helper function to get travel time
+    const travelTime = getTravelTime(cauldronId, marketNode)
+    if (travelTime !== null) return travelTime
     
     // Try to match by name (e.g., "Cauldron 001" -> "cauldron_001")
     const name = cauldron.name?.toLowerCase().replace(/\s+/g, '_') || ''
-    if (networkMap[marketNode] && networkMap[marketNode][name]) {
-      console.log('Found travel time (by name):', networkMap[marketNode][name])
-      return networkMap[marketNode][name]
-    }
+    const travelTimeByName = getTravelTime(name, marketNode)
+    if (travelTimeByName !== null) return travelTimeByName
     
     // Fallback: calculate approximate time based on distance
-    console.log('Using fallback distance calculation')
     // Using Haversine formula for distance, then convert to time
     const R = 6371 // Earth radius in km
     const dLat = (ENCHANTED_MARKET_LAT - cauldron.latitude) * Math.PI / 180
@@ -297,10 +192,7 @@ function App() {
       console.error('Error fetching data:', err)
       setError(err.message || 'Failed to fetch data from API')
       setLoading(false)
-      
-      // Fallback to simulated data on error
-      setCauldrons(generateCauldronData())
-      setTickets(generateTickets())
+      // No fallback - require API connection
     }
   }
 
@@ -348,7 +240,7 @@ function App() {
           <AlertTriangle className="w-12 h-12 text-red-400 mx-auto mb-4" />
           <h2 className="text-xl font-bold text-gray-100 mb-2">Connection Error</h2>
           <p className="text-gray-400 mb-4">{error}</p>
-          <p className="text-sm text-gray-500 mb-4">Using simulated data as fallback</p>
+          <p className="text-sm text-gray-500 mb-4">Please ensure the backend API is running on port 8000</p>
           <button
             onClick={fetchData}
             className="px-4 py-2 bg-cauldron-purple text-white rounded-lg hover:bg-cauldron-purple/80 transition-colors"
@@ -1091,7 +983,21 @@ function App() {
                   />
                   
                   {/* Enchanted Market marker */}
-                  <Marker position={[ENCHANTED_MARKET_LAT, ENCHANTED_MARKET_LNG]} icon={marketIcon}>
+                  <Marker 
+                    position={[ENCHANTED_MARKET_LAT, ENCHANTED_MARKET_LNG]} 
+                    icon={marketIcon}
+                    eventHandlers={{
+                      mouseover: () => {
+                        const marketNode = Object.keys(networkMap).find(key => 
+                          key.toLowerCase().includes('market') || key === 'enchanted_market'
+                        ) || 'market_001'
+                        setHoveredNode(marketNode)
+                      },
+                      mouseout: () => {
+                        setHoveredNode(null)
+                      },
+                    }}
+                  >
                     <Popup>
                       <div className="text-center">
                         <div className="font-bold text-purple-400 text-lg mb-1">🏪 Enchanted Market</div>
@@ -1124,6 +1030,13 @@ function App() {
                         icon={icon}
                         eventHandlers={{
                           click: () => setSelectedCauldron(cauldron),
+                          mouseover: () => {
+                            const cauldronId = cauldron.cauldron_id || cauldron.id || ''
+                            setHoveredNode(cauldronId)
+                          },
+                          mouseout: () => {
+                            setHoveredNode(null)
+                          },
                         }}
                       >
                         <Popup>
@@ -1162,12 +1075,19 @@ function App() {
                       : '#8b5cf6'
                     
                     const travelTime = getTravelTimeToMarket(cauldron)
+                    const cauldronId = cauldron.cauldron_id || cauldron.id || ''
+                    const marketNode = Object.keys(networkMap).find(key => 
+                      key.toLowerCase().includes('market') || key === 'enchanted_market'
+                    ) || 'market_001'
+                    
+                    // Check if this connection should be highlighted (either node is hovered)
+                    const isHighlighted = hoveredNode === cauldronId || hoveredNode === marketNode
                     
                     // Calculate midpoint for label placement
                     const midLat = (cauldron.latitude + ENCHANTED_MARKET_LAT) / 2
                     const midLng = (cauldron.longitude + ENCHANTED_MARKET_LNG) / 2
                     
-                    // Create custom icon for travel time label
+                    // Create custom icon for travel time label (only show when hovered)
                     const travelTimeIcon = L.divIcon({
                       className: 'travel-time-label',
                       html: `<div style="
@@ -1197,8 +1117,8 @@ function App() {
                           ]}
                           pathOptions={{
                             color: color,
-                            weight: 2,
-                            opacity: 0.4,
+                            weight: isHighlighted ? 3 : 2,
+                            opacity: isHighlighted ? 0.8 : 0.4,
                             dashArray: '5, 5',
                           }}
                           eventHandlers={{
@@ -1210,8 +1130,8 @@ function App() {
                             },
                             mouseout: (e) => {
                               e.target.setStyle({
-                                opacity: 0.4,
-                                weight: 2,
+                                opacity: isHighlighted ? 0.8 : 0.4,
+                                weight: isHighlighted ? 3 : 2,
                               })
                             },
                           }}
@@ -1233,16 +1153,151 @@ function App() {
                             </div>
                           </LeafletTooltip>
                         </Polyline>
-                        {/* Travel time label at midpoint */}
-                        <Marker
-                          key={`label-${cauldron.cauldron_id || cauldron.id}`}
-                          position={[midLat, midLng]}
-                          icon={travelTimeIcon}
-                          interactive={false}
-                        />
+                        {/* Travel time label at midpoint - only show when hovering over connected node */}
+                        {isHighlighted && (
+                          <Marker
+                            key={`label-${cauldron.cauldron_id || cauldron.id}`}
+                            position={[midLat, midLng]}
+                            icon={travelTimeIcon}
+                            interactive={false}
+                          />
+                        )}
                       </>
                     )
                   })}
+
+                  {/* Connection lines between neighboring cauldrons */}
+                  {(() => {
+                    const connections = []
+                    const drawnConnections = new Set() // Track drawn connections to avoid duplicates
+                    
+                    // Iterate through all cauldrons and find their neighbors
+                    validCauldrons.forEach((cauldron1) => {
+                      const cauldron1Id = cauldron1.cauldron_id || cauldron1.id || ''
+                      
+                      // Check all connections from this cauldron in the network map
+                      if (networkMap[cauldron1Id]) {
+                        Object.keys(networkMap[cauldron1Id]).forEach((neighborId) => {
+                          // Skip market connections (already drawn above)
+                          if (neighborId.toLowerCase().includes('market')) return
+                          
+                          // Find the neighbor cauldron
+                          const neighborCauldron = validCauldrons.find(c => 
+                            (c.cauldron_id || c.id) === neighborId
+                          )
+                          
+                          if (!neighborCauldron) return
+                          
+                          // Create a unique key for this connection (bidirectional)
+                          const connectionKey = [cauldron1Id, neighborId].sort().join('-')
+                          if (drawnConnections.has(connectionKey)) return
+                          drawnConnections.add(connectionKey)
+                          
+                          const travelTime = networkMap[cauldron1Id][neighborId]
+                          if (travelTime && travelTime > 0) {
+                            connections.push({
+                              from: cauldron1,
+                              to: neighborCauldron,
+                              travelTime: travelTime,
+                              key: connectionKey
+                            })
+                          }
+                        })
+                      }
+                    })
+                    
+                    return connections.map((connection) => {
+                      const { from, to, travelTime, key } = connection
+                      const fromId = from.cauldron_id || from.id || ''
+                      const toId = to.cauldron_id || to.id || ''
+                      
+                      // Check if this connection should be highlighted (either node is hovered)
+                      const isHighlighted = hoveredNode === fromId || hoveredNode === toId
+                      
+                      // Use average color or neutral gray for cauldron-to-cauldron connections
+                      const connectionColor = '#6b7280' // Gray for cauldron-to-cauldron
+                      
+                      // Calculate midpoint for label
+                      const midLat = (from.latitude + to.latitude) / 2
+                      const midLng = (from.longitude + to.longitude) / 2
+                      
+                      // Create custom icon for travel time label (only show when hovered)
+                      const travelTimeIcon = L.divIcon({
+                        className: 'travel-time-label',
+                        html: `<div style="
+                          background: rgba(15, 15, 20, 0.95);
+                          backdrop-filter: blur(10px);
+                          border: 2px solid ${connectionColor};
+                          border-radius: 6px;
+                          padding: 4px 8px;
+                          color: ${connectionColor};
+                          font-weight: bold;
+                          font-size: 11px;
+                          white-space: nowrap;
+                          box-shadow: 0 0 10px ${connectionColor}80;
+                          text-align: center;
+                        ">${travelTime.toFixed(1)} min</div>`,
+                        iconSize: [null, null],
+                        iconAnchor: [0, 0],
+                      })
+                      
+                      return (
+                        <div key={key} style={{ display: 'contents' }}>
+                          <Polyline
+                            positions={[
+                              [from.latitude, from.longitude],
+                              [to.latitude, to.longitude]
+                            ]}
+                            pathOptions={{
+                              color: connectionColor,
+                              weight: isHighlighted ? 2 : 1.5,
+                              opacity: isHighlighted ? 0.6 : 0.3,
+                              dashArray: '3, 3',
+                            }}
+                            eventHandlers={{
+                              mouseover: (e) => {
+                                e.target.setStyle({
+                                  opacity: 0.6,
+                                  weight: 2,
+                                })
+                              },
+                              mouseout: (e) => {
+                                e.target.setStyle({
+                                  opacity: isHighlighted ? 0.6 : 0.3,
+                                  weight: isHighlighted ? 2 : 1.5,
+                                })
+                              },
+                            }}
+                          >
+                            <LeafletTooltip 
+                              permanent={false} 
+                              direction="center" 
+                              className="travel-time-tooltip"
+                              interactive={true}
+                              sticky={true}
+                            >
+                              <div className="text-center">
+                                <div className="font-semibold text-gray-200 text-xs">
+                                  {from.name} → {to.name}
+                                </div>
+                                <div className="text-sm text-gray-300 font-bold">
+                                  {travelTime.toFixed(1)} min
+                                </div>
+                              </div>
+                            </LeafletTooltip>
+                          </Polyline>
+                          {/* Travel time label at midpoint - only show when hovering over connected node */}
+                          {isHighlighted && (
+                            <Marker
+                              position={[midLat, midLng]}
+                              icon={travelTimeIcon}
+                              interactive={false}
+                            />
+                          )}
+                        </div>
+                      )
+                    })
+                  })()}
                 </MapContainer>
               )
             })()}

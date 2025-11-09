@@ -93,7 +93,9 @@ class TransportLogSimulator:
         self._rng = random.Random(1717)
         self._tickets: Deque[TransportTicket] = deque(maxlen=300)
         self._cauldron_ids = tuple(cauldron_ids)
-        self._courier_pool = ("wyvern_01", "wyvern_02", "griffin_03", "banshee_07")
+        # Courier pool - should be fetched from API, not hardcoded
+        # Empty pool means simulator should not be used (API only)
+        self._courier_pool = ()
 
     def sample(self) -> List[TransportTicket]:
         """Return a burst of recent transport tickets."""
@@ -113,7 +115,8 @@ class TransportLogSimulator:
                 cauldron_id=cauldron_id,
                 volume_liters=volume,
                 direction=direction,
-                courier_id=self._rng.choice(self._courier_pool),
+                # No fallback courier - simulator should not be used
+                courier_id="unknown_courier",
                 date=ticket_date,  # EOG requirement: date only
                 timestamp=ticket_timestamp,  # Optional internal timestamp
             )
